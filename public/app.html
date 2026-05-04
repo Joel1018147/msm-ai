@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-SM AI — Intelligent Marketing Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   M-SM AI — Design System
+   Aesthetic: Premium Warm Light — cream whites, 
+   deep navy, burnt orange accents. Clean, confident,
+   high-trust SaaS feel.
+═══════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Core palette */
+  --cream:#FAF8F4;
+  --cream2:#F2EFE8;
+  --cream3:#E8E4DC;
+  --white:#FFFFFF;
+  --navy:#0D1B2A;
+  --navy2:#1A2D42;
+  --navy3:#243B55;
+  --steel:#3D5A73;
+  --slate:#607D94;
+  --mist:#8EA3B5;
+  --silver:#B8C8D5;
+  --fog:#D4DFE8;
+  --orange:#E8622A;
+  --orange2:#F07340;
+  --orange3:#FF8F66;
+  --orange-bg:rgba(232,98,42,0.08);
+  --orange-glow:rgba(232,98,42,0.15);
+  --teal:#1A8F7A;
+  --teal-bg:rgba(26,143,122,0.08);
+  --violet:#6B4FBB;
+  --violet-bg:rgba(107,79,187,0.08);
+  --gold:#C9941A;
+  --gold-bg:rgba(201,148,26,0.1);
+  --red:#C0392B;
+  --red-bg:rgba(192,57,43,0.08);
+  /* Spacing & shape */
+  --r:12px;--r-sm:8px;--r-lg:18px;--r-xl:24px;
+  /* Shadows */
+  --shadow-sm:0 1px 3px rgba(13,27,42,0.08),0 1px 2px rgba(13,27,42,0.04);
+  --shadow:0 4px 16px rgba(13,27,42,0.08),0 2px 6px rgba(13,27,42,0.05);
+  --shadow-lg:0 12px 40px rgba(13,27,42,0.12),0 4px 12px rgba(13,27,42,0.06);
+}
+html,body{height:100%;overflow:hidden;background:var(--cream)}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;flex-direction:column}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--fog);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--silver)}
+
+/* ══ SIDEBAR ══════════════════════════════════ */
+.app-shell{display:flex;flex:1;overflow:hidden}
+.sidebar{
+  width:242px;min-width:242px;
+  background:var(--navy);
+  height:100vh;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+  position:relative;
+}
+.sidebar::after{
+  content:'';
+  position:absolute;top:0;right:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,0.07) 30%,rgba(255,255,255,0.07) 70%,transparent);
+}
+.sb-logo{
+  padding:22px 18px 20px;
+  display:flex;align-items:center;gap:11px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.logo-glyph{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--orange),#C44E1E);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-weight:700;font-size:17px;
+  color:white;flex-shrink:0;
+  box-shadow:0 4px 12px rgba(232,98,42,0.4);
+}
+.logo-name{
+  font-family:'Fraunces',serif;
+  font-size:19px;font-weight:700;color:white;
+  letter-spacing:-0.3px;line-height:1.1;
+}
+.logo-name em{font-style:normal;color:var(--orange3)}
+.logo-tag{font-size:9px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.35);text-transform:uppercase}
+
+.sb-section{
+  padding:18px 16px 5px;
+  font-size:10px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;color:rgba(255,255,255,0.28);
+}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;margin:1px 8px;
+  border-radius:var(--r-sm);
+  cursor:pointer;color:rgba(255,255,255,0.5);
+  font-size:13px;font-weight:500;
+  border:none;background:none;width:calc(100% - 16px);text-align:left;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all .15s;position:relative;
+}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8)}
+.sb-item.active{background:rgba(232,98,42,0.18);color:white}
+.sb-item.active::before{
+  content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+  width:3px;height:18px;background:var(--orange);border-radius:0 2px 2px 0;
+}
+.sb-icon{width:16px;height:16px;flex-shrink:0;opacity:0.7}
+.sb-item.active .sb-icon{opacity:1}
+.sb-badge{
+  margin-left:auto;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+  background:var(--orange-glow);color:var(--orange3);
+  border:1px solid rgba(232,98,42,0.25);
+}
+.sb-bottom{
+  margin-top:auto;
+  padding:14px 10px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+.user-tile{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:var(--r-sm);cursor:pointer;
+  transition:background .15s;
+}
+.user-tile:hover{background:rgba(255,255,255,0.05)}
+.u-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:white;flex-shrink:0;
+}
+.u-info{flex:1;min-width:0}
+.u-name{font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u-plan{font-size:11px;color:rgba(255,255,255,0.35);margin-top:1px}
+
+/* ══ MAIN AREA ═════════════════════════════════ */
+.main-area{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--cream);
+}
+.topbar{
+  height:58px;min-height:58px;
+  background:var(--white);
+  border-bottom:1px solid var(--fog);
+  display:flex;align-items:center;padding:0 28px;gap:14px;
+  box-shadow:var(--shadow-sm);
+  flex-shrink:0;z-index:10;
+}
+.topbar-title{
+  font-family:'Fraunces',serif;
+  font-size:19px;font-weight:600;color:var(--navy);flex:1;
+  letter-spacing:-0.2px;
+}
+.cred-chip{
+  display:flex;align-items:center;gap:7px;
+  background:var(--teal-bg);border:1px solid rgba(26,143,122,0.2);
+  padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:600;color:var(--teal);
+  font-family:'JetBrains Mono',monospace;
+}
+.cred-dot{width:7px;height:7px;background:var(--teal);border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 18px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:600;cursor:pointer;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;
+  white-space:nowrap;
+}
+.btn-primary{background:var(--orange);color:white;box-shadow:0 2px 8px rgba(232,98,42,0.3)}
+.btn-primary:hover{background:var(--orange2);box-shadow:0 4px 14px rgba(232,98,42,0.4);transform:translateY(-1px)}
+.btn-outline{background:var(--white);color:var(--navy2);border:1px solid var(--fog)}
+.btn-outline:hover{background:var(--cream);border-color:var(--silver)}
+.btn-navy{background:var(--navy);color:white}
+.btn-navy:hover{background:var(--navy2)}
+.btn-sm{padding:6px 14px;font-size:12px}
+
+/* ══ PAGES ═════════════════════════════════════ */
+.page{display:none;flex:1;flex-direction:column;overflow:hidden}
+.page.active{display:flex}
+.page-body{flex:1;overflow-y:auto;padding:28px}
+
+/* ══ DASHBOARD ════════════════════════════════ */
+.dash-banner{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);
+  padding:28px 32px;position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+.dash-banner::before{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,98,42,0.15) 0%,transparent 70%);
+}
+.dash-banner::after{
+  content:'M';position:absolute;right:32px;bottom:-20px;
+  font-family:'Fraunces',serif;font-size:160px;font-weight:700;
+  color:rgba(255,255,255,0.03);line-height:1;
+}
+.banner-hello{font-size:13px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:.5px;margin-bottom:4px}
+.banner-title{
+  font-family:'Fraunces',serif;
+  font-size:26px;font-weight:700;color:white;
+  letter-spacing:-.4px;margin-bottom:6px;
+}
+.banner-sub{font-size:13px;color:rgba(255,255,255,0.5);max-width:480px;line-height:1.6}
+.metrics-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px;padding:24px 28px;flex-shrink:0;
+}
+.m-card{
+  background:var(--white);border:1px solid var(--fog);
+  border-radius:var(--r);padding:18px 20px;
+  box-shadow:var(--shadow-sm);transition:all .2s;
+}
+.m-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.m-card-label{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mist);margin-bottom:8px}
+.m-card-val{
+  font-family:'Fraunces',serif;
+  font-size:30px;font-weight:700;color:var(--navy);margin-bottom:4px;
+  letter-spacing:-.5px;line-height:1;
+}
+.m-card-delta{font-size:12px;font-weight:600}
+.delta-up{color:var(--teal)}
+.delta-neu{color:var(--mist)}
+.dash-grid{
+  display:grid;grid-template-columns:1fr 320px;
+  gap:18px;padding:0 28px 28px;flex:1;
+}
+.panel{
+  background:var(--white);border:1px solid var(--fog);
+  border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 20px;border-bottom:1px solid var(--fog);
+}
+.panel-title{font-size:14px;font-weight:700;color:var(--navy)}
+.panel-action{font-size:12px;font-weight:600;color:var(--orange);cursor:pointer}
+.panel-action:hover{text-decoration:underline}
+.panel-body{padding:6px 0}
+.recent-row{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 20px;cursor:pointer;transition:background .15s;
+}
+.recent-row:hover{background:var(--cream)}
+.rr-ico{
+  width:36px;height:36px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+}
+.rr-info{flex:1;min-width:0}
+.rr-name{font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rr-meta{font-size:11px;color:var(--mist);margin-top:2px}
+.rr-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0}
+
+/* Quick tools */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px}
+.q-tile{
+  background:var(--cream);border:1px solid var(--fog);
+  border-radius:var(--r-sm);padding:13px;cursor:pointer;
+  transition:all .2s;text-align:left;border:1px solid var(--fog);
+  border-top-width:2px;border-top-color:transparent;
+}
+.q-tile:hover{background:var(--white);border-top-color:var(--orange);box-shadow:var(--shadow-sm)}
+.qt-ic{font-size:20px;margin-bottom:6px}
+.qt-nm{font-size:12px;font-weight:700;color:var(--navy)}
+
+/* Progress */
+.progress-wrap{padding:14px 20px}
+.progress-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.progress-label{font-size:12px;font-weight:600;color:var(--slate)}
+.progress-pct{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--mist)}
+.progress-track{height:7px;background:var(--fog);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange3));border-radius:4px;transition:width .4s}
+.progress-note{font-size:11px;color:var(--mist)}
+
+/* ══ TOOLS PAGE ════════════════════════════════ */
+.tools-header{
+  background:var(--white);border-bottom:1px solid var(--fog);
+  padding:20px 28px 0;flex-shrink:0;
+}
+.tools-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.page-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+.page-subtitle{font-size:13px;color:var(--mist);margin-top:2px}
+.search-bar{
+  position:relative;
+  max-width:340px;width:100%;
+}
+.search-bar input{
+  width:100%;padding:9px 14px 9px 38px;
+  background:var(--cream);border:1px solid var(--fog);
+  border-radius:var(--r-sm);font-size:13px;color:var(--navy);
+  font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:all .15s;
+}
+.search-bar input:focus{border-color:var(--orange);background:var(--white);box-shadow:0 0 0 3px var(--orange-bg)}
+.search-bar input::placeholder{color:var(--silver)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--mist);font-size:14px;pointer-events:none}
+.cat-row{
+  display:flex;gap:4px;overflow-x:auto;padding-bottom:0;
+  scrollbar-width:none;
+}
+.cat-row::-webkit-scrollbar{display:none}
+.cat-pill{
+  padding:8px 16px;border-radius:var(--r-sm) var(--r-sm) 0 0;
+  font-size:12px;font-weight:700;cursor:pointer;
+  border:none;background:transparent;color:var(--mist);
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+  border-bottom:3px solid transparent;white-space:nowrap;
+}
+.cat-pill:hover{color:var(--navy);background:var(--cream)}
+.cat-pill.active{color:var(--orange);background:var(--orange-bg);border-bottom-color:var(--orange)}
+.tools-canvas{flex:1;overflow-y:auto;padding:22px 28px}
+.tools-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));
+  gap:14px;
+}
+.tool-card{
+  background:var(--white);border:1px solid var(--fog);
+  border-radius:var(--r);padding:20px;cursor:pointer;
+  transition:all .22s;position:relative;overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+.tool-card:hover{box-shadow:var(--shadow);transform:translateY(-3px);border-color:var(--orange)}
+.tool-card .tc-stripe{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--tc-color,var(--orange));opacity:0;transition:opacity .22s;
+}
+.tool-card:hover .tc-stripe{opacity:1}
+.tc-icon{
+  width:44px;height:44px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:13px;
+}
+.tc-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:5px;line-height:1.3}
+.tc-desc{font-size:12px;color:var(--mist);line-height:1.55}
+.tc-badge{
+  position:absolute;top:13px;right:13px;
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+}
+
+/* ══ EDITOR ════════════════════════════════════ */
+.editor-layout{
+  display:grid;grid-template-columns:320px 1fr;
+  flex:1;overflow:hidden;
+}
+.form-panel{
+  background:var(--white);border-right:1px solid var(--fog);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.form-head{
+  padding:16px 20px;border-bottom:1px solid var(--fog);
+  display:flex;align-items:center;gap:10px;
+  position:sticky;top:0;background:var(--white);z-index:5;
+}
+.back-btn{
+  display:flex;align-items:center;gap:5px;
+  font-size:12px;color:var(--mist);cursor:pointer;
+  border:none;background:none;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  padding:5px 8px;border-radius:6px;transition:all .15s;
+}
+.back-btn:hover{background:var(--cream2);color:var(--slate)}
+.form-tool-name{font-size:14px;font-weight:700;color:var(--navy)}
+.form-section{padding:14px 18px;border-bottom:1px solid var(--fog)}
+.f-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mist);margin-bottom:7px}
+.f-input,.f-textarea,.f-select{
+  width:100%;padding:9px 13px;
+  background:var(--cream);border:1px solid var(--fog);
+  border-radius:var(--r-sm);font-size:13px;color:var(--navy);
+  font-family:'Plus Jakarta Sans',sans-serif;outline:none;
+  transition:all .15s;
+}
+.f-input:focus,.f-textarea:focus,.f-select:focus{
+  border-color:var(--orange);background:var(--white);
+  box-shadow:0 0 0 3px var(--orange-bg);
+}
+.f-textarea{resize:vertical;min-height:82px;line-height:1.6}
+.f-select option{background:var(--white);color:var(--navy)}
+.tone-wrap{display:flex;flex-wrap:wrap;gap:5px}
+.tone-tag{
+  padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  cursor:pointer;border:1px solid var(--fog);background:var(--cream);
+  color:var(--mist);font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+}
+.tone-tag:hover{border-color:var(--orange);color:var(--orange)}
+.tone-tag.on{background:var(--orange-bg);border-color:var(--orange);color:var(--orange)}
+.form-footer{padding:16px 18px;position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--fog)}
+
+/* Output panel */
+.output-panel{
+  display:flex;flex-direction:column;background:var(--cream);overflow:hidden;
+}
+.out-header{
+  background:var(--white);border-bottom:1px solid var(--fog);
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.out-tabs{display:flex;gap:2px}
+.out-tab{
+  padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;
+  cursor:pointer;border:none;background:none;color:var(--mist);
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+}
+.out-tab.active{background:var(--cream2);color:var(--navy)}
+.out-actions-row{display:flex;gap:8px}
+.out-body{flex:1;overflow-y:auto;padding:22px}
+.out-empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;height:100%;gap:13px;color:var(--silver);text-align:center;
+}
+.oe-mark{font-size:48px;opacity:.3;line-height:1}
+.oe-label{font-size:14px;max-width:220px;line-height:1.6;color:var(--mist)}
+.out-loading{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:18px}
+.loader{
+  width:40px;height:40px;border:2.5px solid var(--fog);
+  border-top-color:var(--orange);border-radius:50%;
+  animation:spin .75s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:13px;color:var(--mist);font-weight:500}
+.out-results{display:none;flex-direction:column;gap:14px}
+.result-block{
+  background:var(--white);border:1px solid var(--fog);
+  border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);
+  transition:box-shadow .2s;
+}
+.result-block:hover{box-shadow:var(--shadow)}
+.rb-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:var(--cream);border-bottom:1px solid var(--fog);
+}
+.rb-label{
+  font-size:10px;font-weight:800;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--orange);
+  font-family:'JetBrains Mono',monospace;
+}
+.rb-acts{display:flex;gap:2px}
+.icon-btn{
+  width:28px;height:28px;border:none;background:none;
+  border-radius:6px;cursor:pointer;font-size:13px;
+  color:var(--mist);transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.icon-btn:hover{background:var(--cream2);color:var(--navy)}
+.rb-text{padding:16px 18px;font-size:13.5px;line-height:1.78;color:var(--navy2);white-space:pre-wrap}
+.edit-textarea{
+  width:100%;min-height:320px;padding:16px;
+  border:none;background:transparent;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;
+  color:var(--navy2);line-height:1.78;resize:none;outline:none;
+  display:none;
+}
+
+/* ══ CHAT ══════════════════════════════════════ */
+.chat-shell{display:flex;flex-direction:column;flex:1;overflow:hidden;padding:20px 28px 0;gap:0}
+.chat-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0}
+.chat-window{
+  flex:1;overflow-y:auto;
+  background:var(--white);border:1px solid var(--fog);
+  border-radius:var(--r) var(--r) 0 0;padding:20px;
+  display:flex;flex-direction:column;gap:18px;
+  box-shadow:var(--shadow-sm);
+}
+.msg{display:flex;gap:11px;max-width:780px}
+.msg.user{flex-direction:row-reverse;margin-left:auto}
+.m-av{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;
+}
+.msg.ai .m-av{background:var(--orange-bg);border:1px solid rgba(232,98,42,0.2);color:var(--orange)}
+.msg.user .m-av{background:var(--navy);color:white}
+.m-bubble{
+  padding:12px 16px;border-radius:var(--r);
+  font-size:13.5px;line-height:1.72;
+}
+.msg.ai .m-bubble{background:var(--cream);border:1px solid var(--fog);color:var(--navy2);border-bottom-left-radius:4px}
+.msg.user .m-bubble{background:var(--navy);color:rgba(255,255,255,0.92);border-bottom-right-radius:4px}
+.chat-input-bar{
+  display:flex;gap:10px;align-items:flex-end;
+  background:var(--white);
+  border:1px solid var(--fog);border-top:none;
+  border-radius:0 0 var(--r) var(--r);
+  padding:12px 14px;margin-bottom:20px;
+  box-shadow:var(--shadow-sm);
+}
+.chat-ta{
+  flex:1;padding:10px 13px;
+  background:var(--cream);border:1px solid var(--fog);
+  border-radius:var(--r-sm);font-size:13px;
+  color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif;
+  outline:none;resize:none;min-height:42px;max-height:130px;
+  line-height:1.5;transition:all .15s;
+}
+.chat-ta:focus{border-color:var(--orange);background:var(--white);box-shadow:0 0 0 3px var(--orange-bg)}
+.chat-ta::placeholder{color:var(--silver)}
+
+/* ══ DOCUMENTS ══════════════════════════════════ */
+.docs-shell{flex:1;overflow-y:auto;padding:26px 28px}
+.docs-toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.filters-row{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.filter-btn{
+  padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  cursor:pointer;border:1px solid var(--fog);background:var(--white);
+  color:var(--mist);font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+}
+.filter-btn:hover{border-color:var(--orange);color:var(--orange)}
+.filter-btn.active{background:var(--orange);color:white;border-color:var(--orange)}
+.doc-table-wrap{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm)}
+.doc-table{width:100%;border-collapse:collapse}
+.doc-table th{
+  text-align:left;padding:12px 16px;
+  font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--mist);background:var(--cream);border-bottom:1px solid var(--fog);
+}
+.doc-table td{
+  padding:13px 16px;border-bottom:1px solid var(--fog);
+  font-size:13px;color:var(--navy2);vertical-align:middle;
+}
+.doc-table tr:last-child td{border-bottom:none}
+.doc-table tr:hover td{background:var(--cream)}
+.doc-table tr{cursor:pointer;transition:background .12s}
+.doc-type-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+
+/* ══ SEO ════════════════════════════════════════ */
+.seo-shell{flex:1;overflow-y:auto;padding:26px 28px}
+.seo-intro{
+  background:linear-gradient(135deg,var(--navy),var(--navy3));
+  border-radius:var(--r-lg);padding:28px 32px;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.seo-intro::before{
+  content:'';position:absolute;right:-40px;top:-40px;width:220px;height:220px;
+  border-radius:50%;background:radial-gradient(circle,rgba(232,98,42,.15),transparent 70%);
+}
+.seo-intro-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:white;margin-bottom:6px;letter-spacing:-.3px}
+.seo-intro-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:500px}
+.seo-tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.seo-tile{
+  background:var(--white);border:1px solid var(--fog);border-radius:var(--r);
+  padding:22px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow-sm);
+  border-top:3px solid transparent;
+}
+.seo-tile:hover{box-shadow:var(--shadow);border-top-color:var(--orange);transform:translateY(-2px)}
+.st-icon{font-size:28px;margin-bottom:12px}
+.st-name{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.st-desc{font-size:12px;color:var(--mist);line-height:1.6}
+.st-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.st-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--orange-bg);color:var(--orange)}
+
+/* ══ TEMPLATES ══════════════════════════════════ */
+.tpl-shell{flex:1;overflow-y:auto;padding:26px 28px}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:20px}
+.tpl-card{
+  background:var(--white);border:1px solid var(--fog);
+  border-radius:var(--r);padding:20px;cursor:pointer;
+  transition:all .2s;box-shadow:var(--shadow-sm);
+}
+.tpl-card:hover{box-shadow:var(--shadow);border-color:var(--orange);transform:translateY(-2px)}
+.tpl-ic{font-size:28px;margin-bottom:10px}
+.tpl-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:5px}
+.tpl-desc{font-size:12px;color:var(--mist);line-height:1.55}
+.tpl-use{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;color:var(--orange);
+  margin-top:12px;
+}
+
+/* ══ SETTINGS ═══════════════════════════════════ */
+.settings-layout{display:grid;grid-template-columns:200px 1fr;flex:1;overflow:hidden}
+.settings-nav{
+  background:var(--white);border-right:1px solid var(--fog);
+  padding:16px 8px;overflow-y:auto;
+}
+.sn-section{font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--silver);padding:12px 10px 5px}
+.sn-item{
+  display:flex;align-items:center;gap:8px;padding:9px 12px;
+  border-radius:var(--r-sm);cursor:pointer;font-size:13px;font-weight:600;
+  color:var(--slate);transition:all .15s;
+}
+.sn-item:hover{background:var(--cream);color:var(--navy)}
+.sn-item.active{background:var(--orange-bg);color:var(--orange)}
+.settings-content{overflow-y:auto;padding:28px}
+.sc-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--fog);letter-spacing:-.2px}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--fog)}
+.s-row:last-of-type{border-bottom:none}
+.s-info .s-lbl{font-size:14px;font-weight:600;color:var(--navy)}
+.s-info .s-desc{font-size:12px;color:var(--mist);margin-top:2px;line-height:1.5}
+.toggle-sw{
+  width:44px;height:24px;background:var(--fog);border-radius:12px;
+  cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;
+}
+.toggle-sw.on{background:var(--teal)}
+.toggle-sw::after{
+  content:'';width:18px;height:18px;background:white;border-radius:50%;
+  position:absolute;top:3px;left:3px;transition:transform .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-sw.on::after{transform:translateX(20px)}
+.api-row{display:flex;gap:10px;align-items:center;width:100%;margin-top:12px}
+.api-ok{font-size:12px;font-weight:700;color:var(--teal);display:none;font-family:'JetBrains Mono',monospace}
+.api-ok.show{display:block}
+.info-box{
+  background:var(--orange-bg);border:1px solid rgba(232,98,42,.15);
+  border-radius:var(--r-sm);padding:14px 16px;
+  font-size:12px;color:var(--steel);line-height:1.7;margin-top:12px;
+}
+
+/* ══ BILLING ════════════════════════════════════ */
+.billing-shell{flex:1;overflow-y:auto;padding:26px 28px}
+.current-plan-banner{
+  background:linear-gradient(135deg,var(--navy),var(--navy3));
+  border-radius:var(--r-lg);padding:22px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;overflow:hidden;position:relative;
+}
+.current-plan-banner::after{
+  content:'PRO';position:absolute;right:24px;top:50%;transform:translateY(-50%);
+  font-family:'Fraunces',serif;font-size:80px;font-weight:700;
+  color:rgba(255,255,255,0.04);
+}
+.cpb-left .cpb-tag{font-size:11px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:4px}
+.cpb-left .cpb-name{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:white;letter-spacing:-.3px}
+.cpb-left .cpb-price{font-size:13px;color:rgba(255,255,255,.5);margin-top:3px}
+.cpb-right{text-align:right}
+.cpb-cred-label{font-size:11px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.cpb-cred-val{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:white}
+.cpb-bar{width:160px;height:5px;background:rgba(255,255,255,.15);border-radius:3px;margin-top:7px;margin-left:auto}
+.cpb-fill{height:100%;background:var(--orange3);border-radius:3px}
+.plan-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.plan-card{
+  background:var(--white);border:1px solid var(--fog);
+  border-radius:var(--r-lg);padding:24px;
+  box-shadow:var(--shadow-sm);transition:all .2s;
+}
+.plan-card.featured{border-color:var(--orange);box-shadow:0 0 0 1px var(--orange),var(--shadow)}
+.plan-card-tag{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--mist);margin-bottom:4px}
+.plan-card-name{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.2px}
+.plan-price-row{display:flex;align-items:baseline;gap:2px;margin:14px 0}
+.plan-price-curr{font-size:18px;font-weight:700;color:var(--navy)}
+.plan-price-amt{font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--navy);line-height:1}
+.plan-price-period{font-size:13px;color:var(--mist)}
+.plan-features{list-style:none;margin:16px 0}
+.plan-features li{font-size:12px;color:var(--steel);padding:5px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.plan-features li::before{content:'✓';color:var(--teal);font-weight:800;flex-shrink:0}
+
+/* ══ TOAST ══════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:22px;right:22px;
+  background:var(--navy);color:white;
+  padding:13px 20px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:600;
+  transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  z-index:9999;max-width:320px;line-height:1.5;
+  box-shadow:var(--shadow-lg);
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--teal)}
+.toast.error{background:var(--red)}
+
+/* ══ RESPONSIVE ═════════════════════════════════ */
+@media(max-width:1000px){
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-grid{grid-template-columns:1fr}
+  .editor-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<!-- ════════════════ SIDEBAR ════════════════ -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="logo-glyph">M</div>
+    <div>
+      <div class="logo-name">M-SM <em>AI</em></div>
+      <div class="logo-tag">Marketing Platform</div>
+    </div>
+  </div>
+
+  <div class="sb-section">Main</div>
+  <button class="sb-item active" onclick="goTo('dashboard')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="6" height="6" rx="1.3"/><rect x="10" y="2" width="6" height="6" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
+    Dashboard
+  </button>
+  <button class="sb-item" onclick="goTo('tools')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 5a3 3 0 01-4 2.83V16a1.5 1.5 0 01-3 0V7.83A3 3 0 1110 5V12a.5.5 0 001 0V5z"/></svg>
+    AI Tools
+    <span class="sb-badge">40+</span>
+  </button>
+  <button class="sb-item" onclick="goTo('chat')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 9c0 3.866-2.686 7-6 7a5.97 5.97 0 01-3-.8L3 16l.8-3A6 6 0 113 9c0-3.314 2.686-6 6-6s6 2.686 6 6z"/></svg>
+    AI Chat
+  </button>
+
+  <div class="sb-section">Content</div>
+  <button class="sb-item" onclick="goTo('documents')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 2H5a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V7l-4-5z"/><path d="M10 2v5h5"/></svg>
+    Documents
+  </button>
+  <button class="sb-item" onclick="goTo('seo')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.5" cy="7.5" r="4.5"/><path d="M13.5 13.5l-2.5-2.5"/></svg>
+    SEO Suite
+  </button>
+  <button class="sb-item" onclick="goTo('templates')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="14" height="5" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
+    Templates
+  </button>
+
+  <div class="sb-section">Account</div>
+  <button class="sb-item" onclick="goTo('settings')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="2.5"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42"/></svg>
+    Settings
+  </button>
+  <button class="sb-item" onclick="goTo('billing')">
+    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="4" width="14" height="11" rx="2"/><path d="M2 8h14"/></svg>
+    Billing
+  </button>
+
+  <div class="sb-bottom">
+    <div class="user-tile">
+      <div class="u-avatar">JD</div>
+      <div class="u-info">
+        <div class="u-name">John Doe</div>
+        <div class="u-plan">Pro Plan · 4,820 credits</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════ MAIN AREA ════════════════ -->
+<div class="main-area">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="cred-chip">
+      <div class="cred-dot"></div>
+      <span id="cred-count">4,820 credits</span>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="goTo('settings')" style="gap:5px">⚙ Settings</button>
+    <button class="btn btn-primary btn-sm" onclick="goTo('tools')">＋ New Content</button>
+  </div>
+
+  <!-- ══ DASHBOARD PAGE ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="dash-banner">
+      <div class="banner-hello">Good day ☀</div>
+      <div class="banner-title">Welcome back, John</div>
+      <div class="banner-sub">Your AI marketing engine is ready. You've created 312 pieces of content this month — keep the momentum going.</div>
+    </div>
+    <div class="metrics-grid">
+      <div class="m-card">
+        <div class="m-card-label">Words Generated</div>
+        <div class="m-card-val">148K</div>
+        <div class="m-card-delta delta-up">↑ 23% this month</div>
+      </div>
+      <div class="m-card">
+        <div class="m-card-label">Documents</div>
+        <div class="m-card-val">312</div>
+        <div class="m-card-delta delta-up">+18 this week</div>
+      </div>
+      <div class="m-card">
+        <div class="m-card-label">Credits Used</div>
+        <div class="m-card-val">5,180</div>
+        <div class="m-card-delta delta-neu">4,820 remaining</div>
+      </div>
+      <div class="m-card">
+        <div class="m-card-label">Top Tool</div>
+        <div class="m-card-val" style="font-size:18px;line-height:1.4">Blog Writer</div>
+        <div class="m-card-delta delta-neu">47 uses</div>
+      </div>
+    </div>
+    <div class="dash-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Recent Documents</div>
+          <div class="panel-action" onclick="goTo('documents')">View all →</div>
+        </div>
+        <div class="panel-body">
+          <div class="recent-row" onclick="openTool('blog-writer')">
+            <div class="rr-ico" style="background:#EEF2FF">✍️</div>
+            <div class="rr-info">
+              <div class="rr-name">10 Ways to Boost E-Commerce Sales in 2025</div>
+              <div class="rr-meta">Blog Post · 2h ago · 1,240 words</div>
+            </div>
+            <span class="rr-badge" style="background:#EEF2FF;color:#4F46E5">Blog</span>
+          </div>
+          <div class="recent-row" onclick="openTool('email-copy')">
+            <div class="rr-ico" style="background:#ECFDF5">📧</div>
+            <div class="rr-info">
+              <div class="rr-name">Summer Sale Email Campaign — July 2025</div>
+              <div class="rr-meta">Email · Yesterday · 380 words</div>
+            </div>
+            <span class="rr-badge" style="background:#ECFDF5;color:#059669">Email</span>
+          </div>
+          <div class="recent-row" onclick="openTool('product-desc')">
+            <div class="rr-ico" style="background:#FFF1F2">🛍️</div>
+            <div class="rr-info">
+              <div class="rr-name">Wireless Earbuds Pro — Product Description</div>
+              <div class="rr-meta">Product · 2 days ago · 220 words</div>
+            </div>
+            <span class="rr-badge" style="background:#FFF1F2;color:#E11D48">Product</span>
+          </div>
+          <div class="recent-row" onclick="openTool('ad-copy')">
+            <div class="rr-ico" style="background:var(--orange-bg)">🎯</div>
+            <div class="rr-info">
+              <div class="rr-name">Facebook Ad — New Collection Launch</div>
+              <div class="rr-meta">Ad Copy · 3 days ago · 90 words</div>
+            </div>
+            <span class="rr-badge" style="background:var(--orange-bg);color:var(--orange)">Ad</span>
+          </div>
+          <div class="recent-row" onclick="openTool('seo-meta')">
+            <div class="rr-ico" style="background:#EFF6FF">🔍</div>
+            <div class="rr-info">
+              <div class="rr-name">SEO Meta Tags — 5 Landing Pages</div>
+              <div class="rr-meta">SEO · 4 days ago · 320 words</div>
+            </div>
+            <span class="rr-badge" style="background:#EFF6FF;color:#2563EB">SEO</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Quick Create</div></div>
+          <div class="quick-grid">
+            <button class="q-tile" onclick="openTool('blog-writer')">
+              <div class="qt-ic">✍️</div><div class="qt-nm">Blog Post</div>
+            </button>
+            <button class="q-tile" onclick="openTool('social-media')">
+              <div class="qt-ic">📱</div><div class="qt-nm">Social Post</div>
+            </button>
+            <button class="q-tile" onclick="openTool('email-copy')">
+              <div class="qt-ic">📧</div><div class="qt-nm">Email Copy</div>
+            </button>
+            <button class="q-tile" onclick="openTool('ad-copy')">
+              <div class="qt-ic">🎯</div><div class="qt-nm">Ad Copy</div>
+            </button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Credit Usage</div></div>
+          <div class="progress-wrap">
+            <div class="progress-row">
+              <div class="progress-label">Monthly Credits</div>
+              <div class="progress-pct">51.8%</div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:51.8%"></div></div>
+            <div class="progress-note">5,180 used · 4,820 remaining · Resets in 14 days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOOLS PAGE ══ -->
+  <div class="page" id="page-tools">
+    <div class="tools-header">
+      <div class="tools-title-row">
+        <div>
+          <div class="page-title">AI Tools</div>
+          <div class="page-subtitle">40+ tools to write any marketing content in seconds</div>
+        </div>
+        <div class="search-bar">
+          <span class="search-icon">⌕</span>
+          <input type="text" placeholder="Search tools..." id="search-tools" oninput="filterTools(this.value)">
+        </div>
+      </div>
+      <div class="cat-row" id="cat-row">
+        <button class="cat-pill active" onclick="catFilter('all',this)">All Tools</button>
+        <button class="cat-pill" onclick="catFilter('blog',this)">✍️ Blog & Long-form</button>
+        <button class="cat-pill" onclick="catFilter('social',this)">📱 Social Media</button>
+        <button class="cat-pill" onclick="catFilter('email',this)">📧 Email</button>
+        <button class="cat-pill" onclick="catFilter('ads',this)">🎯 Ads & PPC</button>
+        <button class="cat-pill" onclick="catFilter('ecom',this)">🛍️ eCommerce</button>
+        <button class="cat-pill" onclick="catFilter('sales',this)">💼 Sales</button>
+        <button class="cat-pill" onclick="catFilter('rewrite',this)">🔄 Rewrite</button>
+        <button class="cat-pill" onclick="catFilter('seo',this)">🔍 SEO</button>
+      </div>
+    </div>
+    <div class="tools-canvas">
+      <div class="tools-grid" id="tools-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══ EDITOR PAGE ══ -->
+  <div class="page" id="page-editor">
+    <div class="editor-layout">
+      <div class="form-panel">
+        <div class="form-head">
+          <button class="back-btn" onclick="goTo('tools')">← Back</button>
+          <div class="form-tool-name" id="form-tool-name">Blog Writer</div>
+        </div>
+        <div id="form-fields"></div>
+        <div class="form-footer">
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="generateContent()">
+            ✦ Generate Content
+          </button>
+        </div>
+      </div>
+      <div class="output-panel">
+        <div class="out-header">
+          <div class="out-tabs">
+            <button class="out-tab active" onclick="switchOutTab('output',this)">Output</button>
+            <button class="out-tab" onclick="switchOutTab('edit',this)">Edit</button>
+          </div>
+          <div class="out-actions-row">
+            <button class="btn btn-outline btn-sm" onclick="copyAllOutput()">📋 Copy All</button>
+            <button class="btn btn-outline btn-sm" onclick="saveToDocuments()">💾 Save Doc</button>
+          </div>
+        </div>
+        <div class="out-body" id="out-body">
+          <div class="out-empty" id="out-empty">
+            <div class="oe-mark">✦</div>
+            <div class="oe-label">Fill in the details on the left and click Generate to create your content</div>
+          </div>
+          <div class="out-loading" id="out-loading">
+            <div class="loader"></div>
+            <div class="loader-text">Crafting your content…</div>
+          </div>
+          <div class="out-results" id="out-results"></div>
+          <textarea class="edit-textarea" id="edit-textarea"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CHAT PAGE ══ -->
+  <div class="page" id="page-chat">
+    <div class="chat-shell">
+      <div class="chat-header-row">
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">AI Chat</div>
+          <div style="font-size:13px;color:var(--mist);margin-top:3px">Your expert marketing AI — always ready to help</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="clearChat()">🗑 Clear Chat</button>
+      </div>
+      <div class="chat-window" id="chat-window">
+        <div class="msg ai">
+          <div class="m-av" style="font-size:10px;font-weight:800;font-family:'Fraunces',serif">M</div>
+          <div class="m-bubble">
+            Hi there! I'm M-SM AI, your intelligent marketing assistant. I can help you with:<br><br>
+            • Writing and editing any marketing content<br>
+            • Blog posts, email sequences, ad campaigns<br>
+            • SEO strategy and keyword research<br>
+            • Brand voice and messaging strategy<br>
+            • Social media content and captions<br>
+            • Sales copy and product descriptions<br><br>
+            What are you working on today? Tell me and I'll help you create something great.
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <textarea class="chat-ta" id="chat-ta" placeholder="Ask me anything about marketing, content, SEO…" rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="btn btn-primary" onclick="sendMessage()" style="height:44px;padding:0 20px">Send →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DOCUMENTS PAGE ══ -->
+  <div class="page" id="page-documents">
+    <div class="docs-shell">
+      <div class="docs-toprow">
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Documents</div>
+          <div style="font-size:13px;color:var(--mist);margin-top:3px">All your AI-generated content in one place</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="goTo('tools')">＋ New Document</button>
+      </div>
+      <div class="filters-row">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Blog Posts</button>
+        <button class="filter-btn">Emails</button>
+        <button class="filter-btn">Social</button>
+        <button class="filter-btn">Ads</button>
+        <button class="filter-btn">Products</button>
+      </div>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th style="width:40%">Title</th>
+              <th>Type</th>
+              <th>Words</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="doc-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SEO PAGE ══ -->
+  <div class="page" id="page-seo">
+    <div class="seo-shell">
+      <div class="seo-intro">
+        <div class="seo-intro-title">SEO Suite</div>
+        <div class="seo-intro-sub">Dominate search results with AI-powered SEO tools. Write content that ranks on Google and gets cited by AI platforms like ChatGPT and Gemini.</div>
+      </div>
+      <div class="seo-tools-grid">
+        <div class="seo-tile" onclick="openTool('seo-meta')">
+          <div class="st-icon">🔍</div>
+          <div class="st-name">SEO Meta Generator</div>
+          <div class="st-desc">Generate click-worthy title tags (50–60 chars) and meta descriptions (150–160 chars) optimized for maximum CTR on search results.</div>
+          <div class="st-tags"><span class="st-tag">Title Tags</span><span class="st-tag">Meta Desc</span><span class="st-tag">CTR Boost</span></div>
+        </div>
+        <div class="seo-tile" onclick="openTool('keyword-ideas')">
+          <div class="st-icon">💡</div>
+          <div class="st-name">Keyword Cluster Builder</div>
+          <div class="st-desc">Build complete keyword strategies with primary keywords, long-tail variations, question-based queries, and search intent mapping.</div>
+          <div class="st-tags"><span class="st-tag">Long-tail</span><span class="st-tag">Intent</span><span class="st-tag">Clusters</span></div>
+        </div>
+        <div class="seo-tile" onclick="openTool('blog-writer')">
+          <div class="st-icon">📝</div>
+          <div class="st-name">SEO Article Writer</div>
+          <div class="st-desc">Write complete long-form articles with proper H1/H2/H3 structure, semantic keywords, and internal linking suggestions.</div>
+          <div class="st-tags"><span class="st-tag">Long-form</span><span class="st-tag">H-Tags</span><span class="st-tag">NLP-Ready</span></div>
+        </div>
+        <div class="seo-tile" onclick="openTool('paraphrase')">
+          <div class="st-icon">🔄</div>
+          <div class="st-name">Content Optimizer</div>
+          <div class="st-desc">Refresh, rewrite, and optimize existing content for uniqueness, readability, and improved search engine rankings.</div>
+          <div class="st-tags"><span class="st-tag">Rewrite</span><span class="st-tag">Freshness</span><span class="st-tag">Rankings</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TEMPLATES PAGE ══ -->
+  <div class="page" id="page-templates">
+    <div class="tpl-shell">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Custom Templates</div>
+          <div style="font-size:13px;color:var(--mist);margin-top:3px">Save your best prompts and reuse them for any client or campaign</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="toast('Template builder coming in next update!','')">＋ New Template</button>
+      </div>
+      <div class="tpl-grid">
+        <div class="tpl-card" onclick="openTool('blog-writer')">
+          <div class="tpl-ic">✍️</div>
+          <div class="tpl-name">SaaS Blog Post Framework</div>
+          <div class="tpl-desc">Pre-configured prompts for B2B SaaS companies. Includes intro, problem-solution, and CTA sections.</div>
+          <div class="tpl-use">Use Template →</div>
+        </div>
+        <div class="tpl-card" onclick="openTool('email-copy')">
+          <div class="tpl-ic">📧</div>
+          <div class="tpl-name">7-Day Welcome Sequence</div>
+          <div class="tpl-desc">Complete 7-email welcome series for new subscribers with optimal send timing suggestions.</div>
+          <div class="tpl-use">Use Template →</div>
+        </div>
+        <div class="tpl-card" onclick="openTool('ad-copy')">
+          <div class="tpl-ic">🎯</div>
+          <div class="tpl-name">Facebook Ad — AIDA Framework</div>
+          <div class="tpl-desc">Attention-Interest-Desire-Action ad copy template proven for e-commerce campaigns.</div>
+          <div class="tpl-use">Use Template →</div>
+        </div>
+        <div class="tpl-card" onclick="openTool('product-desc')">
+          <div class="tpl-ic">🛍️</div>
+          <div class="tpl-name">Amazon Product Listing</div>
+          <div class="tpl-desc">Full Amazon-optimized listing with bullet points, A+ content sections, and backend keywords.</div>
+          <div class="tpl-use">Use Template →</div>
+        </div>
+        <div class="tpl-card" onclick="openTool('sales-email')">
+          <div class="tpl-ic">💼</div>
+          <div class="tpl-name">B2B Cold Outreach Series</div>
+          <div class="tpl-desc">3-touch cold email sequence for B2B sales teams. Proven framework with 28%+ reply rates.</div>
+          <div class="tpl-use">Use Template →</div>
+        </div>
+        <div class="tpl-card" onclick="openTool('landing-page')">
+          <div class="tpl-ic">🚀</div>
+          <div class="tpl-name">SaaS Landing Page</div>
+          <div class="tpl-desc">Complete landing page copy for SaaS products — hero, features, social proof, pricing, FAQ, CTA.</div>
+          <div class="tpl-use">Use Template →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SETTINGS PAGE ══ -->
+  <div class="page" id="page-settings">
+    <div class="settings-layout">
+      <div class="settings-nav">
+        <div class="sn-section">Account</div>
+        <div class="sn-item active" onclick="showSetting('general',this)">⚙️ General</div>
+        <div class="sn-item" onclick="showSetting('api',this)">🔑 API Key</div>
+        <div class="sn-section">Content</div>
+        <div class="sn-item" onclick="showSetting('brand',this)">🎨 Brand Voice</div>
+        <div class="sn-item" onclick="showSetting('team',this)">👥 Team</div>
+        <div class="sn-section">Preferences</div>
+        <div class="sn-item" onclick="showSetting('notif',this)">🔔 Notifications</div>
+      </div>
+      <div class="settings-content">
+
+        <div id="sc-general">
+          <div class="sc-title">General Settings</div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">Full Name</div><div class="s-desc">Displayed across the platform</div></div>
+            <input class="f-input" value="John Doe" style="width:200px">
+          </div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">Email Address</div><div class="s-desc">Used for login and billing</div></div>
+            <input class="f-input" value="john@company.com" style="width:200px">
+          </div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">Default Language</div><div class="s-desc">Language for generated content</div></div>
+            <select class="f-select" style="width:170px">
+              <option>English</option><option>Spanish</option><option>French</option>
+              <option>German</option><option>Malay</option><option>Arabic</option>
+              <option>Portuguese</option><option>Italian</option><option>Japanese</option>
+            </select>
+          </div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">Default Tone</div><div class="s-desc">Applied to all new content</div></div>
+            <select class="f-select" style="width:170px">
+              <option>Professional</option><option>Friendly</option><option>Bold</option>
+              <option>Witty</option><option>Empathetic</option><option>Casual</option>
+            </select>
+          </div>
+          <div style="margin-top:22px">
+            <button class="btn btn-primary" onclick="toast('Settings saved!','success')">Save Changes</button>
+          </div>
+        </div>
+
+        <div id="sc-api" style="display:none">
+          <div class="sc-title">API Configuration</div>
+          <div class="s-row" style="flex-direction:column;align-items:flex-start;gap:12px">
+            <div class="s-info">
+              <div class="s-lbl">Anthropic API Key</div>
+              <div class="s-desc">This key powers all AI content generation. Get yours at console.anthropic.com</div>
+            </div>
+            <div class="api-row">
+              <input class="f-input" type="password" id="api-key-field" placeholder="sk-ant-api03-…" style="flex:1">
+              <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save Key</button>
+            </div>
+            <div class="api-ok" id="api-ok">✓ API key active — AI tools are ready</div>
+          </div>
+          <div class="info-box">
+            🔒 Your API key is stored locally in your browser's localStorage and never transmitted to our servers. All AI generation happens directly between your browser and Anthropic's API.
+          </div>
+        </div>
+
+        <div id="sc-brand" style="display:none">
+          <div class="sc-title">Brand Voice</div>
+          <div class="form-section" style="padding:0;border:none;margin-bottom:16px">
+            <div class="f-label">Brand / Company Name</div>
+            <input class="f-input" placeholder="e.g. Acme Marketing Co.">
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="f-label">Brand Description</div>
+            <textarea class="f-textarea" rows="3" placeholder="Describe your brand's personality, values, and what makes you unique…"></textarea>
+          </div>
+          <div style="margin-bottom:16px">
+            <div class="f-label">Tone of Voice</div>
+            <div class="tone-wrap" style="margin-top:7px">
+              <div class="tone-tag on" onclick="toneToggle(this)">Professional</div>
+              <div class="tone-tag" onclick="toneToggle(this)">Friendly</div>
+              <div class="tone-tag" onclick="toneToggle(this)">Bold</div>
+              <div class="tone-tag" onclick="toneToggle(this)">Witty</div>
+              <div class="tone-tag" onclick="toneToggle(this)">Empathetic</div>
+              <div class="tone-tag" onclick="toneToggle(this)">Authoritative</div>
+              <div class="tone-tag" onclick="toneToggle(this)">Inspirational</div>
+            </div>
+          </div>
+          <div style="margin-bottom:20px">
+            <div class="f-label">Target Audience</div>
+            <input class="f-input" placeholder="e.g. Small business owners aged 28–50">
+          </div>
+          <button class="btn btn-primary" onclick="toast('Brand voice saved!','success')">Save Brand Voice</button>
+        </div>
+
+        <div id="sc-team" style="display:none">
+          <div class="sc-title">Team Members</div>
+          <div style="text-align:center;padding:48px 20px">
+            <div style="font-size:48px;margin-bottom:14px;opacity:.4">👥</div>
+            <div style="font-size:16px;font-weight:700;color:var(--navy2);margin-bottom:8px">Upgrade to Team Plan</div>
+            <div style="font-size:13px;color:var(--mist);max-width:300px;margin:0 auto 20px;line-height:1.6">Invite teammates, share brand voices, assign roles, and collaborate on content — all in one workspace.</div>
+            <button class="btn btn-primary" onclick="goTo('billing')">View Plans →</button>
+          </div>
+        </div>
+
+        <div id="sc-notif" style="display:none">
+          <div class="sc-title">Notifications</div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">Weekly Usage Report</div><div class="s-desc">Get a summary of your content creation every Monday</div></div>
+            <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">Credit Low Alert</div><div class="s-desc">Notify when credits fall below 1,000</div></div>
+            <div class="toggle-sw on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">New Feature Announcements</div><div class="s-desc">Be first to know about new AI tools</div></div>
+            <div class="toggle-sw" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="s-row">
+            <div class="s-info"><div class="s-lbl">Marketing Tips</div><div class="s-desc">Receive weekly marketing best practices</div></div>
+            <div class="toggle-sw" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div style="margin-top:22px">
+            <button class="btn btn-primary" onclick="toast('Notification preferences saved!','success')">Save Preferences</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BILLING PAGE ══ -->
+  <div class="page" id="page-billing">
+    <div class="billing-shell">
+      <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:6px">Billing & Plans</div>
+      <div style="font-size:13px;color:var(--mist);margin-bottom:22px">Choose the plan that powers your marketing</div>
+      <div class="current-plan-banner">
+        <div class="cpb-left">
+          <div class="cpb-tag">Active Plan</div>
+          <div class="cpb-name">Pro Plan</div>
+          <div class="cpb-price">$99 / month · Renews August 1, 2025</div>
+        </div>
+        <div class="cpb-right">
+          <div class="cpb-cred-label">Credits This Month</div>
+          <div class="cpb-cred-val">4,820 / 10,000</div>
+          <div class="cpb-bar"><div class="cpb-fill" style="width:48.2%"></div></div>
+        </div>
+      </div>
+      <div class="plan-cards-grid">
+        <div class="plan-card">
+          <div class="plan-card-tag">Free</div>
+          <div class="plan-card-name">Starter</div>
+          <div class="plan-price-row"><span class="plan-price-curr">$</span><span class="plan-price-amt">0</span></div>
+          <ul class="plan-features">
+            <li>2,500 credits / month</li>
+            <li>20 core AI tools</li>
+            <li>1 user seat</li>
+            <li>Basic templates</li>
+            <li>Email support</li>
+          </ul>
+          <button class="btn btn-outline" style="width:100%;justify-content:center">Downgrade</button>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-card-tag" style="color:var(--orange)">Current Plan ✓</div>
+          <div class="plan-card-name">Pro</div>
+          <div class="plan-price-row"><span class="plan-price-curr">$</span><span class="plan-price-amt">99</span><span class="plan-price-period">/mo</span></div>
+          <ul class="plan-features">
+            <li>10,000 credits / month</li>
+            <li>All 40+ AI tools</li>
+            <li>Full SEO suite</li>
+            <li>Brand Voice training</li>
+            <li>Custom templates</li>
+            <li>API access</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" disabled>Active Plan</button>
+        </div>
+        <div class="plan-card" style="border-top:3px solid var(--violet)">
+          <div class="plan-card-tag" style="color:var(--violet)">Most Powerful</div>
+          <div class="plan-card-name">Agency</div>
+          <div class="plan-price-row"><span class="plan-price-curr">$</span><span class="plan-price-amt">249</span><span class="plan-price-period">/mo</span></div>
+          <ul class="plan-features">
+            <li>Unlimited credits</li>
+            <li>Team collaboration (10 seats)</li>
+            <li>White-label exports</li>
+            <li>Workflow automation</li>
+            <li>Advanced analytics</li>
+            <li>Dedicated account manager</li>
+            <li>SLA support</li>
+          </ul>
+          <button class="btn btn-navy" style="width:100%;justify-content:center;background:var(--violet)" onclick="toast('Upgrade email sent! Check your inbox.','success')">Upgrade to Agency →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  M-SM AI — Application Logic
+// ═══════════════════════════════════════════════════════════
+
+let apiKey = localStorage.getItem('msm_apikey') || '';
+let activeTone = 'Professional';
+let currentTool = null;
+let chatHistory = [];
+let savedDocs = JSON.parse(localStorage.getItem('msm_docs') || '[]');
+let credits = 4820;
+
+// ── Tool catalogue ───────────────────────────────────────
+const TOOLS = [
+  {id:'blog-writer',name:'Blog Writer',desc:'Write full SEO-optimized blog posts from a title, keywords, and audience.',icon:'✍️',bg:'#EEF2FF',color:'#4F46E5',cat:'blog',badge:'Popular'},
+  {id:'landing-page',name:'Landing Page Copy',desc:'Conversion-focused landing page copy: headlines, body, social proof, and CTAs.',icon:'🚀',bg:'#FFF7ED',color:'#EA580C',cat:'blog',badge:''},
+  {id:'article-outline',name:'Article Outline',desc:'Detailed blog post or article outlines with H2/H3 structure.',icon:'📋',bg:'#F0FDF4',color:'#15803D',cat:'blog',badge:''},
+  {id:'social-media',name:'Social Media Posts',desc:'Posts for Instagram, LinkedIn, X (Twitter), Facebook, and TikTok.',icon:'📱',bg:'#FEF3C7',color:'#B45309',cat:'social',badge:'Popular'},
+  {id:'instagram-bio',name:'Instagram Bio',desc:'Punchy, click-worthy Instagram bios with clear value props.',icon:'💎',bg:'#FDF4FF',color:'#9333EA',cat:'social',badge:''},
+  {id:'youtube-script',name:'YouTube Script',desc:'Full video scripts: hook, story, value, and CTA.',icon:'🎬',bg:'#FEF2F2',color:'#DC2626',cat:'social',badge:''},
+  {id:'linkedin-post',name:'LinkedIn Post',desc:'Thought leadership posts and company updates for LinkedIn.',icon:'👔',bg:'#EFF6FF',color:'#1D4ED8',cat:'social',badge:''},
+  {id:'email-copy',name:'Email Campaign',desc:'Subject lines, body copy, and CTAs for any email type.',icon:'📧',bg:'#ECFDF5',color:'#059669',cat:'email',badge:'Popular'},
+  {id:'email-sequence',name:'Email Sequence',desc:'Complete 3-7 email drip sequences for onboarding or nurturing.',icon:'📬',bg:'#F0FDF4',color:'#047857',cat:'email',badge:''},
+  {id:'subject-lines',name:'Email Subject Lines',desc:'A/B-testable subject lines that boost open rates.',icon:'📮',bg:'#ECFDF5',color:'#059669',cat:'email',badge:''},
+  {id:'ad-copy',name:'Ad Copy',desc:'Facebook, Instagram, Google, and LinkedIn ads that convert.',icon:'🎯',bg:'#FEE2E2',color:'#DC2626',cat:'ads',badge:'Popular'},
+  {id:'google-ads',name:'Google Ads',desc:'Search ads with headlines (30 chars) and descriptions (90 chars).',icon:'🔎',bg:'#EFF6FF',color:'#2563EB',cat:'ads',badge:''},
+  {id:'push-notif',name:'Push Notification',desc:'Short, urgent copy that drives clicks and app opens.',icon:'🔔',bg:'#F5F3FF',color:'#7C3AED',cat:'ads',badge:''},
+  {id:'product-desc',name:'Product Description',desc:'Persuasive product copy for Shopify, Amazon, and marketplaces.',icon:'🛍️',bg:'#FFF1F2',color:'#E11D48',cat:'ecom',badge:'Popular'},
+  {id:'product-title',name:'Product Title',desc:'SEO-friendly product titles for Amazon and Shopify listings.',icon:'🏷️',bg:'#FFF1F2',color:'#BE185D',cat:'ecom',badge:''},
+  {id:'review-reply',name:'Review Responder',desc:'Professional responses to positive and negative customer reviews.',icon:'⭐',bg:'#FEFCE8',color:'#A16207',cat:'ecom',badge:''},
+  {id:'sales-email',name:'Sales Outreach',desc:'Cold email sequences with 3-touch follow-up series.',icon:'💼',bg:'#F0FDF4',color:'#16A34A',cat:'sales',badge:''},
+  {id:'cold-dm',name:'Cold Outreach DM',desc:'LinkedIn and Instagram DM templates for B2B prospecting.',icon:'📤',bg:'#ECFDF5',color:'#0D9488',cat:'sales',badge:''},
+  {id:'sales-pitch',name:'Sales Pitch Script',desc:'Concise elevator pitches and sales call scripts.',icon:'🎤',bg:'#FFF7ED',color:'#C2410C',cat:'sales',badge:''},
+  {id:'paraphrase',name:'Content Rewriter',desc:'Rewrite any content with a fresh perspective and unique voice.',icon:'🔄',bg:'#F5F3FF',color:'#7C3AED',cat:'rewrite',badge:''},
+  {id:'ai-humanizer',name:'AI Humanizer',desc:'Remove AI-detection patterns and add authentic human voice.',icon:'🤖',bg:'#FDF4FF',color:'#A21CAF',cat:'rewrite',badge:'New'},
+  {id:'summarizer',name:'Content Summarizer',desc:'Condense long articles into clear, concise summaries.',icon:'📉',bg:'#F0FDF4',color:'#166534',cat:'rewrite',badge:''},
+  {id:'seo-meta',name:'SEO Meta Tags',desc:'Title tags and meta descriptions for maximum search CTR.',icon:'🔍',bg:'#EFF6FF',color:'#2563EB',cat:'seo',badge:'SEO'},
+  {id:'keyword-ideas',name:'Keyword Clusters',desc:'Long-tail keywords, clusters, and intent mapping for any niche.',icon:'💡',bg:'#FEFCE8',color:'#CA8A04',cat:'seo',badge:'SEO'},
+  {id:'faq-writer',name:'FAQ Generator',desc:'SEO-rich FAQ sections for any product, service, or article.',icon:'❓',bg:'#F5F3FF',color:'#6D28D9',cat:'seo',badge:''},
+];
+
+// ── Form definitions per tool ────────────────────────────
+const FORMS = {
+  'blog-writer':{
+    name:'Blog Writer',
+    fields:[
+      {id:'topic',label:'Blog Topic',type:'input',ph:'e.g. 10 Ways to Grow Your SaaS Business in 2025'},
+      {id:'keywords',label:'Target Keywords',type:'input',ph:'e.g. SaaS growth, startup marketing, B2B tactics'},
+      {id:'audience',label:'Target Audience',type:'input',ph:'e.g. SaaS founders and marketing managers'},
+      {id:'length',label:'Article Length',type:'select',opts:['Short (400–600 words)','Standard (800–1,000 words)','Long-form (1,200–1,500 words)','Deep-dive (2,000+ words)']},
+    ],
+    prompt:d=>`Write a comprehensive, SEO-optimized blog post about: "${d.topic}".
+Target keywords: ${d.keywords}
+Target audience: ${d.audience}
+Length: ${d.length}
+Tone: ${activeTone}
+
+Structure the post with:
+- An engaging, keyword-rich introduction
+- Clear ## H2 subheadings and ### H3 subheadings
+- Practical, actionable content in each section
+- A compelling conclusion with a CTA
+- Use markdown formatting throughout`
+  },
+  'landing-page':{
+    name:'Landing Page Copy',
+    fields:[
+      {id:'product',label:'Product / Service',type:'input',ph:'e.g. AI-powered email marketing tool'},
+      {id:'value',label:'Main Value Proposition',type:'input',ph:'e.g. Double your email open rates in 30 days'},
+      {id:'audience',label:'Target Customer',type:'input',ph:'e.g. Marketing managers at B2B SaaS companies'},
+      {id:'goal',label:'Page Goal',type:'select',opts:['Free trial signup','Book a demo','Direct purchase','Email capture','Webinar registration']},
+    ],
+    prompt:d=>`Write complete landing page copy for: "${d.product}"
+Value proposition: ${d.value}
+Target customer: ${d.audience}
+Page goal: ${d.goal}
+Tone: ${activeTone}
+
+Include these labeled sections:
+HERO HEADLINE: (compelling, benefit-focused)
+HERO SUB-HEADLINE: (clarifies the offer)
+3 BENEFIT SECTIONS: (headline + 2-3 sentences each)
+SOCIAL PROOF: (testimonial-style section)
+HOW IT WORKS: (3-step process)
+FAQ: (3 questions with answers)
+FINAL CTA: (urgency-driven closing section)`
+  },
+  'social-media':{
+    name:'Social Media Posts',
+    fields:[
+      {id:'topic',label:'Topic / Product',type:'input',ph:'e.g. New product launch — wireless earbuds'},
+      {id:'platform',label:'Platform',type:'select',opts:['Instagram','LinkedIn','X (Twitter)','Facebook','TikTok','All platforms']},
+      {id:'goal',label:'Post Goal',type:'select',opts:['Drive engagement','Announce product','Build brand awareness','Drive website traffic','Generate leads']},
+    ],
+    prompt:d=>`Write 3 different ${d.platform} posts about: "${d.topic}"
+Goal: ${d.goal}
+Tone: ${activeTone}
+
+Create 3 completely different variations, each with a unique angle.
+Include appropriate emojis and hashtags.
+Label each: "— POST 1 —", "— POST 2 —", "— POST 3 —"`
+  },
+  'email-copy':{
+    name:'Email Campaign',
+    fields:[
+      {id:'purpose',label:'Email Purpose',type:'input',ph:'e.g. Welcome new subscribers to our newsletter'},
+      {id:'offer',label:'Key Offer / CTA',type:'input',ph:'e.g. Get 30% off your first month — use WELCOME30'},
+      {id:'audience',label:'Recipient',type:'input',ph:'e.g. New trial users who signed up in the last 7 days'},
+      {id:'type',label:'Email Type',type:'select',opts:['Welcome Email','Promotional Offer','Newsletter','Follow-up','Re-engagement','Abandoned Cart']},
+    ],
+    prompt:d=>`Write a high-converting ${d.type} email.
+Purpose: ${d.purpose}
+Offer/CTA: ${d.offer}
+Recipient: ${d.audience}
+Tone: ${activeTone}
+
+Format:
+SUBJECT LINE: (3 options, A/B testable)
+PREVIEW TEXT: (one compelling option)
+---
+[EMAIL BODY with opening, value delivery, offer, and CTA]
+---
+CTA BUTTON TEXT: (2 options)`
+  },
+  'ad-copy':{
+    name:'Ad Copy',
+    fields:[
+      {id:'product',label:'Product / Service',type:'input',ph:'e.g. Project management software for remote teams'},
+      {id:'benefit',label:'Core Benefit / Hook',type:'input',ph:'e.g. Cut meeting time by 40% with async workflows'},
+      {id:'audience',label:'Target Audience',type:'input',ph:'e.g. Remote team managers at 10–100 person companies'},
+      {id:'platform',label:'Ad Platform',type:'select',opts:['Facebook & Instagram','Google Search Ads','LinkedIn Ads','TikTok Ads','YouTube Pre-roll']},
+    ],
+    prompt:d=>`Write 3 high-converting ${d.platform} ad variants for: "${d.product}"
+Core benefit/hook: ${d.benefit}
+Target audience: ${d.audience}
+Tone: ${activeTone}
+
+For each ad provide:
+- Headline (max 40 characters)
+- Primary text / description (max 125 characters)
+- CTA button text
+Label: "— AD VARIANT 1 —", "— AD VARIANT 2 —", "— AD VARIANT 3 —"`
+  },
+  'product-desc':{
+    name:'Product Description',
+    fields:[
+      {id:'product',label:'Product Name',type:'input',ph:'e.g. ProMax Wireless Noise-Cancelling Headphones'},
+      {id:'features',label:'Key Features & Specs',type:'textarea',ph:'e.g. 40hr battery, ANC, Bluetooth 5.3, foldable design, IPX4 waterproof…'},
+      {id:'buyer',label:'Target Buyer',type:'input',ph:'e.g. Remote workers and frequent travellers'},
+      {id:'format',label:'Description Format',type:'select',opts:['Short (60–80 words)','Standard (130–160 words)','Long (220–260 words)','Amazon listing (title + bullets + description)']},
+    ],
+    prompt:d=>`Write a ${d.format} product description for: "${d.product}"
+Key features: ${d.features}
+Target buyer: ${d.buyer}
+Tone: ${activeTone}
+
+Focus on benefits over features. Make it emotionally compelling and conversion-focused.`
+  },
+  'sales-email':{
+    name:'Sales Outreach Email',
+    fields:[
+      {id:'product',label:'Your Product / Service',type:'input',ph:'e.g. B2B content marketing agency'},
+      {id:'prospect',label:'Prospect Profile',type:'input',ph:'e.g. E-commerce DTC brands doing $1M–$10M revenue'},
+      {id:'pain',label:'Pain Point You Solve',type:'input',ph:'e.g. Inconsistent content output and poor organic traffic'},
+      {id:'cta',label:'Desired Next Step',type:'input',ph:'e.g. Book a 20-minute discovery call'},
+    ],
+    prompt:d=>`Write a 3-email cold outreach sequence for selling: "${d.product}"
+Prospect profile: ${d.prospect}
+Pain point addressed: ${d.pain}
+Desired CTA: ${d.cta}
+Tone: ${activeTone}
+
+Email 1 — Initial Outreach: Lead with insight, not pitch
+Email 2 — Follow-up (send 3 days later): Add value, address objection
+Email 3 — Breakup Email (send 7 days later): Final gentle ask
+
+Include subject lines for each email.`
+  },
+  'seo-meta':{
+    name:'SEO Meta Generator',
+    fields:[
+      {id:'page',label:'Page Topic / Title',type:'input',ph:'e.g. Best CRM Software for Small Businesses in 2025'},
+      {id:'keywords',label:'Primary Keywords',type:'input',ph:'e.g. CRM software, small business CRM, best CRM 2025'},
+      {id:'url',label:'Page URL (optional)',type:'input',ph:'e.g. yoursite.com/best-crm-software'},
+    ],
+    prompt:d=>`Generate SEO-optimized meta tags for a page about: "${d.page}"
+Primary keywords: ${d.keywords}
+URL: ${d.url || 'Not provided'}
+
+Deliver:
+3 TITLE TAG OPTIONS: (each 50–60 characters, include primary keyword near front)
+3 META DESCRIPTION OPTIONS: (each 150–160 characters, include CTA)
+10 LSI/SEMANTIC KEYWORDS: (related terms to naturally include in content)
+SCHEMA MARKUP SUGGESTION: (type of structured data to add)
+
+Format each section with clear headers.`
+  },
+  'keyword-ideas':{
+    name:'Keyword Cluster Builder',
+    fields:[
+      {id:'seed',label:'Seed Keyword / Topic',type:'input',ph:'e.g. email marketing software'},
+      {id:'industry',label:'Industry / Niche',type:'input',ph:'e.g. SaaS, e-commerce, digital marketing'},
+      {id:'intent',label:'Intent Focus',type:'select',opts:['All intents','Informational (how/what/why)','Commercial (best/vs/review)','Transactional (buy/get/pricing)','Navigational']},
+    ],
+    prompt:d=>`Build a keyword strategy for: "${d.seed}" in the ${d.industry} industry.
+Search intent focus: ${d.intent}
+
+Deliver:
+1. PRIMARY KEYWORDS (10): High-volume, competitive head terms
+2. LONG-TAIL KEYWORDS (15): Lower competition, higher intent
+3. QUESTION-BASED KEYWORDS (10): For featured snippets and FAQ sections
+4. COMPARISON KEYWORDS (5): [competitor] vs [product], best alternatives
+5. LOCAL SEO VARIANTS (5): If applicable
+6. CONTENT ANGLE SUGGESTIONS: 5 article ideas using these clusters
+
+Format as clearly labeled sections.`
+  },
+  'paraphrase':{
+    name:'Content Rewriter',
+    fields:[
+      {id:'content',label:'Content to Rewrite',type:'textarea',ph:'Paste the text you want to rewrite…'},
+      {id:'style',label:'Rewrite Style',type:'select',opts:['Standard rewrite (same tone)','More professional','More casual and friendly','Simpler language','More detailed (expand)','More concise (shorten by 50%)','Change POV to 2nd person (you)']},
+    ],
+    prompt:d=>`Rewrite the following content in "${d.style}" style. Tone: ${activeTone}.
+Completely rephrase — do not use the same sentence structures or wording.
+The meaning should stay the same but the execution should be entirely fresh.
+
+CONTENT TO REWRITE:
+${d.content}`
+  },
+};
+
+// ── Navigation ────────────────────────────────────────────
+const PAGE_TITLES = {
+  dashboard:'Dashboard',tools:'AI Tools',editor:'Content Editor',chat:'AI Chat',
+  documents:'Documents',seo:'SEO Suite',templates:'Templates',
+  settings:'Settings',billing:'Billing & Plans'
+};
+
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('onclick')?.includes(`'${page}'`));
+  });
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[page] || page;
+  if (page === 'tools') renderTools(TOOLS);
+  if (page === 'documents') renderDocuments();
+}
+
+// ── Tools ─────────────────────────────────────────────────
+function renderTools(list) {
+  document.getElementById('tools-grid').innerHTML = list.map(t => `
+    <div class="tool-card" onclick="openTool('${t.id}')" style="--tc-color:${t.color}">
+      <div class="tc-stripe"></div>
+      ${t.badge ? `<span class="tc-badge" style="background:${t.color}15;color:${t.color}">${t.badge}</span>` : ''}
+      <div class="tc-icon" style="background:${t.bg}">${t.icon}</div>
+      <div class="tc-name">${t.name}</div>
+      <div class="tc-desc">${t.desc}</div>
+    </div>`).join('');
+}
+
+function filterTools(q) {
+  renderTools(TOOLS.filter(t =>
+    t.name.toLowerCase().includes(q.toLowerCase()) ||
+    t.desc.toLowerCase().includes(q.toLowerCase())
+  ));
+}
+
+function catFilter(cat, btn) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderTools(cat === 'all' ? TOOLS : TOOLS.filter(t => t.cat === cat));
+}
+
+// ── Editor ────────────────────────────────────────────────
+function openTool(id) {
+  const form = FORMS[id] || {
+    name: TOOLS.find(t => t.id === id)?.name || id,
+    fields: [{id:'prompt',label:'What do you want to write?',type:'textarea',ph:'Describe what you need…'}],
+    prompt: d => `Write high-quality marketing content about: ${d.prompt}. Tone: ${activeTone}.`
+  };
+  currentTool = { id, form };
+  document.getElementById('form-tool-name').textContent = form.name;
+
+  const container = document.getElementById('form-fields');
+  container.innerHTML = '';
+
+  form.fields.forEach(f => {
+    const sec = document.createElement('div');
+    sec.className = 'form-section';
+    let inp = '';
+    if (f.type === 'input') inp = `<input class="f-input" id="ff-${f.id}" placeholder="${f.ph || ''}">`;
+    else if (f.type === 'textarea') inp = `<textarea class="f-textarea" id="ff-${f.id}" placeholder="${f.ph || ''}" rows="3"></textarea>`;
+    else if (f.type === 'select') inp = `<select class="f-select" id="ff-${f.id}">${f.opts.map(o => `<option>${o}</option>`).join('')}</select>`;
+    sec.innerHTML = `<div class="f-label">${f.label}</div>${inp}`;
+    container.appendChild(sec);
+  });
+
+  // Tone selector
+  const toneSec = document.createElement('div');
+  toneSec.className = 'form-section';
+  toneSec.innerHTML = `<div class="f-label">Tone of Voice</div>
+    <div class="tone-wrap">${['Professional','Friendly','Witty','Bold','Empathetic','Casual'].map(t =>
+      `<div class="tone-tag ${t === activeTone ? 'on' : ''}" onclick="setTone('${t}',this)">${t}</div>`
+    ).join('')}</div>`;
+  container.appendChild(toneSec);
+
+  // Variants
+  const varSec = document.createElement('div');
+  varSec.className = 'form-section';
+  varSec.innerHTML = `<div class="f-label">Number of Variants</div>
+    <select class="f-select" id="ff-variants">
+      <option>1 variant</option>
+      <option selected>2 variants</option>
+      <option>3 variants</option>
+    </select>`;
+  container.appendChild(varSec);
+
+  resetOutput();
+  goTo('editor');
+}
+
+function setTone(t, el) {
+  activeTone = t;
+  el.closest('.tone-wrap').querySelectorAll('.tone-tag').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function toneToggle(el) {
+  el.closest('.tone-wrap').querySelectorAll('.tone-tag').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function resetOutput() {
+  document.getElementById('out-empty').style.display = 'flex';
+  document.getElementById('out-loading').style.display = 'none';
+  document.getElementById('out-results').innerHTML = '';
+  document.getElementById('out-results').style.display = 'none';
+  document.getElementById('edit-textarea').style.display = 'none';
+}
+
+async function generateContent() {
+  const d = {};
+  currentTool.form.fields.forEach(f => {
+    const el = document.getElementById('ff-' + f.id);
+    if (el) d[f.id] = el.value.trim();
+  });
+
+  const firstVal = Object.values(d)[0];
+  if (!firstVal) { toast('Please fill in the first field', 'error'); return; }
+
+  const varCount = parseInt(document.getElementById('ff-variants')?.value || '1');
+  const prompt = currentTool.form.prompt(d);
+
+  document.getElementById('out-empty').style.display = 'none';
+  document.getElementById('out-loading').style.display = 'flex';
+  document.getElementById('out-results').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('msm_token') || '') },
+      body: JSON.stringify({
+        prompt,
+        toolId: currentTool.id,
+        toolName: currentTool.form.name,
+        tone: activeTone,
+        variants: varCount
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Generation failed');
+    }
+
+    const data = await res.json();
+    const text = data.text;
+    credits = Math.max(0, credits - (data.creditsUsed || 10));
+    document.getElementById('cred-count').textContent = credits.toLocaleString() + ' credits';
+
+    renderOutput(text, varCount);
+    toast('✓ Content generated successfully', 'success');
+
+  } catch (e) {
+    document.getElementById('out-loading').style.display = 'none';
+    document.getElementById('out-empty').style.display = 'flex';
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+function renderOutput(text, varCount) {
+  document.getElementById('out-loading').style.display = 'none';
+  const container = document.getElementById('out-results');
+  container.innerHTML = '';
+
+  let variants = [];
+  if (varCount > 1 && text.includes('═══ VARIANT')) {
+    variants = text.split(/═══\s*VARIANT \d+\s*═══/i).filter(v => v.trim());
+  } else {
+    variants = [text];
+  }
+
+  variants.forEach((v, i) => {
+    const block = document.createElement('div');
+    block.className = 'result-block';
+    block.innerHTML = `
+      <div class="rb-head">
+        <span class="rb-label">Variant ${i + 1}</span>
+        <div class="rb-acts">
+          <button class="icon-btn" title="Copy" onclick="copyVariant(this)">📋</button>
+          <button class="icon-btn" title="Save to Documents" onclick="saveVariant(this)">💾</button>
+          <button class="icon-btn" title="Regenerate this variant" onclick="regenVariant(this)">🔄</button>
+        </div>
+      </div>
+      <div class="rb-text">${escHtml(v.trim())}</div>`;
+    container.appendChild(block);
+  });
+
+  container.style.display = 'flex';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyVariant(btn) {
+  const text = btn.closest('.result-block').querySelector('.rb-text').textContent;
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard!', 'success'));
+}
+
+function copyAllOutput() {
+  const all = Array.from(document.querySelectorAll('.rb-text')).map(e => e.textContent);
+  if (!all.length) { toast('Nothing to copy yet', 'error'); return; }
+  navigator.clipboard.writeText(all.join('\n\n────────────────────\n\n')).then(() => toast('All variants copied!', 'success'));
+}
+
+function saveVariant(btn) {
+  const text = btn.closest('.result-block').querySelector('.rb-text').textContent;
+  pushDoc(text);
+  toast('Saved to Documents ✓', 'success');
+}
+
+function saveToDocuments() {
+  const all = document.querySelectorAll('.rb-text');
+  if (!all.length) { toast('Nothing to save yet', 'error'); return; }
+  all.forEach(el => pushDoc(el.textContent));
+  toast(`${all.length} variant(s) saved to Documents ✓`, 'success');
+}
+
+function pushDoc(text) {
+  savedDocs.unshift({
+    id: Date.now(),
+    name: currentTool.form.name + ' — ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
+    type: currentTool.form.name,
+    words: text.split(/\s+/).filter(Boolean).length,
+    date: new Date().toISOString()
+  });
+  localStorage.setItem('msm_docs', JSON.stringify(savedDocs.slice(0, 200)));
+}
+
+async function regenVariant(btn) {
+  const block = btn.closest('.result-block');
+  const textEl = block.querySelector('.rb-text');
+  textEl.innerHTML = '<span style="color:var(--silver)">Regenerating…</span>';
+  const d = {};
+  currentTool.form.fields.forEach(f => {
+    const el = document.getElementById('ff-' + f.id);
+    if (el) d[f.id] = el.value.trim();
+  });
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('msm_token') || '') },
+      body: JSON.stringify({ prompt: currentTool.form.prompt(d) + '\n\nWrite a completely different fresh take. Different angle and wording.', toolId: currentTool.id, toolName: currentTool.form.name, tone: activeTone, variants: 1 })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    textEl.textContent = data.text;
+  } catch(e) {
+    textEl.textContent = 'Regeneration failed: ' + e.message;
+  }
+}
+
+function switchOutTab(tab, el) {
+  document.querySelectorAll('.out-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const results = document.getElementById('out-results');
+  const editArea = document.getElementById('edit-textarea');
+  if (tab === 'output') {
+    editArea.style.display = 'none';
+    results.style.display = results.innerHTML ? 'flex' : 'none';
+  } else {
+    const allText = Array.from(document.querySelectorAll('.rb-text')).map(e => e.textContent).join('\n\n────────────────────\n\n');
+    editArea.value = allText;
+    editArea.style.display = 'block';
+    results.style.display = 'none';
+  }
+}
+
+// ── Chat ──────────────────────────────────────────────────
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+
+async function sendMessage() {
+  const ta = document.getElementById('chat-ta');
+  const msg = ta.value.trim();
+  if (!msg) return;
+  ta.value = '';
+  ta.style.height = 'auto';
+
+  appendMsg('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  const thinking = appendMsg('ai', '<em style="color:var(--silver)">Thinking…</em>', true);
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('msm_token') || '') },
+      body: JSON.stringify({ messages: chatHistory.slice(-20) })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Chat failed');
+    const reply = data.message;
+    thinking.querySelector('.m-bubble').innerHTML = reply.replace(/\n/g, '<br>');
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    thinking.querySelector('.m-bubble').textContent = 'Error: ' + e.message;
+  }
+  scrollChat();
+}
+
+function appendMsg(type, html, raw) {
+  const win = document.getElementById('chat-window');
+  const el = document.createElement('div');
+  el.className = 'msg ' + type;
+  el.innerHTML = `<div class="m-av" style="${type==='ai'?'font-size:10px;font-weight:800;font-family:\'Fraunces\',serif':''}">
+    ${type === 'ai' ? 'M' : 'JD'}</div>
+    <div class="m-bubble">${raw ? html : html.replace(/\n/g,'<br>')}</div>`;
+  win.appendChild(el);
+  scrollChat();
+  return el;
+}
+
+function scrollChat() {
+  const w = document.getElementById('chat-window');
+  w.scrollTop = w.scrollHeight;
+}
+
+function clearChat() {
+  chatHistory = [];
+  document.getElementById('chat-window').innerHTML = `<div class="msg ai">
+    <div class="m-av" style="font-size:10px;font-weight:800;font-family:'Fraunces',serif">M</div>
+    <div class="m-bubble">Chat cleared! What would you like to create today?</div>
+  </div>`;
+}
+
+// ── Documents ─────────────────────────────────────────────
+const TYPE_STYLE = {
+  'Blog Writer':'background:#EEF2FF;color:#4F46E5',
+  'Email Campaign':'background:#ECFDF5;color:#059669',
+  'Product Description':'background:#FFF1F2;color:#E11D48',
+  'Ad Copy':'background:var(--orange-bg);color:var(--orange)',
+  'Social Media Posts':'background:#FEF3C7;color:#B45309',
+  'Sales Outreach Email':'background:#F0FDF4;color:#16A34A',
+  'SEO Meta Generator':'background:#EFF6FF;color:#2563EB',
+  'Keyword Cluster Builder':'background:#FEFCE8;color:#CA8A04',
+  'Landing Page Copy':'background:#FFF7ED;color:#EA580C',
+  'Content Rewriter':'background:#F5F3FF;color:#7C3AED',
+};
+
+const SAMPLE_DOCS = [
+  {id:1,name:'10 Ways to Boost E-Commerce Sales in 2025',type:'Blog Writer',words:1240,date:'2025-07-10'},
+  {id:2,name:'Summer Sale Email — July Promo',type:'Email Campaign',words:380,date:'2025-07-09'},
+  {id:3,name:'Wireless Earbuds Pro — Shopify Listing',type:'Product Description',words:220,date:'2025-07-08'},
+  {id:4,name:'Facebook Ads — New Collection Q3',type:'Ad Copy',words:90,date:'2025-07-07'},
+  {id:5,name:'SEO Meta Tags — 5 Landing Pages',type:'SEO Meta Generator',words:320,date:'2025-07-06'},
+  {id:6,name:'LinkedIn Post — Agency Case Study',type:'Social Media Posts',words:160,date:'2025-07-05'},
+];
+
+function renderDocuments() {
+  const stored = localStorage.getItem('msm_docs');
+  if (stored) savedDocs = JSON.parse(stored);
+  const all = [...SAMPLE_DOCS, ...savedDocs];
+  document.getElementById('doc-tbody').innerHTML = all.map(d => {
+    const style = TYPE_STYLE[d.type] || 'background:var(--cream2);color:var(--slate)';
+    const date = typeof d.date === 'string' ? d.date.substring(0,10) : new Date(d.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return `<tr>
+      <td style="font-weight:600;color:var(--navy)">${d.name}</td>
+      <td><span class="doc-type-tag" style="${style}">${d.type}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mist)">${(d.words||0).toLocaleString()}</td>
+      <td style="font-size:12px;color:var(--mist)">${date}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:11px" onclick="toast('Opening editor…','success')">Edit</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Settings ──────────────────────────────────────────────
+function showSetting(sec, el) {
+  document.querySelectorAll('.sn-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  ['general','api','brand','team','notif'].forEach(s => {
+    const el2 = document.getElementById('sc-' + s);
+    if (el2) el2.style.display = s === sec ? 'block' : 'none';
+  });
+  if (sec === 'api' && apiKey) {
+    document.getElementById('api-key-field').value = apiKey;
+    document.getElementById('api-ok').classList.add('show');
+  }
+}
+
+function saveApiKey() {
+  const k = document.getElementById('api-key-field').value.trim();
+  if (!k.startsWith('sk-ant-')) { toast('Invalid key format — must start with sk-ant-', 'error'); return; }
+  apiKey = k;
+  localStorage.setItem('msm_apikey', k);
+  document.getElementById('api-ok').classList.add('show');
+  toast('✓ API key saved — AI tools are now active!', 'success');
+}
+
+// ── Toast ─────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, type) {
+  clearTimeout(toastTimer);
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (type || '');
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+// ── Init ──────────────────────────────────────────────────
+renderTools(TOOLS);
+if (apiKey) document.getElementById('api-ok')?.classList.add('show');
+</script>
+</body>
+</html>

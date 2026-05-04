@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — M-SM AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{
+  --black:#080810;--dark:#0E0E18;--dark2:#141422;
+  --card:#1A1A2E;--card2:#1F1F35;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#F0F0FF;--text2:#A0A0C0;--text3:#606080;
+  --orange:#FF6B35;--orange2:#FF8C5A;
+  --orange3:rgba(255,107,53,0.12);--orange4:rgba(255,107,53,0.06);
+  --teal:#00D4AA;--red:#FF4757;
+  --r:12px;--r-sm:9px;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--black);color:var(--text);
+  display:flex;align-items:stretch;
+}
+/* Left panel */
+.left-panel{
+  width:48%;background:var(--dark2);
+  display:flex;flex-direction:column;
+  padding:40px 56px;position:relative;overflow:hidden;
+}
+.left-panel::before{
+  content:'';position:absolute;top:-200px;right:-200px;
+  width:600px;height:600px;
+  background:radial-gradient(ellipse,rgba(255,107,53,.1) 0%,transparent 65%);
+  pointer-events:none;
+}
+.left-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:20px;
+  color:var(--text);text-decoration:none;margin-bottom:auto;
+}
+.left-logo-badge{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--orange),#C44414);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:900;color:white;
+  box-shadow:0 4px 14px rgba(255,107,53,.4);
+}
+.left-logo em{font-style:normal;color:var(--orange)}
+.left-content{flex:1;display:flex;flex-direction:column;justify-content:center;gap:32px}
+.left-headline{
+  font-family:'Syne',sans-serif;font-size:38px;font-weight:800;
+  line-height:1.1;letter-spacing:-1.5px;color:var(--text);
+}
+.left-headline .hl{
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.left-desc{font-size:15px;color:var(--text2);line-height:1.7;max-width:360px}
+.left-stats{display:flex;gap:28px}
+.stat-item .stat-val{
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
+  color:var(--text);letter-spacing:-1px;
+}
+.stat-item .stat-label{font-size:12px;color:var(--text3);margin-top:2px}
+.left-testimonial{
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  border-radius:var(--r);padding:20px 22px;
+}
+.testi-quote{font-size:14px;color:var(--text2);line-height:1.7;font-style:italic;margin-bottom:12px}
+.testi-person{display:flex;align-items:center;gap:10px}
+.testi-av{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--orange),#C44414);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:white;
+}
+.testi-name{font-size:13px;font-weight:700;color:var(--text)}
+.testi-role{font-size:11px;color:var(--text3)}
+.left-bottom{margin-top:auto;font-size:12px;color:var(--text3)}
+
+/* Right panel */
+.right-panel{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 56px;background:var(--black);
+  overflow-y:auto;
+}
+.auth-box{width:100%;max-width:420px}
+.auth-title{
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
+  color:var(--text);margin-bottom:6px;letter-spacing:-.5px;
+}
+.auth-sub{font-size:14px;color:var(--text3);margin-bottom:32px;line-height:1.5}
+.auth-sub a{color:var(--orange);text-decoration:none;font-weight:600}
+.auth-sub a:hover{text-decoration:underline}
+.form-group{margin-bottom:16px}
+.form-label{
+  font-size:12px;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--text3);margin-bottom:7px;display:block;
+}
+.form-input{
+  width:100%;padding:13px 16px;
+  background:var(--dark2);border:1px solid var(--border2);
+  border-radius:var(--r-sm);font-size:14px;color:var(--text);
+  font-family:'DM Sans',sans-serif;outline:none;transition:all .2s;
+}
+.form-input:focus{
+  border-color:var(--orange);background:var(--card);
+  box-shadow:0 0 0 3px rgba(255,107,53,.12);
+}
+.form-input::placeholder{color:var(--text3)}
+.form-input-wrap{position:relative}
+.toggle-pw{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;
+  transition:color .15s;
+}
+.toggle-pw:hover{color:var(--text2)}
+.form-options{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.checkbox-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+.checkbox-wrap input{accent-color:var(--orange);width:14px;height:14px}
+.checkbox-label{font-size:13px;color:var(--text3)}
+.forgot-link{font-size:13px;color:var(--orange);text-decoration:none;font-weight:600}
+.forgot-link:hover{text-decoration:underline}
+.btn-submit{
+  width:100%;padding:14px;border:none;
+  background:var(--orange);color:white;
+  border-radius:var(--r-sm);font-size:15px;font-weight:700;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all .2s;box-shadow:0 4px 20px rgba(255,107,53,.3);
+  margin-bottom:20px;
+}
+.btn-submit:hover{background:var(--orange2);box-shadow:0 6px 28px rgba(255,107,53,.45);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.divider-row{
+  display:flex;align-items:center;gap:12px;
+  color:var(--text3);font-size:12px;margin-bottom:18px;
+}
+.divider-line{flex:1;height:1px;background:var(--border)}
+.social-btns{display:flex;gap:10px;margin-bottom:24px}
+.social-btn{
+  flex:1;padding:11px 16px;border-radius:var(--r-sm);
+  border:1px solid var(--border2);background:transparent;
+  color:var(--text2);font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .2s;
+}
+.social-btn:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.2);color:var(--text)}
+.auth-footer{font-size:13px;color:var(--text3);text-align:center}
+.auth-footer a{color:var(--orange);text-decoration:none;font-weight:600}
+.auth-footer a:hover{text-decoration:underline}
+.error-msg{
+  background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.25);
+  border-radius:var(--r-sm);padding:12px 16px;
+  font-size:13px;color:var(--red);margin-bottom:16px;display:none;
+}
+.success-msg{
+  background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);
+  border-radius:var(--r-sm);padding:12px 16px;
+  font-size:13px;color:var(--teal);margin-bottom:16px;display:none;
+}
+
+@media(max-width:800px){
+  body{overflow-y:auto}
+  .left-panel{display:none}
+  .right-panel{padding:40px 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <a href="index.html" class="left-logo">
+    <div class="left-logo-badge">M</div>
+    M-SM <em>AI</em>
+  </a>
+  <div class="left-content">
+    <div class="left-headline">
+      Your AI Marketing<br>Engine is <span class="hl">Waiting</span>
+    </div>
+    <div class="left-desc">Sign in to access 40+ AI writing tools, your document library, AI Chat powered by Groq, and your SEO suite.</div>
+    <div class="left-stats">
+      <div class="stat-item">
+        <div class="stat-val">40+</div>
+        <div class="stat-label">AI Tools</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">10×</div>
+        <div class="stat-label">Faster Writing</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">2.4K</div>
+        <div class="stat-label">Users</div>
+      </div>
+    </div>
+    <div class="left-testimonial">
+      <div class="testi-quote">"Signed up on Monday, had 5 blog posts done by Wednesday. M-SM AI is the best marketing investment I've made this year."</div>
+      <div class="testi-person">
+        <div class="testi-av">JW</div>
+        <div>
+          <div class="testi-name">James Wong</div>
+          <div class="testi-role">Founder, GrowthLab Agency</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="left-bottom">© 2025 M-SM AI · <a href="#" style="color:inherit">Privacy</a> · <a href="#" style="color:inherit">Terms</a></div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-box">
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub">Don't have an account? <a href="signup.html">Sign up free →</a></div>
+
+    <div class="error-msg" id="error-msg">Invalid email or password. Please try again.</div>
+    <div class="success-msg" id="success-msg">Signed in successfully! Redirecting…</div>
+
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="login-email" placeholder="you@company.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="form-input-wrap">
+          <input type="password" class="form-input" id="login-password" placeholder="Your password" required autocomplete="current-password" style="padding-right:46px">
+          <button type="button" class="toggle-pw" onclick="togglePw('login-password',this)">👁</button>
+        </div>
+      </div>
+      <div class="form-options">
+        <label class="checkbox-wrap">
+          <input type="checkbox" id="remember-me">
+          <span class="checkbox-label">Remember me</span>
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn-submit" id="login-btn">Sign In →</button>
+    </form>
+
+    <div class="divider-row"><div class="divider-line"></div>or continue with<div class="divider-line"></div></div>
+    <div class="social-btns">
+      <button class="social-btn" onclick="socialLogin('Google')">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Google
+      </button>
+      <button class="social-btn" onclick="socialLogin('GitHub')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        GitHub
+      </button>
+    </div>
+    <div class="auth-footer">
+      New to M-SM AI? <a href="signup.html">Create a free account</a>
+    </div>
+  </div>
+</div>
+
+<script>
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const errMsg = document.getElementById('error-msg');
+  const sucMsg = document.getElementById('success-msg');
+
+  errMsg.style.display = 'none';
+  sucMsg.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+
+    // Store auth token
+    localStorage.setItem('msm_token', data.token);
+    localStorage.setItem('msm_user', JSON.stringify(data.user));
+
+    sucMsg.textContent = `Welcome back, ${data.user.name}! Redirecting to dashboard…`;
+    sucMsg.style.display = 'block';
+    setTimeout(() => window.location.href = 'app.html', 1200);
+
+  } catch (err) {
+    errMsg.textContent = err.message;
+    errMsg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In →';
+  }
+}
+
+function togglePw(id, btn) {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.textContent = input.type === 'password' ? '👁' : '🙈';
+}
+
+function socialLogin(provider) {
+  window.location.href = `/api/auth/${provider.toLowerCase()}`;
+}
+
+// Handle Google OAuth redirect (token passed in URL after callback)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  const error = params.get('error');
+  const name  = params.get('name');
+  if (token) {
+    localStorage.setItem('msm_token', token);
+    if (name) localStorage.setItem('msm_user', JSON.stringify({ name: decodeURIComponent(name) }));
+    window.location.href = 'app.html';
+    return;
+  }
+  if (error) {
+    const errMsg = document.getElementById('error-msg');
+    const msgs = { google_cancelled: 'Google sign-in was cancelled. Please try again.', account_disabled: 'Your account has been disabled. Contact support.' };
+    errMsg.textContent = msgs[error] || ('Error: ' + decodeURIComponent(error));
+    errMsg.style.display = 'block';
+  }
+})();
+</script>
+</body>
+</html>
