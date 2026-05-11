@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-SM AI — Developer API Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fraunces:wght@700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1B2A;--navy2:#1A2D42;--cream:#FAF8F4;--white:#fff;--orange:#E8622A;--teal:#1A8F7A;--fog:#D4DFE8;--mist:#8EA3B5;--r:12px;--r-sm:8px;--code-bg:#1A2D42}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:var(--navy)}
+.topbar{background:var(--navy);padding:0 5%;height:56px;display:flex;align-items:center;gap:16px}
+.tb-logo{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:white;flex:1}
+.tb-logo em{font-style:normal;color:#FF8F66}
+.tb-a{color:rgba(255,255,255,.6);font-size:13px;text-decoration:none}
+.tb-a:hover{color:white}
+.layout{display:grid;grid-template-columns:240px 1fr;max-width:1200px;margin:0 auto;padding:32px 5%;gap:40px}
+.sidebar{position:sticky;top:80px;height:fit-content}
+.sb-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mist);margin-bottom:10px;margin-top:20px}
+.sb-title:first-child{margin-top:0}
+.sb-link{display:block;font-size:13px;color:var(--mist);text-decoration:none;padding:5px 0;transition:color .15s}
+.sb-link:hover{color:var(--navy)}
+.sb-link.active{color:var(--orange);font-weight:600}
+.content section{margin-bottom:56px}
+h1{font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:var(--navy);margin-bottom:12px}
+h2{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);margin-bottom:12px;padding-top:8px}
+h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px;margin-top:20px}
+p{font-size:14px;line-height:1.75;color:var(--navy2);margin-bottom:14px}
+.badge-method{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;margin-right:8px;font-family:'JetBrains Mono',monospace}
+.get{background:rgba(26,143,122,.12);color:var(--teal)}
+.post{background:rgba(232,98,42,.12);color:var(--orange)}
+.delete{background:rgba(192,57,43,.12);color:#C0392B}
+.put{background:rgba(107,79,187,.12);color:#6B4FBB}
+.endpoint{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.ep-head{padding:14px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s}
+.ep-head:hover{background:var(--cream)}
+.ep-path{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--navy);font-weight:500}
+.ep-desc{font-size:12px;color:var(--mist);margin-left:auto}
+.ep-body{padding:18px;border-top:1px solid var(--fog);display:none}
+.ep-body.open{display:block}
+.param-table{width:100%;border-collapse:collapse;margin-bottom:14px}
+.param-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mist);background:var(--cream);border-bottom:1px solid var(--fog)}
+.param-table td{padding:9px 12px;border-bottom:1px solid var(--fog);font-size:13px}
+.param-table td:first-child{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange)}
+.param-req{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(232,98,42,.1);color:var(--orange)}
+.param-opt{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--cream);color:var(--mist)}
+pre{background:var(--code-bg);border-radius:var(--r-sm);padding:16px;overflow-x:auto;margin-bottom:14px}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;color:#E2F0FF;line-height:1.6}
+.inline-code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(13,27,42,.06);padding:2px 6px;border-radius:4px;color:var(--navy2)}
+.info-box{background:rgba(26,143,122,.08);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:14px 16px;font-size:13px;color:var(--teal);margin-bottom:16px;line-height:1.6}
+.warn-box{background:rgba(232,98,42,.08);border:1px solid rgba(232,98,42,.2);border-radius:var(--r-sm);padding:14px 16px;font-size:13px;color:var(--orange);margin-bottom:16px;line-height:1.6}
+.copy-btn{float:right;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.6);font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s}
+.copy-btn:hover{background:rgba(255,255,255,.2);color:white}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-logo">M-SM <em>AI</em> Developer API</div>
+  <a href="/app.html" class="tb-a">← Back to App</a>
+</div>
+
+<div class="layout">
+<nav class="sidebar">
+  <div class="sb-title">Getting Started</div>
+  <a href="#intro" class="sb-link">Introduction</a>
+  <a href="#auth" class="sb-link">Authentication</a>
+  <a href="#keys" class="sb-link">API Keys</a>
+  <div class="sb-title">Endpoints</div>
+  <a href="#generate" class="sb-link">Generate Content</a>
+  <a href="#chat" class="sb-link">AI Chat</a>
+  <a href="#documents" class="sb-link">Documents</a>
+  <div class="sb-title">Reference</div>
+  <a href="#errors" class="sb-link">Error Codes</a>
+  <a href="#limits" class="sb-link">Rate Limits</a>
+</nav>
+
+<div class="content">
+
+<section id="intro">
+  <h1>M-SM AI Developer API</h1>
+  <p>The M-SM AI API lets you integrate AI marketing content generation directly into your own applications, websites, and workflows. Generate blog posts, ad copy, email campaigns, product descriptions, and more with a simple HTTP request.</p>
+  <div class="info-box">✅ Base URL: <strong>https://msm-ai-production.up.railway.app</strong></div>
+  <p>All API requests must be authenticated using an API key. Responses are returned in JSON format.</p>
+</section>
+
+<section id="auth">
+  <h2>Authentication</h2>
+  <p>The M-SM AI API uses API keys for authentication. Pass your API key in the <span class="inline-code">X-API-Key</span> header with every request.</p>
+  <pre><code><button class="copy-btn" onclick="copyCode(this)">Copy</button>curl -X POST https://msm-ai-production.up.railway.app/api/generate \
+  -H "X-API-Key: mak_your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Write a blog post about AI marketing"}'</code></pre>
+  <div class="warn-box">⚠️ Keep your API key secret. Do not expose it in client-side JavaScript or public repositories.</div>
+</section>
+
+<section id="keys">
+  <h2>API Keys</h2>
+  <p>Generate your API keys from the M-SM AI dashboard under <strong>Settings → Developer API</strong>. Each account can have up to 5 active API keys.</p>
+  <p>API keys start with <span class="inline-code">mak_</span> and are shown only once when created. Store them securely.</p>
+</section>
+
+<section id="generate">
+  <h2>Generate Content</h2>
+  <div class="endpoint">
+    <div class="ep-head" onclick="toggle(this)">
+      <span class="badge-method post">POST</span>
+      <span class="ep-path">/api/generate</span>
+      <span class="ep-desc">Generate marketing content</span>
+    </div>
+    <div class="ep-body open">
+      <h3>Request Body</h3>
+      <table class="param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>prompt</td><td>string</td><td><span class="param-req">Required</span></td><td>The content generation prompt</td></tr>
+          <tr><td>toolId</td><td>string</td><td><span class="param-opt">Optional</span></td><td>Tool identifier (e.g. blog-writer, ad-copy)</td></tr>
+          <tr><td>toolName</td><td>string</td><td><span class="param-opt">Optional</span></td><td>Display name for the document</td></tr>
+          <tr><td>tone</td><td>string</td><td><span class="param-opt">Optional</span></td><td>Professional, Friendly, Bold, Witty, Casual. Default: Professional</td></tr>
+          <tr><td>variants</td><td>integer</td><td><span class="param-opt">Optional</span></td><td>Number of variants (1-3). Default: 1</td></tr>
+        </tbody>
+      </table>
+      <h3>Example Request</h3>
+      <pre><code><button class="copy-btn" onclick="copyCode(this)">Copy</button>curl -X POST https://msm-ai-production.up.railway.app/api/generate \
+  -H "X-API-Key: mak_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Write a Facebook ad for a fitness app targeting busy professionals",
+    "toolId": "ad-copy",
+    "toolName": "Ad Copy",
+    "tone": "Bold",
+    "variants": 2
+  }'</code></pre>
+      <h3>Example Response</h3>
+      <pre><code>{
+  "success": true,
+  "text": "Stop making excuses. Start making gains...",
+  "wordCount": 87,
+  "creditsUsed": 10,
+  "docId": 142,
+  "seoScore": 72,
+  "readabilityScore": 85
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="chat">
+  <h2>AI Chat</h2>
+  <div class="endpoint">
+    <div class="ep-head" onclick="toggle(this)">
+      <span class="badge-method post">POST</span>
+      <span class="ep-path">/api/chat</span>
+      <span class="ep-desc">Send a message to the AI marketing assistant</span>
+    </div>
+    <div class="ep-body open">
+      <h3>Request Body</h3>
+      <table class="param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>messages</td><td>array</td><td><span class="param-req">Required</span></td><td>Array of message objects with role and content</td></tr>
+          <tr><td>model</td><td>string</td><td><span class="param-opt">Optional</span></td><td>Groq model ID. Default: llama-3.3-70b-versatile</td></tr>
+        </tbody>
+      </table>
+      <h3>Example Request</h3>
+      <pre><code><button class="copy-btn" onclick="copyCode(this)">Copy</button>curl -X POST https://msm-ai-production.up.railway.app/api/chat \
+  -H "X-API-Key: mak_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {"role": "user", "content": "Give me 5 email subject line ideas for a Black Friday sale"}
+    ]
+  }'</code></pre>
+      <h3>Example Response</h3>
+      <pre><code>{
+  "success": true,
+  "message": "Here are 5 high-converting subject lines:\n1. ⚡ 60% Off Ends Tonight...",
+  "model": "llama-3.3-70b-versatile"
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="documents">
+  <h2>Documents</h2>
+  <div class="endpoint">
+    <div class="ep-head" onclick="toggle(this)">
+      <span class="badge-method get">GET</span>
+      <span class="ep-path">/api/documents</span>
+      <span class="ep-desc">List all documents</span>
+    </div>
+    <div class="ep-body">
+      <h3>Query Parameters</h3>
+      <table class="param-table">
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>page</td><td>integer</td><td>Page number. Default: 1</td></tr>
+          <tr><td>limit</td><td>integer</td><td>Results per page. Default: 30, Max: 100</td></tr>
+        </tbody>
+      </table>
+      <pre><code><button class="copy-btn" onclick="copyCode(this)">Copy</button>curl https://msm-ai-production.up.railway.app/api/documents?page=1&limit=10 \
+  -H "X-API-Key: mak_your_key"</code></pre>
+    </div>
+  </div>
+  <div class="endpoint">
+    <div class="ep-head" onclick="toggle(this)">
+      <span class="badge-method get">GET</span>
+      <span class="ep-path">/api/documents/:id</span>
+      <span class="ep-desc">Get a single document</span>
+    </div>
+    <div class="ep-body">
+      <pre><code>curl https://msm-ai-production.up.railway.app/api/documents/142 \
+  -H "X-API-Key: mak_your_key"</code></pre>
+    </div>
+  </div>
+  <div class="endpoint">
+    <div class="ep-head" onclick="toggle(this)">
+      <span class="badge-method delete">DELETE</span>
+      <span class="ep-path">/api/documents/:id</span>
+      <span class="ep-desc">Delete a document</span>
+    </div>
+    <div class="ep-body">
+      <pre><code>curl -X DELETE https://msm-ai-production.up.railway.app/api/documents/142 \
+  -H "X-API-Key: mak_your_key"</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="errors">
+  <h2>Error Codes</h2>
+  <table class="param-table">
+    <thead><tr><th>Status</th><th>Error</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>400</td><td>Bad Request</td><td>Missing required fields or invalid input</td></tr>
+      <tr><td>401</td><td>Unauthorized</td><td>Invalid or missing API key</td></tr>
+      <tr><td>402</td><td>Payment Required</td><td>Insufficient credits. Upgrade plan.</td></tr>
+      <tr><td>404</td><td>Not Found</td><td>Resource not found</td></tr>
+      <tr><td>429</td><td>Too Many Requests</td><td>Rate limit exceeded</td></tr>
+      <tr><td>500</td><td>Server Error</td><td>Internal server error</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="limits">
+  <h2>Rate Limits</h2>
+  <table class="param-table">
+    <thead><tr><th>Endpoint</th><th>Limit</th><th>Window</th></tr></thead>
+    <tbody>
+      <tr><td>/api/generate</td><td>60 requests</td><td>Per minute</td></tr>
+      <tr><td>/api/chat</td><td>60 requests</td><td>Per minute</td></tr>
+      <tr><td>/api/bulk/generate</td><td>5 requests</td><td>Per minute</td></tr>
+      <tr><td>All auth endpoints</td><td>30 requests</td><td>Per 15 minutes</td></tr>
+    </tbody>
+  </table>
+  <div class="info-box">Credits are deducted per generation. Each word of output costs approximately 0.1 credits (min 10 credits per request). Chat costs 5 credits per message.</div>
+</section>
+
+</div>
+</div>
+
+<script>
+function toggle(head){const body=head.nextElementSibling;body.classList.toggle('open');}
+function copyCode(btn){
+  const code=btn.parentElement.textContent.replace('Copy','').trim();
+  navigator.clipboard.writeText(code).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);});
+}
+</script>
+</body>
+</html>

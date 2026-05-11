@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-SM AI Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fraunces:wght@700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0D1B2A;--cream:#FAF8F4;--white:#fff;--orange:#E8622A;--teal:#1A8F7A;--red:#C0392B;--fog:#D4DFE8;--mist:#8EA3B5;--r:12px;--r-sm:8px}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:var(--navy)}
+.topbar{background:var(--navy);padding:0 28px;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+.tb-logo{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:white;flex:1}
+.tb-logo em{font-style:normal;color:#FF8F66}
+.tb-badge{background:var(--orange);color:white;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.tb-a{color:rgba(255,255,255,.6);font-size:13px;text-decoration:none}
+.tb-a:hover{color:white}
+.wrap{max-width:1200px;margin:0 auto;padding:28px}
+.pg-title{font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:4px}
+.pg-sub{font-size:13px;color:var(--mist);margin-bottom:24px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.sc{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);padding:18px 20px}
+.sc-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mist);margin-bottom:6px}
+.sc-val{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--navy)}
+.sc-sub{font-size:11px;color:var(--mist);margin-top:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.panel{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);overflow:hidden}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--fog)}
+.ph-title{font-size:14px;font-weight:700}
+.prow{display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--fog)}
+.prow:last-child{border-bottom:none}
+.prow-name{font-size:13px;font-weight:600;flex:0 0 80px}
+.prow-bar{flex:1;height:5px;background:var(--fog);border-radius:3px;overflow:hidden}
+.prow-fill{height:100%;background:var(--orange);border-radius:3px}
+.prow-count{font-size:12px;color:var(--mist);font-family:'JetBrains Mono',monospace;flex:0 0 60px;text-align:right}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;padding:10px 16px;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mist);background:var(--cream);border-bottom:1px solid var(--fog)}
+.tbl td{padding:11px 16px;border-bottom:1px solid var(--fog);font-size:13px;vertical-align:middle}
+.tbl tr:hover td{background:var(--cream);cursor:pointer}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.b-free{background:var(--cream);color:var(--mist)}
+.b-pro{background:rgba(232,98,42,.1);color:var(--orange)}
+.b-agency{background:rgba(26,143,122,.1);color:var(--teal)}
+.b-admin{background:rgba(107,79,187,.1);color:#6B4FBB}
+.b-on{background:rgba(26,143,122,.1);color:var(--teal)}
+.b-off{background:rgba(192,57,43,.1);color:var(--red)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-or{background:var(--orange);color:white}
+.btn-or:hover{background:#F07340}
+.btn-out{background:var(--white);color:var(--navy);border:1px solid var(--fog)}
+.btn-out:hover{background:var(--cream)}
+.btn-red{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.2)}
+.btn-red:hover{background:var(--red);color:white}
+.search-row{display:flex;gap:10px;padding:14px 18px;border-bottom:1px solid var(--fog)}
+.si{flex:1;padding:8px 13px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:13px;font-family:inherit;outline:none}
+.si:focus{border-color:var(--orange)}
+.pgn{display:flex;align-items:center;gap:8px;padding:12px 18px;justify-content:flex-end;border-top:1px solid var(--fog)}
+.pgn-info{font-size:11px;color:var(--mist);font-family:'JetBrains Mono',monospace;flex:1}
+.pgn-btn{padding:5px 12px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--white)}
+.pgn-btn:hover{background:var(--cream)}
+.pgn-btn:disabled{opacity:.4;cursor:not-allowed}
+.ov{display:none;position:fixed;inset:0;background:rgba(13,27,42,.5);z-index:200;align-items:center;justify-content:center}
+.ov.show{display:flex}
+.modal{background:var(--white);border-radius:var(--r);padding:26px;width:100%;max-width:420px}
+.modal-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;margin-bottom:18px}
+.fg{margin-bottom:13px}
+.fl{font-size:11px;font-weight:700;color:var(--mist);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
+.fi,.fs{width:100%;padding:8px 12px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:13px;font-family:inherit;outline:none}
+.fi:focus,.fs:focus{border-color:var(--orange)}
+.m-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:white;padding:11px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--teal)}
+.toast.error{background:var(--red)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-logo">M-SM <em>AI</em></div>
+  <span class="tb-badge">ADMIN</span>
+  <a href="/app.html" class="tb-a">← Back to App</a>
+  <a href="/login.html" onclick="localStorage.removeItem('msm_token')" class="tb-a">Sign Out</a>
+</div>
+<div class="wrap">
+  <div class="pg-title">Admin Dashboard</div>
+  <div class="pg-sub">Manage users, monitor usage, and control the platform</div>
+  <div class="stats">
+    <div class="sc"><div class="sc-label">Total Users</div><div class="sc-val" id="s-users">—</div><div class="sc-sub">All time</div></div>
+    <div class="sc"><div class="sc-label">Documents</div><div class="sc-val" id="s-docs">—</div><div class="sc-sub">Generated</div></div>
+    <div class="sc"><div class="sc-label">Words Written</div><div class="sc-val" id="s-words">—</div><div class="sc-sub">AI generated</div></div>
+    <div class="sc"><div class="sc-label">New This Month</div><div class="sc-val" id="s-week">—</div><div class="sc-sub">Signups</div></div>
+  </div>
+  <div class="g2">
+    <div class="panel">
+      <div class="ph"><div class="ph-title">Users by Plan</div></div>
+      <div id="plan-bd"><div style="padding:20px;color:var(--mist);font-size:13px">Loading...</div></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><div class="ph-title">Recent Signups</div></div>
+      <div id="recent-users"><div style="padding:20px;color:var(--mist);font-size:13px">Loading...</div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph">
+      <div class="ph-title">All Users</div>
+      <button class="btn btn-or btn-sm" onclick="toast('Share signup link: '+location.origin+'/signup.html','')">+ Invite User</button>
+    </div>
+    <div class="search-row">
+      <input class="si" id="search-in" placeholder="Search name or email..." oninput="debSearch(this.value)">
+      <button class="btn btn-out" onclick="loadUsers(1)">Refresh</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>User</th><th>Plan</th><th>Credits</th><th>Joined</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="utbody"><tr><td colspan="7" style="text-align:center;padding:28px;color:var(--mist)">Loading...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pgn">
+      <div class="pgn-info" id="pgn-info">Loading...</div>
+      <button class="pgn-btn" id="prev-btn" onclick="changePage(-1)">← Prev</button>
+      <button class="pgn-btn" id="next-btn" onclick="changePage(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="edit-ov">
+  <div class="modal">
+    <div class="modal-title">Edit User</div>
+    <input type="hidden" id="e-id">
+    <div class="fg"><label class="fl">Plan</label>
+      <select class="fs" id="e-plan">
+        <option value="free">Free (2,500 credits)</option>
+        <option value="pro">Pro (10,000 credits)</option>
+        <option value="agency">Agency (Unlimited)</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Override Credits (optional)</label>
+      <input type="number" class="fi" id="e-credits" placeholder="Leave blank to use plan default">
+    </div>
+    <div class="fg"><label class="fl">Role</label>
+      <select class="fs" id="e-role"><option value="user">User</option><option value="admin">Admin</option></select>
+    </div>
+    <div class="fg"><label class="fl">Account Status</label>
+      <select class="fs" id="e-status"><option value="true">Active</option><option value="false">Disabled</option></select>
+    </div>
+    <div class="m-acts">
+      <button class="btn btn-out" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-red btn-sm" onclick="disableUser()">Disable</button>
+      <button class="btn btn-or" onclick="saveUser()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TK = localStorage.getItem('msm_token');
+let page = 1, total = 0, q = '', editId = null;
+const H = () => ({'Content-Type':'application/json','Authorization':'Bearer '+TK});
+
+async function init(){
+  if(!TK){window.location.href='/login.html';return;}
+  const me = await fetch('/api/auth/me',{headers:H()}).then(r=>r.json());
+  if(me.role!=='admin'){alert('Admin access required');window.location.href='/app.html';return;}
+  loadStats();loadUsers(1);
+}
+
+async function loadStats(){
+  const d = await fetch('/api/admin/stats',{headers:H()}).then(r=>r.json());
+  document.getElementById('s-users').textContent=(d.totalUsers||0).toLocaleString();
+  document.getElementById('s-docs').textContent=(d.totalDocuments||0).toLocaleString();
+  const w=parseInt(d.totalWords||0);
+  document.getElementById('s-words').textContent=w>=1000000?(w/1000000).toFixed(1)+'M':w>=1000?Math.round(w/1000)+'K':w;
+  const wk=(d.dailySignups||[]).reduce((a,b)=>a+parseInt(b.signups),0);
+  document.getElementById('s-week').textContent=wk;
+  const plans=d.planBreakdown||[];
+  const pt=plans.reduce((a,b)=>a+parseInt(b.count),0);
+  const clrs={free:'var(--fog)',pro:'var(--orange)',agency:'var(--teal)'};
+  const bgs={free:'b-free',pro:'b-pro',agency:'b-agency'};
+  document.getElementById('plan-bd').innerHTML=plans.map(p=>{
+    const pct=pt>0?Math.round((parseInt(p.count)/pt)*100):0;
+    return `<div class="prow"><span class="prow-name"><span class="badge ${bgs[p.plan]||'b-free'}">${p.plan.toUpperCase()}</span></span><div class="prow-bar"><div class="prow-fill" style="width:${pct}%;background:${clrs[p.plan]||'var(--fog)'}"></div></div><span class="prow-count">${p.count}</span></div>`;
+  }).join('')||'<div style="padding:18px;text-align:center;color:var(--mist)">No data</div>';
+  document.getElementById('recent-users').innerHTML=(d.recentUsers||[]).map(u=>`<div class="prow"><div style="width:30px;height:30px;border-radius:50%;background:rgba(232,98,42,.1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--orange);flex-shrink:0">${u.name.charAt(0).toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.name}</div><div style="font-size:11px;color:var(--mist)">${u.email}</div></div><span class="badge b-${u.plan}">${u.plan}</span></div>`).join('')||'<div style="padding:18px;text-align:center;color:var(--mist)">No users yet</div>';
+}
+
+async function loadUsers(p=1){
+  page=p;
+  const url=`/api/admin/users?page=${p}&limit=15${q?'&search='+encodeURIComponent(q):''}`;
+  const d=await fetch(url,{headers:H()}).then(r=>r.json());
+  total=d.total||0;
+  const tbody=document.getElementById('utbody');
+  if(!d.users?.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--mist)">No users found</td></tr>`;return;}
+  const bmap={free:'b-free',pro:'b-pro',agency:'b-agency',admin:'b-admin'};
+  tbody.innerHTML=d.users.map(u=>{
+    const joined=new Date(u.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});
+    const ll=u.last_login?new Date(u.last_login).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'Never';
+    const roleTag=u.role==='admin'?'<span class="badge b-admin" style="margin-left:4px">ADMIN</span>':'';
+    return `<tr><td><div style="font-weight:600">${u.name}${roleTag}</div><div style="font-size:11px;color:var(--mist)">${u.email}</div></td><td><span class="badge ${bmap[u.plan]||'b-free'}">${u.plan.toUpperCase()}</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${(u.credits||0).toLocaleString()}/${(u.credits_max||0).toLocaleString()}</td><td style="font-size:11px;color:var(--mist)">${joined}</td><td style="font-size:11px;color:var(--mist)">${ll}</td><td><span class="badge ${u.is_active?'b-on':'b-off'}">${u.is_active?'Active':'Off'}</span></td><td><button class="btn btn-out btn-sm" onclick="editUser(${u.id},'${u.plan}',${u.credits},'${u.role}',${u.is_active})">Edit</button></td></tr>`;
+  }).join('');
+  document.getElementById('pgn-info').textContent=`${Math.min((p-1)*15+1,total)}-${Math.min(p*15,total)} of ${total}`;
+  document.getElementById('prev-btn').disabled=p<=1;
+  document.getElementById('next-btn').disabled=p*15>=total;
+}
+
+let st;
+function debSearch(v){q=v;clearTimeout(st);st=setTimeout(()=>loadUsers(1),400);}
+function changePage(d){loadUsers(page+d);}
+
+function editUser(id,plan,credits,role,active){
+  editId=id;
+  document.getElementById('e-id').value=id;
+  document.getElementById('e-plan').value=plan;
+  document.getElementById('e-credits').value='';
+  document.getElementById('e-role').value=role;
+  document.getElementById('e-status').value=String(active);
+  document.getElementById('edit-ov').classList.add('show');
+}
+
+async function saveUser(){
+  const body={plan:document.getElementById('e-plan').value,role:document.getElementById('e-role').value,is_active:document.getElementById('e-status').value==='true'};
+  const c=document.getElementById('e-credits').value;
+  if(c)body.credits=parseInt(c);
+  const r=await fetch(`/api/admin/users/${editId}`,{method:'PUT',headers:H(),body:JSON.stringify(body)});
+  if(r.ok){toast('User updated!','success');closeModal();loadUsers(page);loadStats();}
+  else{const e=await r.json();toast(e.error,'error');}
+}
+
+async function disableUser(){
+  if(!confirm('Disable this user?'))return;
+  const r=await fetch(`/api/admin/users/${editId}`,{method:'DELETE',headers:H()});
+  if(r.ok){toast('User disabled','success');closeModal();loadUsers(page);}
+  else{const e=await r.json();toast(e.error,'error');}
+}
+
+function closeModal(){document.getElementById('edit-ov').classList.remove('show');editId=null;}
+
+let tt;
+function toast(msg,type){clearTimeout(tt);const el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(type||'');tt=setTimeout(()=>el.classList.remove('show'),3500);}
+
+init();
+</script>
+</body>
+</html>
