@@ -729,12 +729,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   </button>
 
   <div class="sb-bottom">
-    <div class="user-tile">
-      <div class="u-avatar">JD</div>
+    <div class="user-tile" onclick="logout()" title="Click to sign out">
+      <div class="u-avatar"></div>
       <div class="u-info">
-        <div class="u-name">John Doe</div>
-        <div class="u-plan">Pro Plan · 4,820 credits</div>
+        <div class="u-name">Loading...</div>
+        <div class="u-plan">Loading...</div>
       </div>
+      <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-left:auto">Sign out</span>
     </div>
   </div>
 </nav>
@@ -1131,7 +1132,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
             </select>
           </div>
           <div style="margin-top:22px">
-            <button class="btn btn-primary" onclick="toast('Settings saved!','success')">Save Changes</button>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
           </div>
         </div>
 
@@ -1179,7 +1180,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
             <div class="f-label">Target Audience</div>
             <input class="f-input" placeholder="e.g. Small business owners aged 28–50">
           </div>
-          <button class="btn btn-primary" onclick="toast('Brand voice saved!','success')">Save Brand Voice</button>
+          <button class="btn btn-primary" onclick="saveBrandVoice()">Save Brand Voice</button>
         </div>
 
         <div id="sc-team" style="display:none">
@@ -1930,9 +1931,147 @@ function toast(msg, type) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
 }
 
+// ════════════════════════════════════════════════════
+//  REAL AUTH & DATA — connects to server API
+// ════════════════════════════════════════════════════
+let currentUser = null;
+function getToken() { return localStorage.getItem('msm_token') || ''; }
+function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
+
+async function initApp() {
+  // Handle Google OAuth redirect
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get('token');
+  if (urlToken) { localStorage.setItem('msm_token', urlToken); window.history.replaceState({}, '', '/app.html'); }
+
+  if (!getToken()) { window.location.href = '/login.html'; return; }
+
+  try {
+    const res = await fetch('/api/auth/me', { headers: authHeaders() });
+    if (!res.ok) { localStorage.removeItem('msm_token'); window.location.href = '/login.html'; return; }
+    currentUser = await res.json();
+    applyUser(currentUser);
+    loadStats();
+  } catch (err) { window.location.href = '/login.html'; }
+}
+
+function applyUser(u) {
+  // Sidebar
+  const n = document.querySelector('.u-name');
+  const p = document.querySelector('.u-plan');
+  const a = document.querySelector('.u-avatar');
+  if (n) n.textContent = u.name;
+  if (p) p.textContent = `${u.plan.charAt(0).toUpperCase()+u.plan.slice(1)} Plan · ${(u.credits||0).toLocaleString()} credits`;
+  if (a) {
+    if (u.avatar) a.innerHTML = `<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    else a.textContent = u.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+  }
+  // Topbar credits
+  const c = document.getElementById('cred-count');
+  if (c) c.textContent = (u.credits||0).toLocaleString()+' credits';
+  credits = u.credits || 0;
+  // Dashboard greeting
+  const g = document.querySelector('.banner-title');
+  if (g) g.textContent = `Welcome back, ${u.name.split(' ')[0]}`;
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch('/api/stats', { headers: authHeaders() });
+    if (!res.ok) return;
+    const s = await res.json();
+    const vals = document.querySelectorAll('.m-card-val');
+    if (vals[0]) vals[0].textContent = s.totalWords >= 1000 ? Math.round(s.totalWords/1000)+'K' : (s.totalWords||0);
+    if (vals[1]) vals[1].textContent = s.totalDocuments || 0;
+    if (vals[2]) vals[2].textContent = (s.creditsUsed||0).toLocaleString();
+    if (vals[3]) { vals[3].textContent = s.topTool || 'None yet'; vals[3].style.fontSize='16px'; }
+    const deltas = document.querySelectorAll('.m-card-delta');
+    if (deltas[1]) deltas[1].textContent = `+${s.docsThisWeek||0} this week`;
+    if (deltas[2]) deltas[2].textContent = `${(s.creditsRemaining||0).toLocaleString()} remaining`;
+    const pct = s.creditsMax > 0 ? Math.round(((s.creditsUsed||0)/s.creditsMax)*100) : 0;
+    const fill = document.querySelector('.progress-fill');
+    const pctEl = document.querySelector('.progress-pct');
+    if (fill) fill.style.width = pct+'%';
+    if (pctEl) pctEl.textContent = pct+'%';
+    const note = document.querySelector('.progress-note');
+    if (note) note.textContent = `${(s.creditsUsed||0).toLocaleString()} used · ${(s.creditsRemaining||0).toLocaleString()} remaining`;
+    if (s.recentDocuments && s.recentDocuments.length > 0) renderRecentDocs(s.recentDocuments);
+    else {
+      const panel = document.querySelector('.panel-body');
+      if (panel) panel.innerHTML = `<div style="padding:24px;text-align:center;color:var(--mist);font-size:13px">No documents yet — create your first piece of content!</div>`;
+    }
+  } catch (err) { console.log('Stats err:', err.message); }
+}
+
+function renderRecentDocs(docs) {
+  const panel = document.querySelector('.panel-body');
+  if (!panel) return;
+  const icons = {'Blog Writer':'✍️','Email Campaign':'📧','Product Description':'🛍️','Ad Copy':'🎯','Social Media Posts':'📱','Sales Outreach Email':'💼','SEO Meta Generator':'🔍','Landing Page Copy':'🚀','Content Rewriter':'🔄','Keyword Cluster Builder':'💡'};
+  const bgs   = {'Blog Writer':'#EEF2FF','Email Campaign':'#ECFDF5','Product Description':'#FFF1F2','Ad Copy':'var(--orange-bg)','Social Media Posts':'#FEF3C7'};
+  const tcs   = {'Blog Writer':'#4F46E5','Email Campaign':'#059669','Product Description':'#E11D48','Ad Copy':'var(--orange)','Social Media Posts':'#B45309'};
+  panel.innerHTML = docs.map(d => {
+    const icon = icons[d.tool_name]||'📄';
+    const bg = bgs[d.tool_name]||'var(--cream2)';
+    const tc = tcs[d.tool_name]||'var(--slate)';
+    const date = new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return `<div class="recent-row"><div class="rr-ico" style="background:${bg}">${icon}</div><div class="rr-info"><div class="rr-name">${d.title}</div><div class="rr-meta">${d.tool_name||'Content'} · ${date} · ${(d.word_count||0).toLocaleString()} words</div></div><span class="rr-badge" style="background:${bg};color:${tc}">${(d.tool_name||'Doc').split(' ')[0]}</span></div>`;
+  }).join('');
+}
+
+async function renderDocuments() {
+  try {
+    const res = await fetch('/api/documents', { headers: authHeaders() });
+    if (!res.ok) return;
+    const data = await res.json();
+    const docs = data.documents || [];
+    const tbody = document.getElementById('doc-tbody');
+    if (!tbody) return;
+    if (docs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--mist)">No documents yet. Start creating content with AI Tools!</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = docs.map(d => {
+      const style = TYPE_STYLE[d.tool_name]||'background:var(--cream2);color:var(--slate)';
+      const date = new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      return `<tr><td style="font-weight:600;color:var(--navy)">${d.title}</td><td><span class="doc-type-tag" style="${style}">${d.tool_name||'Content'}</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mist)">${(d.word_count||0).toLocaleString()}</td><td style="font-size:12px;color:var(--mist)">${date}</td><td><button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:11px" onclick="deleteDoc(${d.id},this)">🗑 Delete</button></td></tr>`;
+    }).join('');
+  } catch(err) { console.log('Docs err:', err.message); }
+}
+
+async function deleteDoc(id, btn) {
+  if (!confirm('Delete this document?')) return;
+  btn.textContent = '...';
+  await fetch(`/api/documents/${id}`, { method:'DELETE', headers: authHeaders() });
+  renderDocuments();
+  toast('Document deleted','');
+}
+
+async function saveSettings() {
+  const inputs = document.querySelectorAll('#sc-general input');
+  const name = inputs[0]?.value;
+  await fetch('/api/auth/me', { method:'PUT', headers: authHeaders(), body: JSON.stringify({ name }) });
+  if (currentUser) { currentUser.name = name; applyUser(currentUser); }
+  toast('Settings saved!', 'success');
+}
+
+async function saveBrandVoice() {
+  const inputs = document.querySelectorAll('#sc-brand input, #sc-brand textarea');
+  const brand_name = inputs[0]?.value;
+  const brand_desc = inputs[1]?.value;
+  const toneEl = document.querySelector('#sc-brand .tone-tag.on');
+  const brand_tone = toneEl?.textContent || 'Professional';
+  await fetch('/api/auth/me', { method:'PUT', headers: authHeaders(), body: JSON.stringify({ brand_name, brand_desc, brand_tone }) });
+  toast('Brand voice saved!', 'success');
+}
+
+function logout() {
+  localStorage.removeItem('msm_token');
+  window.location.href = '/login.html';
+}
+
 // ── Init ──────────────────────────────────────────────────
 renderTools(TOOLS);
-if (apiKey) document.getElementById('api-ok')?.classList.add('show');
+initApp();
 </script>
 </body>
 </html>
