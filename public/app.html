@@ -748,7 +748,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     <div class="topbar-title" id="topbar-title">Dashboard</div>
     <div class="cred-chip">
       <div class="cred-dot"></div>
-      <span id="cred-count">4,820 credits</span>
+      <span id="cred-count">Loading...</span>
     </div>
     <button class="btn btn-outline btn-sm" onclick="goTo('settings')" style="gap:5px">⚙ Settings</button>
     <button class="btn btn-primary btn-sm" onclick="goTo('tools')">＋ New Content</button>
@@ -1110,11 +1110,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
           <div class="sc-title">General Settings</div>
           <div class="s-row">
             <div class="s-info"><div class="s-lbl">Full Name</div><div class="s-desc">Displayed across the platform</div></div>
-            <input class="f-input" value="John Doe" style="width:200px">
+            <input class="f-input" value="" placeholder="Your name" style="width:200px">
           </div>
           <div class="s-row">
             <div class="s-info"><div class="s-lbl">Email Address</div><div class="s-desc">Used for login and billing</div></div>
-            <input class="f-input" value="john@company.com" style="width:200px">
+            <input class="f-input" value="" placeholder="Your email" readonly style="width:200px">
           </div>
           <div class="s-row">
             <div class="s-info"><div class="s-lbl">Default Language</div><div class="s-desc">Language for generated content</div></div>
@@ -1140,17 +1140,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
           <div class="sc-title">API Configuration</div>
           <div class="s-row" style="flex-direction:column;align-items:flex-start;gap:12px">
             <div class="s-info">
-              <div class="s-lbl">Anthropic API Key</div>
-              <div class="s-desc">This key powers all AI content generation. Get yours at console.anthropic.com</div>
+              <div class="s-lbl">Your Groq API Key (Optional)</div>
+              <div class="s-desc">Add your own free Groq key from console.groq.com to use your personal quota</div>
             </div>
             <div class="api-row">
-              <input class="f-input" type="password" id="api-key-field" placeholder="sk-ant-api03-…" style="flex:1">
+              <input class="f-input" type="password" id="api-key-field" placeholder="gsk_…" style="flex:1">
               <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save Key</button>
             </div>
-            <div class="api-ok" id="api-ok">✓ API key active — AI tools are ready</div>
+            <div class="api-ok" id="api-ok"></div>
           </div>
           <div class="info-box">
-            🔒 Your API key is stored locally in your browser's localStorage and never transmitted to our servers. All AI generation happens directly between your browser and Anthropic's API.
+            ✅ The platform already has a built-in Groq AI key — all tools work out of the box for free. You only need to add your own key if you want to use your personal Groq quota.
           </div>
         </div>
 
@@ -1295,12 +1295,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 //  M-SM AI — Application Logic
 // ═══════════════════════════════════════════════════════════
 
-let apiKey = localStorage.getItem('msm_apikey') || '';
+let apiKey = ''; // legacy - not used, Groq key is server-side
 let activeTone = 'Professional';
 let currentTool = null;
 let chatHistory = [];
-let savedDocs = JSON.parse(localStorage.getItem('msm_docs') || '[]');
-let credits = 4820;
+let savedDocs = []; // legacy - not used, documents come from server
+let credits = 0;
 
 // ── Tool catalogue ───────────────────────────────────────
 const TOOLS = [
@@ -1729,28 +1729,33 @@ function copyAllOutput() {
   navigator.clipboard.writeText(all.join('\n\n────────────────────\n\n')).then(() => toast('All variants copied!', 'success'));
 }
 
-function saveVariant(btn) {
+async function saveVariant(btn) {
   const text = btn.closest('.result-block').querySelector('.rb-text').textContent;
-  pushDoc(text);
+  await pushDoc(text);
   toast('Saved to Documents ✓', 'success');
 }
 
-function saveToDocuments() {
+async function saveToDocuments() {
   const all = document.querySelectorAll('.rb-text');
   if (!all.length) { toast('Nothing to save yet', 'error'); return; }
-  all.forEach(el => pushDoc(el.textContent));
+  for (const el of all) { await pushDoc(el.textContent); }
   toast(`${all.length} variant(s) saved to Documents ✓`, 'success');
 }
 
-function pushDoc(text) {
-  savedDocs.unshift({
-    id: Date.now(),
-    name: currentTool.form.name + ' — ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
-    type: currentTool.form.name,
-    words: text.split(/\s+/).filter(Boolean).length,
-    date: new Date().toISOString()
-  });
-  localStorage.setItem('msm_docs', JSON.stringify(savedDocs.slice(0, 200)));
+async function pushDoc(text) {
+  const title = (currentTool?.form?.name || 'Content') + ' — ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  try {
+    await fetch('/api/documents', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        title,
+        content: text,
+        tool_id: currentTool?.id,
+        tool_name: currentTool?.form?.name
+      })
+    });
+  } catch(e) { console.log('Save doc error:', e.message); }
 }
 
 async function regenVariant(btn) {
@@ -1906,19 +1911,29 @@ function showSetting(sec, el) {
     const el2 = document.getElementById('sc-' + s);
     if (el2) el2.style.display = s === sec ? 'block' : 'none';
   });
-  if (sec === 'api' && apiKey) {
-    document.getElementById('api-key-field').value = apiKey;
-    document.getElementById('api-ok').classList.add('show');
+  // Populate general settings with real user data
+  if (sec === 'general' && currentUser) {
+    const inputs = document.querySelectorAll('#sc-general input');
+    if (inputs[0]) inputs[0].value = currentUser.name || '';
+    if (inputs[1]) inputs[1].value = currentUser.email || '';
+  }
+  // Populate brand voice with real user data
+  if (sec === 'brand' && currentUser) {
+    const inputs = document.querySelectorAll('#sc-brand input, #sc-brand textarea');
+    if (inputs[0]) inputs[0].value = currentUser.brand_name || '';
+    if (inputs[1]) inputs[1].value = currentUser.brand_desc || '';
   }
 }
 
-function saveApiKey() {
+async function saveApiKey() {
   const k = document.getElementById('api-key-field').value.trim();
-  if (!k.startsWith('sk-ant-')) { toast('Invalid key format — must start with sk-ant-', 'error'); return; }
-  apiKey = k;
-  localStorage.setItem('msm_apikey', k);
-  document.getElementById('api-ok').classList.add('show');
-  toast('✓ API key saved — AI tools are now active!', 'success');
+  if (!k.startsWith('gsk_')) { toast('Invalid Groq key — must start with gsk_', 'error'); return; }
+  try {
+    await fetch('/api/keys', { method:'PUT', headers: authHeaders(), body: JSON.stringify({ groq_key: k }) });
+    document.getElementById('api-ok').textContent = '✓ Groq API key saved';
+    document.getElementById('api-ok').classList.add('show');
+    toast('✓ Groq API key saved!', 'success');
+  } catch(e) { toast('Error saving key', 'error'); }
 }
 
 // ── Toast ─────────────────────────────────────────────────
