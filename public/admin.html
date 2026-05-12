@@ -3,243 +3,345 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-SM AI Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fraunces:wght@700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<title>M-SM AI — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--navy:#0D1B2A;--cream:#FAF8F4;--white:#fff;--orange:#E8622A;--teal:#1A8F7A;--red:#C0392B;--fog:#D4DFE8;--mist:#8EA3B5;--r:12px;--r-sm:8px}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:var(--navy)}
-.topbar{background:var(--navy);padding:0 28px;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
-.tb-logo{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:white;flex:1}
-.tb-logo em{font-style:normal;color:#FF8F66}
-.tb-badge{background:var(--orange);color:white;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
-.tb-a{color:rgba(255,255,255,.6);font-size:13px;text-decoration:none}
-.tb-a:hover{color:white}
-.wrap{max-width:1200px;margin:0 auto;padding:28px}
-.pg-title{font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:4px}
-.pg-sub{font-size:13px;color:var(--mist);margin-bottom:24px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.sc{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);padding:18px 20px}
-.sc-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mist);margin-bottom:6px}
-.sc-val{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--navy)}
-.sc-sub{font-size:11px;color:var(--mist);margin-top:2px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.panel{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);overflow:hidden}
-.ph{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--fog)}
-.ph-title{font-size:14px;font-weight:700}
-.prow{display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--fog)}
-.prow:last-child{border-bottom:none}
-.prow-name{font-size:13px;font-weight:600;flex:0 0 80px}
-.prow-bar{flex:1;height:5px;background:var(--fog);border-radius:3px;overflow:hidden}
-.prow-fill{height:100%;background:var(--orange);border-radius:3px}
-.prow-count{font-size:12px;color:var(--mist);font-family:'JetBrains Mono',monospace;flex:0 0 60px;text-align:right}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{text-align:left;padding:10px 16px;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mist);background:var(--cream);border-bottom:1px solid var(--fog)}
-.tbl td{padding:11px 16px;border-bottom:1px solid var(--fog);font-size:13px;vertical-align:middle}
-.tbl tr:hover td{background:var(--cream);cursor:pointer}
-.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
-.b-free{background:var(--cream);color:var(--mist)}
-.b-pro{background:rgba(232,98,42,.1);color:var(--orange)}
-.b-agency{background:rgba(26,143,122,.1);color:var(--teal)}
-.b-admin{background:rgba(107,79,187,.1);color:#6B4FBB}
-.b-on{background:rgba(26,143,122,.1);color:var(--teal)}
-.b-off{background:rgba(192,57,43,.1);color:var(--red)}
-.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
-.btn-sm{padding:4px 10px;font-size:11px}
-.btn-or{background:var(--orange);color:white}
-.btn-or:hover{background:#F07340}
-.btn-out{background:var(--white);color:var(--navy);border:1px solid var(--fog)}
-.btn-out:hover{background:var(--cream)}
-.btn-red{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.2)}
-.btn-red:hover{background:var(--red);color:white}
-.search-row{display:flex;gap:10px;padding:14px 18px;border-bottom:1px solid var(--fog)}
-.si{flex:1;padding:8px 13px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:13px;font-family:inherit;outline:none}
-.si:focus{border-color:var(--orange)}
-.pgn{display:flex;align-items:center;gap:8px;padding:12px 18px;justify-content:flex-end;border-top:1px solid var(--fog)}
-.pgn-info{font-size:11px;color:var(--mist);font-family:'JetBrains Mono',monospace;flex:1}
-.pgn-btn{padding:5px 12px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--white)}
-.pgn-btn:hover{background:var(--cream)}
-.pgn-btn:disabled{opacity:.4;cursor:not-allowed}
-.ov{display:none;position:fixed;inset:0;background:rgba(13,27,42,.5);z-index:200;align-items:center;justify-content:center}
-.ov.show{display:flex}
-.modal{background:var(--white);border-radius:var(--r);padding:26px;width:100%;max-width:420px}
-.modal-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;margin-bottom:18px}
-.fg{margin-bottom:13px}
-.fl{font-size:11px;font-weight:700;color:var(--mist);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
-.fi,.fs{width:100%;padding:8px 12px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:13px;font-family:inherit;outline:none}
-.fi:focus,.fs:focus{border-color:var(--orange)}
-.m-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:white;padding:11px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;max-width:300px}
+:root{--cream:#FAF8F4;--cream2:#F2EFE8;--white:#fff;--navy:#0D1B2A;--navy2:#1A2D42;--slate:#607D94;--mist:#8EA3B5;--fog:#D4DFE8;--orange:#E8622A;--orange2:#F07340;--orange-bg:rgba(232,98,42,0.08);--teal:#1A8F7A;--teal-bg:rgba(26,143,122,0.08);--red:#C0392B;--red-bg:rgba(192,57,43,0.08);--violet:#6B4FBB;--gold:#C9941A;--r:12px;--r-sm:8px;}
+html,body{height:100%;background:var(--cream);font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy)}
+body{display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--fog);border-radius:3px}
+.topbar{height:58px;background:var(--white);border-bottom:1px solid var(--fog);display:flex;align-items:center;padding:0 28px;gap:16px;box-shadow:0 1px 3px rgba(13,27,42,0.08);flex-shrink:0;}
+.topbar-logo{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--navy);flex:1}
+.topbar-logo em{font-style:normal;color:var(--orange)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.btn-primary{background:var(--orange);color:white}.btn-primary:hover{background:var(--orange2)}
+.btn-outline{background:var(--white);color:var(--navy2);border:1px solid var(--fog)}.btn-outline:hover{background:var(--cream)}
+.btn-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,.2)}.btn-red:hover{background:rgba(192,57,43,.15)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.admin-shell{display:flex;flex:1;overflow:hidden}
+.admin-nav{width:220px;min-width:220px;background:var(--navy);display:flex;flex-direction:column;padding:16px 10px;overflow-y:auto;}
+.nav-section{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 10px 5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--r-sm);cursor:pointer;color:rgba(255,255,255,.55);font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.nav-item.active{background:rgba(232,98,42,.2);color:white}
+.nav-bottom{margin-top:auto;padding:12px 0 0;border-top:1px solid rgba(255,255,255,.06)}
+.admin-main{flex:1;overflow-y:auto;padding:28px}
+.page{display:none}.page.active{display:block}
+.page-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--mist);margin-bottom:24px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);padding:18px 20px;box-shadow:0 1px 3px rgba(13,27,42,0.08)}
+.stat-label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mist);margin-bottom:8px}
+.stat-val{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--navy);margin-bottom:3px;letter-spacing:-.5px}
+.stat-note{font-size:12px;color:var(--teal)}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);padding:20px;box-shadow:0 1px 3px rgba(13,27,42,0.08)}
+.chart-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:16px}
+.table-card{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);box-shadow:0 1px 3px rgba(13,27,42,0.08);overflow:hidden;margin-bottom:20px}
+.table-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--fog)}
+.table-title{font-size:14px;font-weight:700;color:var(--navy)}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mist);background:var(--cream);border-bottom:1px solid var(--fog)}
+.data-table td{padding:12px 16px;border-bottom:1px solid var(--fog);font-size:13px;color:var(--navy2);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--cream)}
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.badge-free{background:var(--cream2);color:var(--slate)}.badge-pro{background:var(--orange-bg);color:var(--orange)}.badge-agency{background:rgba(107,79,187,.1);color:var(--violet)}.badge-admin{background:var(--red-bg);color:var(--red)}.badge-active{background:var(--teal-bg);color:var(--teal)}.badge-inactive{background:var(--cream2);color:var(--mist)}
+.search-row{display:flex;gap:10px;margin-bottom:16px;align-items:center}
+.search-input{flex:1;max-width:320px;padding:8px 14px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:13px;color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif;outline:none;background:var(--cream)}
+.search-input:focus{border-color:var(--orange);background:var(--white)}
+.modal-overlay{position:fixed;inset:0;background:rgba(13,27,42,.5);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--white);border-radius:var(--r);padding:28px;width:100%;max-width:440px;box-shadow:0 12px 40px rgba(13,27,42,.2);position:relative}
+.modal-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--navy);margin-bottom:20px}
+.modal-close{position:absolute;top:16px;right:16px;border:none;background:none;cursor:pointer;font-size:18px;color:var(--mist)}
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mist);margin-bottom:6px;display:block}
+.form-select{width:100%;padding:9px 13px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:13px;color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif;outline:none;background:var(--cream2)}
+.form-select:focus{border-color:var(--orange);background:var(--white)}
+.plan-bars{display:flex;flex-direction:column;gap:10px}
+.plan-bar-row{display:flex;align-items:center;gap:10px}
+.plan-bar-label{width:60px;font-size:12px;font-weight:700;color:var(--slate)}
+.plan-bar-track{flex:1;height:10px;background:var(--fog);border-radius:5px;overflow:hidden}
+.plan-bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.plan-bar-count{width:40px;font-size:12px;color:var(--mist);text-align:right;font-family:'JetBrains Mono',monospace}
+.activity-chart{display:flex;align-items:flex-end;gap:4px;height:80px}
+.activity-bar{flex:1;background:var(--orange-bg);border-radius:3px 3px 0 0;cursor:pointer;transition:background .15s;position:relative;min-width:4px}
+.activity-bar:hover{background:var(--orange)}
+.tools-list{display:flex;flex-direction:column;gap:8px}
+.tool-row{display:flex;align-items:center;gap:10px}
+.tool-name{font-size:12px;font-weight:600;color:var(--navy2);width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tool-bar-track{flex:1;height:7px;background:var(--fog);border-radius:4px;overflow:hidden}
+.tool-bar-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange2));border-radius:4px}
+.tool-count{font-size:11px;color:var(--mist);font-family:'JetBrains Mono',monospace;width:40px;text-align:right}
+.pagination{display:flex;align-items:center;gap:6px;padding:16px;border-top:1px solid var(--fog);flex-wrap:wrap}
+.page-btn{padding:5px 12px;border:1px solid var(--fog);border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--white);color:var(--slate);font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.page-btn:hover,.page-btn.active{background:var(--orange);color:white;border-color:var(--orange)}
+.page-info{font-size:12px;color:var(--mist);margin-left:auto}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--navy);color:white;padding:12px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;box-shadow:0 4px 16px rgba(13,27,42,.2)}
 .toast.show{transform:translateY(0);opacity:1}
-.toast.success{background:var(--teal)}
-.toast.error{background:var(--red)}
+.toast.success{background:var(--teal)}.toast.error{background:var(--red)}
 </style>
 </head>
 <body>
 <div class="topbar">
-  <div class="tb-logo">M-SM <em>AI</em></div>
-  <span class="tb-badge">ADMIN</span>
-  <a href="/app.html" class="tb-a">← Back to App</a>
-  <a href="/login.html" onclick="localStorage.removeItem('msm_token')" class="tb-a">Sign Out</a>
+  <div class="topbar-logo">M-SM <em>AI</em> <span style="font-size:13px;font-weight:400;color:var(--mist);margin-left:4px">Admin Panel</span></div>
+  <span class="badge badge-admin" style="font-size:11px;padding:4px 12px">ADMIN</span>
+  <button class="btn btn-outline btn-sm" onclick="window.location.href='/app.html'">← Back to App</button>
+  <button class="btn btn-primary btn-sm" onclick="loadAll()">🔄 Refresh</button>
 </div>
-<div class="wrap">
-  <div class="pg-title">Admin Dashboard</div>
-  <div class="pg-sub">Manage users, monitor usage, and control the platform</div>
-  <div class="stats">
-    <div class="sc"><div class="sc-label">Total Users</div><div class="sc-val" id="s-users">—</div><div class="sc-sub">All time</div></div>
-    <div class="sc"><div class="sc-label">Documents</div><div class="sc-val" id="s-docs">—</div><div class="sc-sub">Generated</div></div>
-    <div class="sc"><div class="sc-label">Words Written</div><div class="sc-val" id="s-words">—</div><div class="sc-sub">AI generated</div></div>
-    <div class="sc"><div class="sc-label">New This Month</div><div class="sc-val" id="s-week">—</div><div class="sc-sub">Signups</div></div>
+<div class="admin-shell">
+<nav class="admin-nav">
+  <div class="nav-section">Overview</div>
+  <button class="nav-item active" onclick="showPage('overview',this)">📊 Overview</button>
+  <button class="nav-item" onclick="showPage('users',this)">👥 Users</button>
+  <button class="nav-item" onclick="showPage('analytics',this)">📈 Analytics</button>
+  <div class="nav-section">Content</div>
+  <button class="nav-item" onclick="showPage('tools-stats',this)">🔧 Tool Usage</button>
+  <div class="nav-bottom">
+    <button class="nav-item" onclick="logout()" style="color:rgba(255,100,100,.7)">🚪 Sign Out</button>
   </div>
-  <div class="g2">
-    <div class="panel">
-      <div class="ph"><div class="ph-title">Users by Plan</div></div>
-      <div id="plan-bd"><div style="padding:20px;color:var(--mist);font-size:13px">Loading...</div></div>
+</nav>
+<main class="admin-main">
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="pg-overview">
+    <div class="page-title">Dashboard Overview</div>
+    <div class="page-sub">Platform statistics at a glance</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-val" id="stat-users">—</div><div class="stat-note" id="stat-users-note">Loading...</div></div>
+      <div class="stat-card"><div class="stat-label">Documents Created</div><div class="stat-val" id="stat-docs">—</div><div class="stat-note">All time</div></div>
+      <div class="stat-card"><div class="stat-label">Words Generated</div><div class="stat-val" id="stat-words">—</div><div class="stat-note">All time</div></div>
+      <div class="stat-card"><div class="stat-label">Platform Status</div><div class="stat-val" style="font-size:18px;color:var(--teal)">✓ Online</div><div class="stat-note">v4.0.0</div></div>
     </div>
-    <div class="panel">
-      <div class="ph"><div class="ph-title">Recent Signups</div></div>
-      <div id="recent-users"><div style="padding:20px;color:var(--mist);font-size:13px">Loading...</div></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">Plan Distribution</div><div class="plan-bars" id="plan-bars"><div style="color:var(--mist);font-size:13px">Loading...</div></div></div>
+      <div class="chart-card"><div class="chart-title">Signups Last 30 Days</div><div class="activity-chart" id="signup-chart"></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-head"><div class="table-title">Recent Signups</div></div>
+      <table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Credits</th><th>Joined</th></tr></thead><tbody id="recent-users-tbody"></tbody></table>
     </div>
   </div>
-  <div class="panel">
-    <div class="ph">
-      <div class="ph-title">All Users</div>
-      <button class="btn btn-or btn-sm" onclick="toast('Share signup link: '+location.origin+'/signup.html','')">+ Invite User</button>
-    </div>
+
+  <!-- USERS -->
+  <div class="page" id="pg-users">
+    <div class="page-title">User Management</div>
+    <div class="page-sub">View, edit, and manage all users</div>
     <div class="search-row">
-      <input class="si" id="search-in" placeholder="Search name or email..." oninput="debSearch(this.value)">
-      <button class="btn btn-out" onclick="loadUsers(1)">Refresh</button>
+      <input type="text" class="search-input" placeholder="Search by name or email..." id="user-search" oninput="searchUsers(this.value)">
+      <div id="users-total" style="font-size:13px;color:var(--mist)"></div>
     </div>
-    <div style="overflow-x:auto">
-      <table class="tbl">
-        <thead><tr><th>User</th><th>Plan</th><th>Credits</th><th>Joined</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody id="utbody"><tr><td colspan="7" style="text-align:center;padding:28px;color:var(--mist)">Loading...</td></tr></tbody>
-      </table>
-    </div>
-    <div class="pgn">
-      <div class="pgn-info" id="pgn-info">Loading...</div>
-      <button class="pgn-btn" id="prev-btn" onclick="changePage(-1)">← Prev</button>
-      <button class="pgn-btn" id="next-btn" onclick="changePage(1)">Next →</button>
+    <div class="table-card">
+      <table class="data-table"><thead><tr><th>User</th><th>Plan</th><th>Credits</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead><tbody id="users-tbody"></tbody></table>
+      <div class="pagination" id="users-pagination"></div>
     </div>
   </div>
+
+  <!-- ANALYTICS -->
+  <div class="page" id="pg-analytics">
+    <div class="page-title">Analytics</div>
+    <div class="page-sub">Usage trends and performance</div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">Daily Signups (30 days)</div><div class="activity-chart" id="analytics-signup-chart"></div></div>
+      <div class="chart-card"><div class="chart-title">Top AI Tools by Usage</div><div class="tools-list" id="analytics-tools-list"><div style="color:var(--mist);font-size:13px">Loading...</div></div></div>
+    </div>
+  </div>
+
+  <!-- TOOL STATS -->
+  <div class="page" id="pg-tools-stats">
+    <div class="page-title">Tool Usage Statistics</div>
+    <div class="page-sub">See which AI tools are most popular</div>
+    <div class="table-card">
+      <table class="data-table"><thead><tr><th>Tool</th><th>Times Used</th><th>Words Generated</th><th>Popularity</th></tr></thead><tbody id="tools-stats-tbody"></tbody>
+    </table></div>
+  </div>
+
+</main>
 </div>
 
-<div class="ov" id="edit-ov">
+<!-- USER EDIT MODAL -->
+<div class="modal-overlay" id="user-modal">
   <div class="modal">
-    <div class="modal-title">Edit User</div>
-    <input type="hidden" id="e-id">
-    <div class="fg"><label class="fl">Plan</label>
-      <select class="fs" id="e-plan">
-        <option value="free">Free (2,500 credits)</option>
-        <option value="pro">Pro (10,000 credits)</option>
-        <option value="agency">Agency (Unlimited)</option>
-      </select>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-user-name">Edit User</div>
+    <div class="form-group"><label class="form-label">Plan</label>
+      <select class="form-select" id="modal-plan"><option value="free">Free (2,500 credits)</option><option value="pro">Pro (10,000 credits)</option><option value="agency">Agency (Unlimited)</option></select>
     </div>
-    <div class="fg"><label class="fl">Override Credits (optional)</label>
-      <input type="number" class="fi" id="e-credits" placeholder="Leave blank to use plan default">
+    <div class="form-group"><label class="form-label">Role</label>
+      <select class="form-select" id="modal-role"><option value="user">User</option><option value="admin">Admin</option></select>
     </div>
-    <div class="fg"><label class="fl">Role</label>
-      <select class="fs" id="e-role"><option value="user">User</option><option value="admin">Admin</option></select>
+    <div class="form-group"><label class="form-label">Status</label>
+      <select class="form-select" id="modal-status"><option value="true">Active</option><option value="false">Suspended</option></select>
     </div>
-    <div class="fg"><label class="fl">Account Status</label>
-      <select class="fs" id="e-status"><option value="true">Active</option><option value="false">Disabled</option></select>
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+      <button class="btn btn-outline" onclick="resetCreds()">🔄 Reset Credits</button>
+      <button class="btn btn-red" onclick="deleteUser()">Suspend User</button>
     </div>
-    <div class="m-acts">
-      <button class="btn btn-out" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-red btn-sm" onclick="disableUser()">Disable</button>
-      <button class="btn btn-or" onclick="saveUser()">Save Changes</button>
-    </div>
+    <div id="modal-err" style="color:var(--red);font-size:13px;margin-top:10px;display:none"></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const TK = localStorage.getItem('msm_token');
-let page = 1, total = 0, q = '', editId = null;
-const H = () => ({'Content-Type':'application/json','Authorization':'Bearer '+TK});
+const TOKEN = localStorage.getItem('msm_token') || '';
+let editId = null;
 
-async function init(){
-  if(!TK){window.location.href='/login.html';return;}
-  const me = await fetch('/api/auth/me',{headers:H()}).then(r=>r.json());
-  if(me.role!=='admin'){alert('Admin access required');window.location.href='/app.html';return;}
-  loadStats();loadUsers(1);
+function H() { return {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}; }
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='users') loadUsers();
+  if(id==='analytics') loadAnalytics();
+  if(id==='tools-stats') loadToolStats();
 }
 
-async function loadStats(){
-  const d = await fetch('/api/admin/stats',{headers:H()}).then(r=>r.json());
-  document.getElementById('s-users').textContent=(d.totalUsers||0).toLocaleString();
-  document.getElementById('s-docs').textContent=(d.totalDocuments||0).toLocaleString();
-  const w=parseInt(d.totalWords||0);
-  document.getElementById('s-words').textContent=w>=1000000?(w/1000000).toFixed(1)+'M':w>=1000?Math.round(w/1000)+'K':w;
-  const wk=(d.dailySignups||[]).reduce((a,b)=>a+parseInt(b.signups),0);
-  document.getElementById('s-week').textContent=wk;
-  const plans=d.planBreakdown||[];
-  const pt=plans.reduce((a,b)=>a+parseInt(b.count),0);
-  const clrs={free:'var(--fog)',pro:'var(--orange)',agency:'var(--teal)'};
-  const bgs={free:'b-free',pro:'b-pro',agency:'b-agency'};
-  document.getElementById('plan-bd').innerHTML=plans.map(p=>{
-    const pct=pt>0?Math.round((parseInt(p.count)/pt)*100):0;
-    return `<div class="prow"><span class="prow-name"><span class="badge ${bgs[p.plan]||'b-free'}">${p.plan.toUpperCase()}</span></span><div class="prow-bar"><div class="prow-fill" style="width:${pct}%;background:${clrs[p.plan]||'var(--fog)'}"></div></div><span class="prow-count">${p.count}</span></div>`;
-  }).join('')||'<div style="padding:18px;text-align:center;color:var(--mist)">No data</div>';
-  document.getElementById('recent-users').innerHTML=(d.recentUsers||[]).map(u=>`<div class="prow"><div style="width:30px;height:30px;border-radius:50%;background:rgba(232,98,42,.1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--orange);flex-shrink:0">${u.name.charAt(0).toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.name}</div><div style="font-size:11px;color:var(--mist)">${u.email}</div></div><span class="badge b-${u.plan}">${u.plan}</span></div>`).join('')||'<div style="padding:18px;text-align:center;color:var(--mist)">No users yet</div>';
+async function loadAll() {
+  if(!TOKEN){window.location.href='/login.html';return;}
+  try {
+    const res = await fetch('/api/admin/stats',{headers:H()});
+    if(res.status===401){window.location.href='/login.html';return;}
+    if(res.status===403){showErr('Admin access required. Only the first registered user has admin access.');return;}
+    const d = await res.json();
+
+    document.getElementById('stat-users').textContent = d.totalUsers.toLocaleString();
+    document.getElementById('stat-docs').textContent = d.totalDocs.toLocaleString();
+    document.getElementById('stat-words').textContent = d.totalWords>=1000?Math.round(d.totalWords/1000)+'K':d.totalWords;
+    document.getElementById('stat-users-note').textContent = d.planBreakdown.map(p=>p.count+' '+p.plan).join(' · ');
+
+    const maxP = Math.max(...d.planBreakdown.map(p=>+p.count));
+    const pColors = {free:'var(--fog)',pro:'var(--orange)',agency:'var(--violet)'};
+    document.getElementById('plan-bars').innerHTML = d.planBreakdown.map(p=>`
+      <div class="plan-bar-row">
+        <div class="plan-bar-label" style="text-transform:capitalize">${p.plan}</div>
+        <div class="plan-bar-track"><div class="plan-bar-fill" style="width:${maxP>0?(p.count/maxP*100):0}%;background:${pColors[p.plan]||'var(--orange)'}"></div></div>
+        <div class="plan-bar-count">${p.count}</div>
+      </div>`).join('');
+
+    renderChart('signup-chart', d.dailySignups, 'signups');
+
+    document.getElementById('recent-users-tbody').innerHTML = d.recentUsers.map(u=>`
+      <tr>
+        <td style="font-weight:600">${u.name}</td>
+        <td style="color:var(--mist);font-size:12px">${u.email}</td>
+        <td><span class="badge badge-${u.plan}">${u.plan}</span></td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${(u.credits||0).toLocaleString()}</td>
+        <td style="font-size:12px;color:var(--mist)">${fmtDate(u.created_at)}</td>
+      </tr>`).join('');
+  } catch(e){showErr(e.message);}
 }
 
-async function loadUsers(p=1){
-  page=p;
-  const url=`/api/admin/users?page=${p}&limit=15${q?'&search='+encodeURIComponent(q):''}`;
-  const d=await fetch(url,{headers:H()}).then(r=>r.json());
-  total=d.total||0;
-  const tbody=document.getElementById('utbody');
-  if(!d.users?.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--mist)">No users found</td></tr>`;return;}
-  const bmap={free:'b-free',pro:'b-pro',agency:'b-agency',admin:'b-admin'};
-  tbody.innerHTML=d.users.map(u=>{
-    const joined=new Date(u.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});
-    const ll=u.last_login?new Date(u.last_login).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'Never';
-    const roleTag=u.role==='admin'?'<span class="badge b-admin" style="margin-left:4px">ADMIN</span>':'';
-    return `<tr><td><div style="font-weight:600">${u.name}${roleTag}</div><div style="font-size:11px;color:var(--mist)">${u.email}</div></td><td><span class="badge ${bmap[u.plan]||'b-free'}">${u.plan.toUpperCase()}</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${(u.credits||0).toLocaleString()}/${(u.credits_max||0).toLocaleString()}</td><td style="font-size:11px;color:var(--mist)">${joined}</td><td style="font-size:11px;color:var(--mist)">${ll}</td><td><span class="badge ${u.is_active?'b-on':'b-off'}">${u.is_active?'Active':'Off'}</span></td><td><button class="btn btn-out btn-sm" onclick="editUser(${u.id},'${u.plan}',${u.credits},'${u.role}',${u.is_active})">Edit</button></td></tr>`;
+function renderChart(id, data, field) {
+  const el = document.getElementById(id);
+  if(!el||!data.length){if(el)el.innerHTML='<div style="color:var(--mist);font-size:12px">No data yet</div>';return;}
+  const max = Math.max(...data.map(d=>+d[field]||0));
+  el.innerHTML = data.map(d=>{
+    const v=+d[field]||0;
+    const pct=max>0?Math.max(4,(v/max)*100):4;
+    const dt=new Date(d.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return `<div class="activity-bar" style="height:${pct}%" title="${dt}: ${v}"></div>`;
   }).join('');
-  document.getElementById('pgn-info').textContent=`${Math.min((p-1)*15+1,total)}-${Math.min(p*15,total)} of ${total}`;
-  document.getElementById('prev-btn').disabled=p<=1;
-  document.getElementById('next-btn').disabled=p*15>=total;
 }
 
-let st;
-function debSearch(v){q=v;clearTimeout(st);st=setTimeout(()=>loadUsers(1),400);}
-function changePage(d){loadUsers(page+d);}
+async function loadUsers(page=1,search='') {
+  try {
+    const url=`/api/admin/users?page=${page}&limit=20${search?'&search='+encodeURIComponent(search):''}`;
+    const res=await fetch(url,{headers:H()});
+    const d=await res.json();
+    document.getElementById('users-total').textContent=d.total.toLocaleString()+' total users';
+    document.getElementById('users-tbody').innerHTML = d.users.map(u=>`
+      <tr>
+        <td><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--mist)">${u.email}</div></td>
+        <td><span class="badge badge-${u.plan}">${u.plan}</span></td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${(u.credits||0).toLocaleString()}</td>
+        <td><span class="badge badge-${u.role==='admin'?'admin':'free'}">${u.role}</span></td>
+        <td><span class="badge badge-${u.is_active?'active':'inactive'}">${u.is_active?'Active':'Suspended'}</span></td>
+        <td style="font-size:12px;color:var(--mist)">${u.last_login?fmtDate(u.last_login):'Never'}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="openModal(${u.id},'${u.name.replace(/'/g,"\\'")}','${u.plan}','${u.role}',${u.is_active})">Edit</button></td>
+      </tr>`).join('');
+    // Pagination
+    const totalPages=Math.ceil(d.total/20);
+    document.getElementById('users-pagination').innerHTML=totalPages<=1?'':[...Array(Math.min(totalPages,10)).keys()].map(i=>`<button class="page-btn ${i+1===page?'active':''}" onclick="loadUsers(${i+1},'${search}')">${i+1}</button>`).join('')+`<span class="page-info">Page ${page} of ${totalPages}</span>`;
+  } catch(e){console.error(e);}
+}
 
-function editUser(id,plan,credits,role,active){
+let searchT;
+function searchUsers(v){clearTimeout(searchT);searchT=setTimeout(()=>loadUsers(1,v),400);}
+
+function openModal(id,name,plan,role,active) {
   editId=id;
-  document.getElementById('e-id').value=id;
-  document.getElementById('e-plan').value=plan;
-  document.getElementById('e-credits').value='';
-  document.getElementById('e-role').value=role;
-  document.getElementById('e-status').value=String(active);
-  document.getElementById('edit-ov').classList.add('show');
+  document.getElementById('modal-user-name').textContent='Edit: '+name;
+  document.getElementById('modal-plan').value=plan;
+  document.getElementById('modal-role').value=role;
+  document.getElementById('modal-status').value=String(active);
+  document.getElementById('modal-err').style.display='none';
+  document.getElementById('user-modal').classList.add('show');
+}
+function closeModal(){document.getElementById('user-modal').classList.remove('show');editId=null;}
+
+async function saveEdit() {
+  try {
+    const res=await fetch(`/api/admin/users/${editId}`,{method:'PUT',headers:H(),body:JSON.stringify({plan:document.getElementById('modal-plan').value,role:document.getElementById('modal-role').value,is_active:document.getElementById('modal-status').value==='true'})});
+    if(!res.ok)throw new Error('Update failed');
+    toast('User updated ✓','success');closeModal();loadUsers();
+  } catch(e){document.getElementById('modal-err').textContent=e.message;document.getElementById('modal-err').style.display='block';}
 }
 
-async function saveUser(){
-  const body={plan:document.getElementById('e-plan').value,role:document.getElementById('e-role').value,is_active:document.getElementById('e-status').value==='true'};
-  const c=document.getElementById('e-credits').value;
-  if(c)body.credits=parseInt(c);
-  const r=await fetch(`/api/admin/users/${editId}`,{method:'PUT',headers:H(),body:JSON.stringify(body)});
-  if(r.ok){toast('User updated!','success');closeModal();loadUsers(page);loadStats();}
-  else{const e=await r.json();toast(e.error,'error');}
+async function resetCreds() {
+  if(!confirm('Reset credits to plan maximum?'))return;
+  await fetch(`/api/admin/users/${editId}/reset-credits`,{method:'POST',headers:H()});
+  toast('Credits reset ✓','success');closeModal();loadUsers();
 }
 
-async function disableUser(){
-  if(!confirm('Disable this user?'))return;
-  const r=await fetch(`/api/admin/users/${editId}`,{method:'DELETE',headers:H()});
-  if(r.ok){toast('User disabled','success');closeModal();loadUsers(page);}
-  else{const e=await r.json();toast(e.error,'error');}
+async function deleteUser() {
+  if(!confirm('Suspend this user?'))return;
+  await fetch(`/api/admin/users/${editId}`,{method:'DELETE',headers:H()});
+  toast('User suspended','success');closeModal();loadUsers();
 }
 
-function closeModal(){document.getElementById('edit-ov').classList.remove('show');editId=null;}
+async function loadAnalytics() {
+  try {
+    const res=await fetch('/api/admin/stats',{headers:H()});
+    const d=await res.json();
+    renderChart('analytics-signup-chart',d.dailySignups,'signups');
+    const max=Math.max(...d.topTools.map(t=>+t.uses||0));
+    document.getElementById('analytics-tools-list').innerHTML=d.topTools.map(t=>`
+      <div class="tool-row">
+        <div class="tool-name">${t.tool_name}</div>
+        <div class="tool-bar-track"><div class="tool-bar-fill" style="width:${max>0?(t.uses/max*100):0}%"></div></div>
+        <div class="tool-count">${t.uses}</div>
+      </div>`).join('');
+  } catch(e){console.error(e);}
+}
 
-let tt;
-function toast(msg,type){clearTimeout(tt);const el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(type||'');tt=setTimeout(()=>el.classList.remove('show'),3500);}
+async function loadToolStats() {
+  try {
+    const res=await fetch('/api/admin/stats',{headers:H()});
+    const d=await res.json();
+    const max=Math.max(...d.topTools.map(t=>+t.uses||0));
+    document.getElementById('tools-stats-tbody').innerHTML=d.topTools.map(t=>`
+      <tr>
+        <td style="font-weight:600">${t.tool_name||'Unknown'}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${(+t.uses||0).toLocaleString()}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${(+t.words||0).toLocaleString()}</td>
+        <td style="width:200px"><div class="tool-bar-track" style="height:8px"><div class="tool-bar-fill" style="width:${max>0?(t.uses/max*100):0}%"></div></div></td>
+      </tr>`).join('');
+  } catch(e){console.error(e);}
+}
 
-init();
+function fmtDate(dt){return dt?new Date(dt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';}
+function showErr(msg){document.querySelector('.admin-main').innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px;gap:16px;text-align:center"><div style="font-size:48px">🔒</div><div style="font-size:18px;font-weight:700;color:var(--navy)">Access Denied</div><div style="font-size:14px;color:var(--mist);max-width:360px;line-height:1.6">${msg}</div><button class="btn btn-primary" onclick="window.location.href='/app.html'">← Back to App</button></div>`;}
+function logout(){localStorage.removeItem('msm_token');window.location.href='/login.html';}
+let toastT;
+function toast(msg,type){clearTimeout(toastT);const el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(type||'');toastT=setTimeout(()=>el.classList.remove('show'),3000);}
+
+if(!TOKEN){window.location.href='/login.html';}else{loadAll();}
 </script>
 </body>
 </html>

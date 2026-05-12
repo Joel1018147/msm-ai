@@ -1436,18 +1436,121 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  M-SM AI — Application Logic
+//  M-SM AI v4.0 — Clean Application Logic (No Duplicates)
 // ═══════════════════════════════════════════════════════════
 
-let apiKey = ''; // legacy - not used, Groq key is server-side
+// ── State ────────────────────────────────────────────────
 let activeTone = 'Professional';
 let currentTool = null;
 let chatHistory = [];
-let savedDocs = []; // legacy - not used, documents come from server
 let credits = 0;
+let currentUser = null;
+let bulkJobId = null;
+let bulkPollTimer = null;
 
-// ── Tool catalogue ───────────────────────────────────────
-const TOOLS = [
+// ── Auth ─────────────────────────────────────────────────
+function getToken() { return localStorage.getItem('msm_token') || ''; }
+function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
+
+async function initApp() {
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get('token');
+  if (urlToken) { localStorage.setItem('msm_token', urlToken); window.history.replaceState({}, '', '/app.html'); }
+  if (!getToken()) { window.location.href = '/login.html'; return; }
+  try {
+    const res = await fetch('/api/auth/me', { headers: authHeaders() });
+    if (!res.ok) { localStorage.removeItem('msm_token'); window.location.href = '/login.html'; return; }
+    currentUser = await res.json();
+    applyUser(currentUser);
+    loadStats();
+    // Show admin link if admin
+    if (currentUser.role === 'admin') {
+      const adminBtn = document.getElementById('admin-nav-btn');
+      if (adminBtn) adminBtn.style.display = 'flex';
+    }
+  } catch { window.location.href = '/login.html'; }
+}
+
+function applyUser(u) {
+  const n = document.querySelector('.u-name');
+  const p = document.querySelector('.u-plan');
+  const a = document.querySelector('.u-avatar');
+  if (n) n.textContent = u.name;
+  if (p) p.textContent = `${(u.plan||'free').charAt(0).toUpperCase()+(u.plan||'free').slice(1)} Plan · ${(u.credits||0).toLocaleString()} credits`;
+  if (a) {
+    if (u.avatar) a.innerHTML = `<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    else a.textContent = u.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+  }
+  const c = document.getElementById('cred-count');
+  if (c) c.textContent = (u.credits||0).toLocaleString()+' credits';
+  credits = u.credits || 0;
+  const g = document.querySelector('.banner-title');
+  if (g) g.textContent = `Welcome back, ${u.name.split(' ')[0]}`;
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch('/api/stats', { headers: authHeaders() });
+    if (!res.ok) return;
+    const s = await res.json();
+    const vals = document.querySelectorAll('.m-card-val');
+    if (vals[0]) vals[0].textContent = s.totalWords>=1000?Math.round(s.totalWords/1000)+'K':(s.totalWords||0);
+    if (vals[1]) vals[1].textContent = s.totalDocuments||0;
+    if (vals[2]) vals[2].textContent = (s.creditsUsed||0).toLocaleString();
+    if (vals[3]) { vals[3].textContent = s.topTool||'None yet'; vals[3].style.fontSize='16px'; }
+    const deltas = document.querySelectorAll('.m-card-delta');
+    if (deltas[1]) deltas[1].textContent = `+${s.docsThisWeek||0} this week`;
+    if (deltas[2]) deltas[2].textContent = `${(s.creditsRemaining||0).toLocaleString()} remaining`;
+    const pct = s.creditsMax>0?Math.round(((s.creditsUsed||0)/s.creditsMax)*100):0;
+    const fill = document.querySelector('.progress-fill');
+    const pctEl = document.querySelector('.progress-pct');
+    if (fill) fill.style.width=pct+'%';
+    if (pctEl) pctEl.textContent=pct+'%';
+    const note = document.querySelector('.progress-note');
+    if (note) note.textContent=`${(s.creditsUsed||0).toLocaleString()} used · ${(s.creditsRemaining||0).toLocaleString()} remaining`;
+    if (s.recentDocuments?.length>0) renderRecentDocs(s.recentDocuments);
+    else {
+      const panel=document.querySelector('.panel-body');
+      if(panel) panel.innerHTML=`<div style="padding:24px;text-align:center;color:var(--mist);font-size:13px">No documents yet — create your first piece of content!</div>`;
+    }
+  } catch(e) { console.log('Stats err:',e.message); }
+}
+
+function renderRecentDocs(docs) {
+  const panel = document.querySelector('.panel-body');
+  if (!panel) return;
+  const icons={'Blog Writer':'✍️','Email Campaign':'📧','Product Description':'🛍️','Ad Copy':'🎯','Social Media Posts':'📱','Sales Outreach Email':'💼','SEO Meta Generator':'🔍','Landing Page Copy':'🚀','Content Rewriter':'🔄','Keyword Cluster Builder':'💡'};
+  const bgs={'Blog Writer':'#EEF2FF','Email Campaign':'#ECFDF5','Product Description':'#FFF1F2','Ad Copy':'var(--orange-bg)','Social Media Posts':'#FEF3C7'};
+  const tcs={'Blog Writer':'#4F46E5','Email Campaign':'#059669','Product Description':'#E11D48','Ad Copy':'var(--orange)','Social Media Posts':'#B45309'};
+  panel.innerHTML=docs.map(d=>{
+    const icon=icons[d.tool_name]||'📄';
+    const bg=bgs[d.tool_name]||'var(--cream2)';
+    const tc=tcs[d.tool_name]||'var(--slate)';
+    const date=new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return `<div class="recent-row"><div class="rr-ico" style="background:${bg}">${icon}</div><div class="rr-info"><div class="rr-name">${d.title}</div><div class="rr-meta">${d.tool_name||'Content'} · ${date} · ${(d.word_count||0).toLocaleString()} words</div></div><span class="rr-badge" style="background:${bg};color:${tc}">${(d.tool_name||'Doc').split(' ')[0]}</span></div>`;
+  }).join('');
+}
+
+function logout() { localStorage.removeItem('msm_token'); window.location.href='/login.html'; }
+
+// ── Navigation ───────────────────────────────────────────
+const PAGE_TITLES={dashboard:'Dashboard',tools:'AI Tools',editor:'Content Editor',chat:'AI Chat',documents:'Documents',seo:'SEO Suite',templates:'Templates',bulk:'Bulk Generate',settings:'Settings',billing:'Billing & Plans'};
+
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(el=>{
+    el.classList.toggle('active',el.getAttribute('onclick')?.includes(`'${page}'`));
+  });
+  const pg=document.getElementById('page-'+page);
+  if(pg) pg.classList.add('active');
+  document.getElementById('topbar-title').textContent=PAGE_TITLES[page]||page;
+  if(page==='tools') renderTools(TOOLS);
+  if(page==='documents') renderDocuments();
+  if(page==='bulk') initBulkPage();
+}
+
+// ── Tool Catalogue ───────────────────────────────────────
+const TOOLS=[
   {id:'blog-writer',name:'Blog Writer',desc:'Write full SEO-optimized blog posts from a title, keywords, and audience.',icon:'✍️',bg:'#EEF2FF',color:'#4F46E5',cat:'blog',badge:'Popular'},
   {id:'landing-page',name:'Landing Page Copy',desc:'Conversion-focused landing page copy: headlines, body, social proof, and CTAs.',icon:'🚀',bg:'#FFF7ED',color:'#EA580C',cat:'blog',badge:''},
   {id:'article-outline',name:'Article Outline',desc:'Detailed blog post or article outlines with H2/H3 structure.',icon:'📋',bg:'#F0FDF4',color:'#15803D',cat:'blog',badge:''},
@@ -1475,1360 +1578,571 @@ const TOOLS = [
   {id:'faq-writer',name:'FAQ Generator',desc:'SEO-rich FAQ sections for any product, service, or article.',icon:'❓',bg:'#F5F3FF',color:'#6D28D9',cat:'seo',badge:''},
 ];
 
-// ── Form definitions per tool ────────────────────────────
-const FORMS = {
-  'blog-writer':{
-    name:'Blog Writer',
-    fields:[
-      {id:'topic',label:'Blog Topic',type:'input',ph:'e.g. 10 Ways to Grow Your SaaS Business in 2025'},
-      {id:'keywords',label:'Target Keywords',type:'input',ph:'e.g. SaaS growth, startup marketing, B2B tactics'},
-      {id:'audience',label:'Target Audience',type:'input',ph:'e.g. SaaS founders and marketing managers'},
-      {id:'length',label:'Article Length',type:'select',opts:['Short (400–600 words)','Standard (800–1,000 words)','Long-form (1,200–1,500 words)','Deep-dive (2,000+ words)']},
-    ],
-    prompt:d=>`Write a comprehensive, SEO-optimized blog post about: "${d.topic}".
-Target keywords: ${d.keywords}
-Target audience: ${d.audience}
-Length: ${d.length}
-Tone: ${activeTone}
-
-Structure the post with:
-- An engaging, keyword-rich introduction
-- Clear ## H2 subheadings and ### H3 subheadings
-- Practical, actionable content in each section
-- A compelling conclusion with a CTA
-- Use markdown formatting throughout`
-  },
-  'landing-page':{
-    name:'Landing Page Copy',
-    fields:[
-      {id:'product',label:'Product / Service',type:'input',ph:'e.g. AI-powered email marketing tool'},
-      {id:'value',label:'Main Value Proposition',type:'input',ph:'e.g. Double your email open rates in 30 days'},
-      {id:'audience',label:'Target Customer',type:'input',ph:'e.g. Marketing managers at B2B SaaS companies'},
-      {id:'goal',label:'Page Goal',type:'select',opts:['Free trial signup','Book a demo','Direct purchase','Email capture','Webinar registration']},
-    ],
-    prompt:d=>`Write complete landing page copy for: "${d.product}"
-Value proposition: ${d.value}
-Target customer: ${d.audience}
-Page goal: ${d.goal}
-Tone: ${activeTone}
-
-Include these labeled sections:
-HERO HEADLINE: (compelling, benefit-focused)
-HERO SUB-HEADLINE: (clarifies the offer)
-3 BENEFIT SECTIONS: (headline + 2-3 sentences each)
-SOCIAL PROOF: (testimonial-style section)
-HOW IT WORKS: (3-step process)
-FAQ: (3 questions with answers)
-FINAL CTA: (urgency-driven closing section)`
-  },
-  'social-media':{
-    name:'Social Media Posts',
-    fields:[
-      {id:'topic',label:'Topic / Product',type:'input',ph:'e.g. New product launch — wireless earbuds'},
-      {id:'platform',label:'Platform',type:'select',opts:['Instagram','LinkedIn','X (Twitter)','Facebook','TikTok','All platforms']},
-      {id:'goal',label:'Post Goal',type:'select',opts:['Drive engagement','Announce product','Build brand awareness','Drive website traffic','Generate leads']},
-    ],
-    prompt:d=>`Write 3 different ${d.platform} posts about: "${d.topic}"
-Goal: ${d.goal}
-Tone: ${activeTone}
-
-Create 3 completely different variations, each with a unique angle.
-Include appropriate emojis and hashtags.
-Label each: "— POST 1 —", "— POST 2 —", "— POST 3 —"`
-  },
-  'email-copy':{
-    name:'Email Campaign',
-    fields:[
-      {id:'purpose',label:'Email Purpose',type:'input',ph:'e.g. Welcome new subscribers to our newsletter'},
-      {id:'offer',label:'Key Offer / CTA',type:'input',ph:'e.g. Get 30% off your first month — use WELCOME30'},
-      {id:'audience',label:'Recipient',type:'input',ph:'e.g. New trial users who signed up in the last 7 days'},
-      {id:'type',label:'Email Type',type:'select',opts:['Welcome Email','Promotional Offer','Newsletter','Follow-up','Re-engagement','Abandoned Cart']},
-    ],
-    prompt:d=>`Write a high-converting ${d.type} email.
-Purpose: ${d.purpose}
-Offer/CTA: ${d.offer}
-Recipient: ${d.audience}
-Tone: ${activeTone}
-
-Format:
-SUBJECT LINE: (3 options, A/B testable)
-PREVIEW TEXT: (one compelling option)
----
-[EMAIL BODY with opening, value delivery, offer, and CTA]
----
-CTA BUTTON TEXT: (2 options)`
-  },
-  'ad-copy':{
-    name:'Ad Copy',
-    fields:[
-      {id:'product',label:'Product / Service',type:'input',ph:'e.g. Project management software for remote teams'},
-      {id:'benefit',label:'Core Benefit / Hook',type:'input',ph:'e.g. Cut meeting time by 40% with async workflows'},
-      {id:'audience',label:'Target Audience',type:'input',ph:'e.g. Remote team managers at 10–100 person companies'},
-      {id:'platform',label:'Ad Platform',type:'select',opts:['Facebook & Instagram','Google Search Ads','LinkedIn Ads','TikTok Ads','YouTube Pre-roll']},
-    ],
-    prompt:d=>`Write 3 high-converting ${d.platform} ad variants for: "${d.product}"
-Core benefit/hook: ${d.benefit}
-Target audience: ${d.audience}
-Tone: ${activeTone}
-
-For each ad provide:
-- Headline (max 40 characters)
-- Primary text / description (max 125 characters)
-- CTA button text
-Label: "— AD VARIANT 1 —", "— AD VARIANT 2 —", "— AD VARIANT 3 —"`
-  },
-  'product-desc':{
-    name:'Product Description',
-    fields:[
-      {id:'product',label:'Product Name',type:'input',ph:'e.g. ProMax Wireless Noise-Cancelling Headphones'},
-      {id:'features',label:'Key Features & Specs',type:'textarea',ph:'e.g. 40hr battery, ANC, Bluetooth 5.3, foldable design, IPX4 waterproof…'},
-      {id:'buyer',label:'Target Buyer',type:'input',ph:'e.g. Remote workers and frequent travellers'},
-      {id:'format',label:'Description Format',type:'select',opts:['Short (60–80 words)','Standard (130–160 words)','Long (220–260 words)','Amazon listing (title + bullets + description)']},
-    ],
-    prompt:d=>`Write a ${d.format} product description for: "${d.product}"
-Key features: ${d.features}
-Target buyer: ${d.buyer}
-Tone: ${activeTone}
-
-Focus on benefits over features. Make it emotionally compelling and conversion-focused.`
-  },
-  'sales-email':{
-    name:'Sales Outreach Email',
-    fields:[
-      {id:'product',label:'Your Product / Service',type:'input',ph:'e.g. B2B content marketing agency'},
-      {id:'prospect',label:'Prospect Profile',type:'input',ph:'e.g. E-commerce DTC brands doing $1M–$10M revenue'},
-      {id:'pain',label:'Pain Point You Solve',type:'input',ph:'e.g. Inconsistent content output and poor organic traffic'},
-      {id:'cta',label:'Desired Next Step',type:'input',ph:'e.g. Book a 20-minute discovery call'},
-    ],
-    prompt:d=>`Write a 3-email cold outreach sequence for selling: "${d.product}"
-Prospect profile: ${d.prospect}
-Pain point addressed: ${d.pain}
-Desired CTA: ${d.cta}
-Tone: ${activeTone}
-
-Email 1 — Initial Outreach: Lead with insight, not pitch
-Email 2 — Follow-up (send 3 days later): Add value, address objection
-Email 3 — Breakup Email (send 7 days later): Final gentle ask
-
-Include subject lines for each email.`
-  },
-  'seo-meta':{
-    name:'SEO Meta Generator',
-    fields:[
-      {id:'page',label:'Page Topic / Title',type:'input',ph:'e.g. Best CRM Software for Small Businesses in 2025'},
-      {id:'keywords',label:'Primary Keywords',type:'input',ph:'e.g. CRM software, small business CRM, best CRM 2025'},
-      {id:'url',label:'Page URL (optional)',type:'input',ph:'e.g. yoursite.com/best-crm-software'},
-    ],
-    prompt:d=>`Generate SEO-optimized meta tags for a page about: "${d.page}"
-Primary keywords: ${d.keywords}
-URL: ${d.url || 'Not provided'}
-
-Deliver:
-3 TITLE TAG OPTIONS: (each 50–60 characters, include primary keyword near front)
-3 META DESCRIPTION OPTIONS: (each 150–160 characters, include CTA)
-10 LSI/SEMANTIC KEYWORDS: (related terms to naturally include in content)
-SCHEMA MARKUP SUGGESTION: (type of structured data to add)
-
-Format each section with clear headers.`
-  },
-  'keyword-ideas':{
-    name:'Keyword Cluster Builder',
-    fields:[
-      {id:'seed',label:'Seed Keyword / Topic',type:'input',ph:'e.g. email marketing software'},
-      {id:'industry',label:'Industry / Niche',type:'input',ph:'e.g. SaaS, e-commerce, digital marketing'},
-      {id:'intent',label:'Intent Focus',type:'select',opts:['All intents','Informational (how/what/why)','Commercial (best/vs/review)','Transactional (buy/get/pricing)','Navigational']},
-    ],
-    prompt:d=>`Build a keyword strategy for: "${d.seed}" in the ${d.industry} industry.
-Search intent focus: ${d.intent}
-
-Deliver:
-1. PRIMARY KEYWORDS (10): High-volume, competitive head terms
-2. LONG-TAIL KEYWORDS (15): Lower competition, higher intent
-3. QUESTION-BASED KEYWORDS (10): For featured snippets and FAQ sections
-4. COMPARISON KEYWORDS (5): [competitor] vs [product], best alternatives
-5. LOCAL SEO VARIANTS (5): If applicable
-6. CONTENT ANGLE SUGGESTIONS: 5 article ideas using these clusters
-
-Format as clearly labeled sections.`
-  },
-  'paraphrase':{
-    name:'Content Rewriter',
-    fields:[
-      {id:'content',label:'Content to Rewrite',type:'textarea',ph:'Paste the text you want to rewrite…'},
-      {id:'style',label:'Rewrite Style',type:'select',opts:['Standard rewrite (same tone)','More professional','More casual and friendly','Simpler language','More detailed (expand)','More concise (shorten by 50%)','Change POV to 2nd person (you)']},
-    ],
-    prompt:d=>`Rewrite the following content in "${d.style}" style. Tone: ${activeTone}.
-Completely rephrase — do not use the same sentence structures or wording.
-The meaning should stay the same but the execution should be entirely fresh.
-
-CONTENT TO REWRITE:
-${d.content}`
-  },
+const FORMS={
+  'blog-writer':{name:'Blog Writer',fields:[{id:'topic',label:'Blog Topic',type:'input',ph:'e.g. 10 Ways to Grow Your SaaS Business in 2025'},{id:'keywords',label:'Target Keywords',type:'input',ph:'e.g. SaaS growth, startup marketing, B2B tactics'},{id:'audience',label:'Target Audience',type:'input',ph:'e.g. SaaS founders and marketing managers'},{id:'length',label:'Article Length',type:'select',opts:['Short (400–600 words)','Standard (800–1,000 words)','Long-form (1,200–1,500 words)','Deep-dive (2,000+ words)']}],prompt:d=>`Write a comprehensive, SEO-optimized blog post about: "${d.topic}".\nTarget keywords: ${d.keywords}\nTarget audience: ${d.audience}\nLength: ${d.length}\nTone: ${activeTone}\n\nUse ## H2 and ### H3 headings, include practical tips and a conclusion with CTA.`},
+  'landing-page':{name:'Landing Page Copy',fields:[{id:'product',label:'Product / Service',type:'input',ph:'e.g. AI-powered email marketing tool'},{id:'value',label:'Main Value Proposition',type:'input',ph:'e.g. Double your email open rates in 30 days'},{id:'audience',label:'Target Customer',type:'input',ph:'e.g. Marketing managers at B2B SaaS companies'},{id:'goal',label:'Page Goal',type:'select',opts:['Free trial signup','Book a demo','Direct purchase','Email capture','Webinar registration']}],prompt:d=>`Write complete landing page copy for: "${d.product}"\nValue proposition: ${d.value}\nTarget customer: ${d.audience}\nPage goal: ${d.goal}\nTone: ${activeTone}\n\nInclude: HERO HEADLINE, HERO SUB-HEADLINE, 3 BENEFIT SECTIONS, SOCIAL PROOF, HOW IT WORKS (3 steps), FAQ (3 questions), FINAL CTA.`},
+  'social-media':{name:'Social Media Posts',fields:[{id:'topic',label:'Topic / Product',type:'input',ph:'e.g. New summer collection launch'},{id:'platform',label:'Platform',type:'select',opts:['Instagram','LinkedIn','X (Twitter)','Facebook','TikTok','All platforms']},{id:'goal',label:'Post Goal',type:'select',opts:['Drive engagement','Announce product','Build brand awareness','Drive website traffic','Generate leads']}],prompt:d=>`Write 3 different ${d.platform} posts about: "${d.topic}"\nGoal: ${d.goal}\nTone: ${activeTone}\n\nCreate 3 completely different variations with emojis and hashtags.\nLabel each: "— POST 1 —", "— POST 2 —", "— POST 3 —"`},
+  'email-copy':{name:'Email Campaign',fields:[{id:'purpose',label:'Email Purpose',type:'input',ph:'e.g. Welcome new subscribers to our newsletter'},{id:'offer',label:'Key Offer / CTA',type:'input',ph:'e.g. Get 30% off your first month'},{id:'audience',label:'Recipient',type:'input',ph:'e.g. New trial users'},{id:'type',label:'Email Type',type:'select',opts:['Welcome Email','Promotional Offer','Newsletter','Follow-up','Re-engagement','Abandoned Cart']}],prompt:d=>`Write a high-converting ${d.type} email.\nPurpose: ${d.purpose}\nOffer/CTA: ${d.offer}\nRecipient: ${d.audience}\nTone: ${activeTone}\n\nFormat:\nSUBJECT LINE: (3 A/B-testable options)\nPREVIEW TEXT:\n---\n[EMAIL BODY]\n---\nCTA BUTTON TEXT: (2 options)`},
+  'ad-copy':{name:'Ad Copy',fields:[{id:'product',label:'Product / Service',type:'input',ph:'e.g. Project management software for remote teams'},{id:'benefit',label:'Core Benefit / Hook',type:'input',ph:'e.g. Cut meeting time by 40%'},{id:'audience',label:'Target Audience',type:'input',ph:'e.g. Remote team managers'},{id:'platform',label:'Ad Platform',type:'select',opts:['Facebook & Instagram','Google Search Ads','LinkedIn Ads','TikTok Ads','YouTube Pre-roll']}],prompt:d=>`Write 3 high-converting ${d.platform} ad variants for: "${d.product}"\nCore benefit: ${d.benefit}\nTarget audience: ${d.audience}\nTone: ${activeTone}\n\nFor each ad provide:\n- Headline (max 40 characters)\n- Primary text (max 125 characters)\n- CTA button text\nLabel: "— AD 1 —", "— AD 2 —", "— AD 3 —"`},
+  'product-desc':{name:'Product Description',fields:[{id:'product',label:'Product Name',type:'input',ph:'e.g. ProMax Wireless Noise-Cancelling Headphones'},{id:'features',label:'Key Features & Specs',type:'textarea',ph:'e.g. 40hr battery, ANC, Bluetooth 5.3...'},{id:'buyer',label:'Target Buyer',type:'input',ph:'e.g. Remote workers and frequent travellers'},{id:'format',label:'Description Format',type:'select',opts:['Short (60–80 words)','Standard (130–160 words)','Long (220–260 words)','Amazon listing (title + bullets + description)']}],prompt:d=>`Write a ${d.format} product description for: "${d.product}"\nKey features: ${d.features}\nTarget buyer: ${d.buyer}\nTone: ${activeTone}\n\nFocus on benefits over features. Be emotionally compelling and conversion-focused.`},
+  'sales-email':{name:'Sales Outreach Email',fields:[{id:'product',label:'Your Product / Service',type:'input',ph:'e.g. B2B content marketing agency'},{id:'prospect',label:'Prospect Profile',type:'input',ph:'e.g. E-commerce DTC brands doing $1M–$10M revenue'},{id:'pain',label:'Pain Point You Solve',type:'input',ph:'e.g. Inconsistent content output'},{id:'cta',label:'Desired Next Step',type:'input',ph:'e.g. Book a 20-minute discovery call'}],prompt:d=>`Write a 3-email cold outreach sequence for selling: "${d.product}"\nProspect: ${d.prospect}\nPain point: ${d.pain}\nDesired CTA: ${d.cta}\nTone: ${activeTone}\n\nEmail 1 — Initial Outreach\nEmail 2 — Follow-up (3 days later)\nEmail 3 — Breakup Email (7 days later)\n\nInclude subject lines for each.`},
+  'seo-meta':{name:'SEO Meta Generator',fields:[{id:'page',label:'Page Topic / Title',type:'input',ph:'e.g. Best CRM Software for Small Businesses in 2025'},{id:'keywords',label:'Primary Keywords',type:'input',ph:'e.g. CRM software, small business CRM'},{id:'url',label:'Page URL (optional)',type:'input',ph:'e.g. yoursite.com/best-crm-software'}],prompt:d=>`Generate SEO-optimized meta tags for: "${d.page}"\nPrimary keywords: ${d.keywords}\nURL: ${d.url||'Not provided'}\n\nDeliver:\n3 TITLE TAG OPTIONS: (50-60 chars each)\n3 META DESCRIPTION OPTIONS: (150-160 chars each)\n10 LSI/SEMANTIC KEYWORDS:\nSCHEMA MARKUP SUGGESTION:`},
+  'keyword-ideas':{name:'Keyword Cluster Builder',fields:[{id:'seed',label:'Seed Keyword / Topic',type:'input',ph:'e.g. email marketing software'},{id:'industry',label:'Industry / Niche',type:'input',ph:'e.g. SaaS, e-commerce'},{id:'intent',label:'Intent Focus',type:'select',opts:['All intents','Informational','Commercial','Transactional']}],prompt:d=>`Build a keyword strategy for: "${d.seed}" in ${d.industry}.\nSearch intent: ${d.intent}\n\n1. PRIMARY KEYWORDS (10)\n2. LONG-TAIL KEYWORDS (15)\n3. QUESTION-BASED KEYWORDS (10)\n4. COMPARISON KEYWORDS (5)\n5. CONTENT ANGLE SUGGESTIONS (5 article ideas)`},
+  'paraphrase':{name:'Content Rewriter',fields:[{id:'content',label:'Content to Rewrite',type:'textarea',ph:'Paste the text you want to rewrite…'},{id:'style',label:'Rewrite Style',type:'select',opts:['Standard rewrite','More professional','More casual and friendly','Simpler language','More detailed','More concise','Change to 2nd person (you)']}],prompt:d=>`Rewrite the following content in "${d.style}" style. Tone: ${activeTone}.\nCompletely rephrase — different sentence structures and wording.\n\nCONTENT TO REWRITE:\n${d.content}`},
 };
 
-// ── Navigation ────────────────────────────────────────────
-const PAGE_TITLES = {
-  dashboard:'Dashboard', tools:'AI Tools', editor:'Content Editor', chat:'AI Chat',
-  documents:'Documents', seo:'SEO Suite', templates:'Templates', bulk:'Bulk Generate',
-  settings:'Settings', billing:'Billing & Plans'
-};
-
-function goTo(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(el => {
-    el.classList.toggle('active', el.getAttribute('onclick')?.includes(`'${page}'`));
-  });
-  const pg = document.getElementById('page-' + page);
-  if (pg) pg.classList.add('active');
-  document.getElementById('topbar-title').textContent = PAGE_TITLES[page] || page;
-  if (page === 'tools') renderTools(TOOLS);
-  if (page === 'documents') renderDocuments();
-}
-
-// ── Tools ─────────────────────────────────────────────────
+// ── Tools Rendering ──────────────────────────────────────
 function renderTools(list) {
-  document.getElementById('tools-grid').innerHTML = list.map(t => `
+  document.getElementById('tools-grid').innerHTML=list.map(t=>`
     <div class="tool-card" onclick="openTool('${t.id}')" style="--tc-color:${t.color}">
       <div class="tc-stripe"></div>
-      ${t.badge ? `<span class="tc-badge" style="background:${t.color}15;color:${t.color}">${t.badge}</span>` : ''}
+      ${t.badge?`<span class="tc-badge" style="background:${t.color}15;color:${t.color}">${t.badge}</span>`:''}
       <div class="tc-icon" style="background:${t.bg}">${t.icon}</div>
       <div class="tc-name">${t.name}</div>
       <div class="tc-desc">${t.desc}</div>
     </div>`).join('');
 }
 
-function filterTools(q) {
-  renderTools(TOOLS.filter(t =>
-    t.name.toLowerCase().includes(q.toLowerCase()) ||
-    t.desc.toLowerCase().includes(q.toLowerCase())
-  ));
-}
+function filterTools(q) { renderTools(TOOLS.filter(t=>t.name.toLowerCase().includes(q.toLowerCase())||t.desc.toLowerCase().includes(q.toLowerCase()))); }
+function catFilter(cat,btn) { document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); renderTools(cat==='all'?TOOLS:TOOLS.filter(t=>t.cat===cat)); }
 
-function catFilter(cat, btn) {
-  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  renderTools(cat === 'all' ? TOOLS : TOOLS.filter(t => t.cat === cat));
-}
-
-// ── Editor ────────────────────────────────────────────────
+// ── Editor ───────────────────────────────────────────────
 function openTool(id) {
-  const form = FORMS[id] || {
-    name: TOOLS.find(t => t.id === id)?.name || id,
-    fields: [{id:'prompt',label:'What do you want to write?',type:'textarea',ph:'Describe what you need…'}],
-    prompt: d => `Write high-quality marketing content about: ${d.prompt}. Tone: ${activeTone}.`
-  };
-  currentTool = { id, form };
-  document.getElementById('form-tool-name').textContent = form.name;
-
-  const container = document.getElementById('form-fields');
-  container.innerHTML = '';
-
-  form.fields.forEach(f => {
-    const sec = document.createElement('div');
-    sec.className = 'form-section';
-    let inp = '';
-    if (f.type === 'input') inp = `<input class="f-input" id="ff-${f.id}" placeholder="${f.ph || ''}">`;
-    else if (f.type === 'textarea') inp = `<textarea class="f-textarea" id="ff-${f.id}" placeholder="${f.ph || ''}" rows="3"></textarea>`;
-    else if (f.type === 'select') inp = `<select class="f-select" id="ff-${f.id}">${f.opts.map(o => `<option>${o}</option>`).join('')}</select>`;
-    sec.innerHTML = `<div class="f-label">${f.label}</div>${inp}`;
+  const form=FORMS[id]||{name:TOOLS.find(t=>t.id===id)?.name||id,fields:[{id:'prompt',label:'What do you want to write?',type:'textarea',ph:'Describe what you need…'}],prompt:d=>`Write high-quality marketing content: ${d.prompt}. Tone: ${activeTone}.`};
+  currentTool={id,form};
+  document.getElementById('form-tool-name').textContent=form.name;
+  const container=document.getElementById('form-fields');
+  container.innerHTML='';
+  form.fields.forEach(f=>{
+    const sec=document.createElement('div'); sec.className='form-section';
+    let inp='';
+    if(f.type==='input') inp=`<input class="f-input" id="ff-${f.id}" placeholder="${f.ph||''}">`;
+    else if(f.type==='textarea') inp=`<textarea class="f-textarea" id="ff-${f.id}" placeholder="${f.ph||''}" rows="3"></textarea>`;
+    else inp=`<select class="f-select" id="ff-${f.id}">${f.opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    sec.innerHTML=`<div class="f-label">${f.label}</div>${inp}`;
     container.appendChild(sec);
   });
-
-  // Tone selector
-  const toneSec = document.createElement('div');
-  toneSec.className = 'form-section';
-  toneSec.innerHTML = `<div class="f-label">Tone of Voice</div>
-    <div class="tone-wrap">${['Professional','Friendly','Witty','Bold','Empathetic','Casual'].map(t =>
-      `<div class="tone-tag ${t === activeTone ? 'on' : ''}" onclick="setTone('${t}',this)">${t}</div>`
-    ).join('')}</div>`;
+  const toneSec=document.createElement('div'); toneSec.className='form-section';
+  toneSec.innerHTML=`<div class="f-label">Tone of Voice</div><div class="tone-wrap">${['Professional','Friendly','Witty','Bold','Empathetic','Casual'].map(t=>`<div class="tone-tag ${t===activeTone?'on':''}" onclick="setTone('${t}',this)">${t}</div>`).join('')}</div>`;
   container.appendChild(toneSec);
-
-  // Variants
-  const varSec = document.createElement('div');
-  varSec.className = 'form-section';
-  varSec.innerHTML = `<div class="f-label">Number of Variants</div>
-    <select class="f-select" id="ff-variants">
-      <option>1 variant</option>
-      <option selected>2 variants</option>
-      <option>3 variants</option>
-    </select>`;
+  const varSec=document.createElement('div'); varSec.className='form-section';
+  varSec.innerHTML=`<div class="f-label">Number of Variants</div><select class="f-select" id="ff-variants"><option>1 variant</option><option selected>2 variants</option><option>3 variants</option></select>`;
   container.appendChild(varSec);
-
   resetOutput();
   goTo('editor');
 }
 
-function setTone(t, el) {
-  activeTone = t;
-  el.closest('.tone-wrap').querySelectorAll('.tone-tag').forEach(c => c.classList.remove('on'));
-  el.classList.add('on');
-}
-
-function toneToggle(el) {
-  el.closest('.tone-wrap').querySelectorAll('.tone-tag').forEach(c => c.classList.remove('on'));
-  el.classList.add('on');
-}
+function setTone(t,el) { activeTone=t; el.closest('.tone-wrap').querySelectorAll('.tone-tag').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
+function toneToggle(el) { el.closest('.tone-wrap').querySelectorAll('.tone-tag').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
 
 function resetOutput() {
-  document.getElementById('out-empty').style.display = 'flex';
-  document.getElementById('out-loading').style.display = 'none';
-  document.getElementById('out-results').innerHTML = '';
-  document.getElementById('out-results').style.display = 'none';
-  document.getElementById('edit-textarea').style.display = 'none';
+  document.getElementById('out-empty').style.display='flex';
+  document.getElementById('out-loading').style.display='none';
+  document.getElementById('out-results').innerHTML='';
+  document.getElementById('out-results').style.display='none';
+  document.getElementById('edit-textarea').style.display='none';
 }
 
 async function generateContent() {
-  const d = {};
-  currentTool.form.fields.forEach(f => {
-    const el = document.getElementById('ff-' + f.id);
-    if (el) d[f.id] = el.value.trim();
-  });
-
-  const firstVal = Object.values(d)[0];
-  if (!firstVal) { toast('Please fill in the first field', 'error'); return; }
-
-  const varCount = parseInt(document.getElementById('ff-variants')?.value || '1');
-  const prompt = currentTool.form.prompt(d);
-
-  document.getElementById('out-empty').style.display = 'none';
-  document.getElementById('out-loading').style.display = 'flex';
-  document.getElementById('out-results').style.display = 'none';
-
+  const d={};
+  currentTool.form.fields.forEach(f=>{const el=document.getElementById('ff-'+f.id);if(el)d[f.id]=el.value.trim();});
+  const firstVal=Object.values(d)[0];
+  if(!firstVal){toast('Please fill in the first field','error');return;}
+  const varCount=parseInt(document.getElementById('ff-variants')?.value||'1');
+  const prompt=currentTool.form.prompt(d);
+  document.getElementById('out-empty').style.display='none';
+  document.getElementById('out-loading').style.display='flex';
+  document.getElementById('out-results').style.display='none';
   try {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('msm_token') || '') },
-      body: JSON.stringify({
-        prompt,
-        toolId: currentTool.id,
-        toolName: currentTool.form.name,
-        tone: activeTone,
-        variants: varCount
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Generation failed');
-    }
-
-    const data = await res.json();
-    const text = data.text;
-    credits = Math.max(0, credits - (data.creditsUsed || 10));
-    document.getElementById('cred-count').textContent = credits.toLocaleString() + ' credits';
-
-    renderOutput(text, varCount);
-    toast('✓ Content generated successfully', 'success');
-
-  } catch (e) {
-    document.getElementById('out-loading').style.display = 'none';
-    document.getElementById('out-empty').style.display = 'flex';
-    toast('Error: ' + e.message, 'error');
+    const res=await fetch('/api/generate',{method:'POST',headers:authHeaders(),body:JSON.stringify({prompt,toolId:currentTool.id,toolName:currentTool.form.name,tone:activeTone,variants:varCount})});
+    if(!res.ok){const err=await res.json();throw new Error(err.error||'Generation failed');}
+    const data=await res.json();
+    credits=Math.max(0,credits-(data.creditsUsed||10));
+    document.getElementById('cred-count').textContent=credits.toLocaleString()+' credits';
+    renderOutput(data.text,varCount);
+    toast('✓ Content generated successfully','success');
+  } catch(e){
+    document.getElementById('out-loading').style.display='none';
+    document.getElementById('out-empty').style.display='flex';
+    toast('Error: '+e.message,'error');
   }
 }
 
-function renderOutput(text, varCount) {
-  document.getElementById('out-loading').style.display = 'none';
-  const container = document.getElementById('out-results');
-  container.innerHTML = '';
-
-  let variants = [];
-  if (varCount > 1 && text.includes('═══ VARIANT')) {
-    variants = text.split(/═══\s*VARIANT \d+\s*═══/i).filter(v => v.trim());
-  } else {
-    variants = [text];
-  }
-
-  variants.forEach((v, i) => {
-    const block = document.createElement('div');
-    block.className = 'result-block';
-    block.innerHTML = `
-      <div class="rb-head">
-        <span class="rb-label">Variant ${i + 1}</span>
-        <div class="rb-acts">
-          <button class="icon-btn" title="Copy" onclick="copyVariant(this)">📋</button>
-          <button class="icon-btn" title="Save to Documents" onclick="saveVariant(this)">💾</button>
-          <button class="icon-btn" title="Regenerate this variant" onclick="regenVariant(this)">🔄</button>
-        </div>
-      </div>
-      <div class="rb-text">${escHtml(v.trim())}</div>`;
+function renderOutput(text,varCount) {
+  document.getElementById('out-loading').style.display='none';
+  const container=document.getElementById('out-results');
+  container.innerHTML='';
+  let variants=[];
+  if(varCount>1&&text.includes('═══ VARIANT')) variants=text.split(/═══\s*VARIANT \d+\s*═══/i).filter(v=>v.trim());
+  else variants=[text];
+  variants.forEach((v,i)=>{
+    const block=document.createElement('div'); block.className='result-block';
+    block.innerHTML=`<div class="rb-head"><span class="rb-label">Variant ${i+1}</span><div class="rb-acts">
+      <button class="icon-btn" title="Copy" onclick="copyVariant(this)">📋</button>
+      <button class="icon-btn" title="Save to Documents" onclick="saveVariant(this)">💾</button>
+      <button class="icon-btn" title="Regenerate" onclick="regenVariant(this)">🔄</button>
+      ${currentUser?.has_wp?`<button class="icon-btn" title="Publish to WordPress" onclick="wpPublishVariant(this)">🌐</button>`:''}
+    </div></div><div class="rb-text">${escHtml(v.trim())}</div>`;
     container.appendChild(block);
   });
-
-  container.style.display = 'flex';
+  container.style.display='flex';
 }
 
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function copyVariant(btn) {
-  const text = btn.closest('.result-block').querySelector('.rb-text').textContent;
-  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard!', 'success'));
-}
-
-function copyAllOutput() {
-  const all = Array.from(document.querySelectorAll('.rb-text')).map(e => e.textContent);
-  if (!all.length) { toast('Nothing to copy yet', 'error'); return; }
-  navigator.clipboard.writeText(all.join('\n\n────────────────────\n\n')).then(() => toast('All variants copied!', 'success'));
-}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function copyVariant(btn){const t=btn.closest('.result-block').querySelector('.rb-text').textContent;navigator.clipboard.writeText(t).then(()=>toast('Copied!','success'));}
+function copyAllOutput(){const all=Array.from(document.querySelectorAll('.rb-text')).map(e=>e.textContent);if(!all.length){toast('Nothing to copy','error');return;}navigator.clipboard.writeText(all.join('\n\n────────────\n\n')).then(()=>toast('All copied!','success'));}
 
 async function saveVariant(btn) {
-  const text = btn.closest('.result-block').querySelector('.rb-text').textContent;
-  await pushDoc(text);
-  toast('Saved to Documents ✓', 'success');
+  const text=btn.closest('.result-block').querySelector('.rb-text').textContent;
+  await pushDocToServer(text);
+  toast('Saved to Documents ✓','success');
 }
 
 async function saveToDocuments() {
-  const all = document.querySelectorAll('.rb-text');
-  if (!all.length) { toast('Nothing to save yet', 'error'); return; }
-  for (const el of all) { await pushDoc(el.textContent); }
-  toast(`${all.length} variant(s) saved to Documents ✓`, 'success');
+  const all=document.querySelectorAll('.rb-text');
+  if(!all.length){toast('Nothing to save','error');return;}
+  for(const el of all){await pushDocToServer(el.textContent);}
+  toast(`${all.length} variant(s) saved ✓`,'success');
 }
 
-async function pushDoc(text) {
-  const title = (currentTool?.form?.name || 'Content') + ' — ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+async function pushDocToServer(text) {
+  const title=(currentTool?.form?.name||'Content')+' — '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   try {
-    await fetch('/api/documents', {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({
-        title,
-        content: text,
-        tool_id: currentTool?.id,
-        tool_name: currentTool?.form?.name
-      })
-    });
-  } catch(e) { console.log('Save doc error:', e.message); }
+    await fetch('/api/documents',{method:'POST',headers:authHeaders(),body:JSON.stringify({title,content:text,tool_id:currentTool?.id,tool_name:currentTool?.form?.name})});
+  } catch(e){console.log('Save doc err:',e.message);}
 }
 
 async function regenVariant(btn) {
-  const block = btn.closest('.result-block');
-  const textEl = block.querySelector('.rb-text');
-  textEl.innerHTML = '<span style="color:var(--silver)">Regenerating…</span>';
-  const d = {};
-  currentTool.form.fields.forEach(f => {
-    const el = document.getElementById('ff-' + f.id);
-    if (el) d[f.id] = el.value.trim();
-  });
+  const textEl=btn.closest('.result-block').querySelector('.rb-text');
+  textEl.innerHTML='<span style="color:var(--silver)">Regenerating…</span>';
+  const d={};currentTool.form.fields.forEach(f=>{const el=document.getElementById('ff-'+f.id);if(el)d[f.id]=el.value.trim();});
   try {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('msm_token') || '') },
-      body: JSON.stringify({ prompt: currentTool.form.prompt(d) + '\n\nWrite a completely different fresh take. Different angle and wording.', toolId: currentTool.id, toolName: currentTool.form.name, tone: activeTone, variants: 1 })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    textEl.textContent = data.text;
-  } catch(e) {
-    textEl.textContent = 'Regeneration failed: ' + e.message;
-  }
+    const res=await fetch('/api/generate',{method:'POST',headers:authHeaders(),body:JSON.stringify({prompt:currentTool.form.prompt(d)+'\n\nWrite a completely different, fresh take — different angle and wording.',toolId:currentTool.id,toolName:currentTool.form.name,tone:activeTone,variants:1})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error);
+    textEl.textContent=data.text;
+    toast('Regenerated ✓','success');
+  } catch(e){textEl.textContent='Regeneration failed: '+e.message;}
 }
 
-function switchOutTab(tab, el) {
-  document.querySelectorAll('.out-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  const results = document.getElementById('out-results');
-  const editArea = document.getElementById('edit-textarea');
-  if (tab === 'output') {
-    editArea.style.display = 'none';
-    results.style.display = results.innerHTML ? 'flex' : 'none';
-  } else {
-    const allText = Array.from(document.querySelectorAll('.rb-text')).map(e => e.textContent).join('\n\n────────────────────\n\n');
-    editArea.value = allText;
-    editArea.style.display = 'block';
-    results.style.display = 'none';
-  }
+async function wpPublishVariant(btn) {
+  const text=btn.closest('.result-block').querySelector('.rb-text').textContent;
+  const title=currentTool?.form?.name+' — '+new Date().toLocaleDateString();
+  // Save first, then publish
+  try {
+    const saveRes=await fetch('/api/documents',{method:'POST',headers:authHeaders(),body:JSON.stringify({title,content:text,tool_id:currentTool?.id,tool_name:currentTool?.form?.name})});
+    const saveData=await saveRes.json();
+    const docId=saveData.id;
+    const status=prompt('Publish as (draft or publish):','draft');
+    if(!status) return;
+    const pubRes=await fetch('/api/integrations/wordpress/publish',{method:'POST',headers:authHeaders(),body:JSON.stringify({docId,title,status})});
+    const pubData=await pubRes.json();
+    if(!pubRes.ok) throw new Error(pubData.error);
+    toast(`✓ Published to WordPress! Edit at: ${pubData.editUrl}`,'success');
+  } catch(e){toast('WordPress error: '+e.message,'error');}
 }
 
-// ── Chat ──────────────────────────────────────────────────
-function handleChatKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+function switchOutTab(tab,el) {
+  document.querySelectorAll('.out-tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+  const results=document.getElementById('out-results'),ea=document.getElementById('edit-textarea');
+  if(tab==='output'){ea.style.display='none';results.style.display=results.innerHTML?'flex':'none';}
+  else{ea.value=Array.from(document.querySelectorAll('.rb-text')).map(e=>e.textContent).join('\n\n────────────\n\n');ea.style.display='block';results.style.display='none';}
 }
 
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
-}
+// ── Chat ─────────────────────────────────────────────────
+function handleChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,130)+'px';}
 
 async function sendMessage() {
-  const ta = document.getElementById('chat-ta');
-  const msg = ta.value.trim();
-  if (!msg) return;
-  ta.value = '';
-  ta.style.height = 'auto';
-
-  appendMsg('user', msg);
-  chatHistory.push({ role: 'user', content: msg });
-
-  const thinking = appendMsg('ai', '<em style="color:var(--silver)">Thinking…</em>', true);
-
+  const ta=document.getElementById('chat-ta');
+  const msg=ta.value.trim();if(!msg)return;
+  ta.value='';ta.style.height='auto';
+  appendMsg('user',msg);
+  chatHistory.push({role:'user',content:msg});
+  const thinking=appendMsg('ai','<em style="color:var(--silver)">Thinking…</em>',true);
   try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('msm_token') || '') },
-      body: JSON.stringify({ messages: chatHistory.slice(-20) })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Chat failed');
-    const reply = data.message;
-    thinking.querySelector('.m-bubble').innerHTML = reply.replace(/\n/g, '<br>');
-    chatHistory.push({ role: 'assistant', content: reply });
-  } catch (e) {
-    thinking.querySelector('.m-bubble').textContent = 'Error: ' + e.message;
-  }
+    const res=await fetch('/api/chat',{method:'POST',headers:authHeaders(),body:JSON.stringify({messages:chatHistory.slice(-20)})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Chat failed');
+    thinking.querySelector('.m-bubble').innerHTML=data.message.replace(/\n/g,'<br>');
+    chatHistory.push({role:'assistant',content:data.message});
+  } catch(e){thinking.querySelector('.m-bubble').textContent='Error: '+e.message;}
   scrollChat();
 }
 
-function appendMsg(type, html, raw) {
-  const win = document.getElementById('chat-window');
-  const el = document.createElement('div');
-  el.className = 'msg ' + type;
-  el.innerHTML = `<div class="m-av" style="${type==='ai'?'font-size:10px;font-weight:800;font-family:\'Fraunces\',serif':''}">
-    ${type === 'ai' ? 'M' : 'JD'}</div>
-    <div class="m-bubble">${raw ? html : html.replace(/\n/g,'<br>')}</div>`;
-  win.appendChild(el);
-  scrollChat();
-  return el;
+function appendMsg(type,html,raw){
+  const win=document.getElementById('chat-window');
+  const el=document.createElement('div');el.className='msg '+type;
+  el.innerHTML=`<div class="m-av" style="${type==='ai'?'font-size:10px;font-weight:800;font-family:\'Fraunces\',serif':''}">${type==='ai'?'M':'JD'}</div><div class="m-bubble">${raw?html:html.replace(/\n/g,'<br>')}</div>`;
+  win.appendChild(el);scrollChat();return el;
+}
+function scrollChat(){const w=document.getElementById('chat-window');w.scrollTop=w.scrollHeight;}
+function clearChat(){chatHistory=[];document.getElementById('chat-window').innerHTML=`<div class="msg ai"><div class="m-av" style="font-size:10px;font-weight:800;font-family:'Fraunces',serif">M</div><div class="m-bubble">Chat cleared! What would you like to create today?</div></div>`;}
+
+// ── Documents ────────────────────────────────────────────
+const TYPE_STYLE={'Blog Writer':'background:#EEF2FF;color:#4F46E5','Email Campaign':'background:#ECFDF5;color:#059669','Product Description':'background:#FFF1F2;color:#E11D48','Ad Copy':'background:var(--orange-bg);color:var(--orange)','Social Media Posts':'background:#FEF3C7;color:#B45309','Sales Outreach Email':'background:#F0FDF4;color:#16A34A','SEO Meta Generator':'background:#EFF6FF;color:#2563EB','Keyword Cluster Builder':'background:#FEFCE8;color:#CA8A04','Landing Page Copy':'background:#FFF7ED;color:#EA580C','Content Rewriter':'background:#F5F3FF;color:#7C3AED'};
+
+async function renderDocuments() {
+  try {
+    const res=await fetch('/api/documents',{headers:authHeaders()});
+    if(!res.ok) return;
+    const data=await res.json();
+    const docs=data.documents||[];
+    const tbody=document.getElementById('doc-tbody');
+    if(!tbody) return;
+    if(!docs.length){tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--mist)">No documents yet. Start creating content with AI Tools!</td></tr>`;return;}
+    tbody.innerHTML=docs.map(d=>{
+      const style=TYPE_STYLE[d.tool_name]||'background:var(--cream2);color:var(--slate)';
+      const date=new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      const seoColor=d.seo_score>=80?'var(--teal)':d.seo_score>=60?'var(--gold)':'var(--mist)';
+      return `<tr>
+        <td style="font-weight:600;color:var(--navy)">${d.title}</td>
+        <td><span class="doc-type-tag" style="${style}">${d.tool_name||'Content'}</span></td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mist)">${(d.word_count||0).toLocaleString()}</td>
+        <td style="font-size:12px;color:var(--mist)">${date}</td>
+        <td style="display:flex;gap:6px">
+          ${currentUser?.has_wp?`<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="publishDocWP(${d.id},'${d.title.replace(/'/g,"\\'")}')">🌐 WP</button>`:''}
+          ${currentUser?.has_shopify?`<button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="publishDocShopify(${d.id})">🛍️ Shopify</button>`:''}
+          <button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px" onclick="deleteDoc(${d.id},this)">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e){console.log('Docs err:',e.message);}
 }
 
-function scrollChat() {
-  const w = document.getElementById('chat-window');
-  w.scrollTop = w.scrollHeight;
+async function deleteDoc(id,btn){
+  if(!confirm('Delete this document?'))return;
+  btn.textContent='...';
+  await fetch(`/api/documents/${id}`,{method:'DELETE',headers:authHeaders()});
+  renderDocuments();toast('Deleted','');
 }
 
-function clearChat() {
-  chatHistory = [];
-  document.getElementById('chat-window').innerHTML = `<div class="msg ai">
-    <div class="m-av" style="font-size:10px;font-weight:800;font-family:'Fraunces',serif">M</div>
-    <div class="m-bubble">Chat cleared! What would you like to create today?</div>
-  </div>`;
+async function publishDocWP(docId,title) {
+  const status=prompt('Publish status (draft or publish):','draft');
+  if(!status) return;
+  try {
+    const res=await fetch('/api/integrations/wordpress/publish',{method:'POST',headers:authHeaders(),body:JSON.stringify({docId,title,status})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error);
+    toast(`✓ Published to WordPress! Edit: ${data.editUrl}`,'success');
+  } catch(e){toast('Error: '+e.message,'error');}
 }
 
-// ── Documents ─────────────────────────────────────────────
-const TYPE_STYLE = {
-  'Blog Writer':'background:#EEF2FF;color:#4F46E5',
-  'Email Campaign':'background:#ECFDF5;color:#059669',
-  'Product Description':'background:#FFF1F2;color:#E11D48',
-  'Ad Copy':'background:var(--orange-bg);color:var(--orange)',
-  'Social Media Posts':'background:#FEF3C7;color:#B45309',
-  'Sales Outreach Email':'background:#F0FDF4;color:#16A34A',
-  'SEO Meta Generator':'background:#EFF6FF;color:#2563EB',
-  'Keyword Cluster Builder':'background:#FEFCE8;color:#CA8A04',
-  'Landing Page Copy':'background:#FFF7ED;color:#EA580C',
-  'Content Rewriter':'background:#F5F3FF;color:#7C3AED',
-};
-
-const SAMPLE_DOCS = [
-  {id:1,name:'10 Ways to Boost E-Commerce Sales in 2025',type:'Blog Writer',words:1240,date:'2025-07-10'},
-  {id:2,name:'Summer Sale Email — July Promo',type:'Email Campaign',words:380,date:'2025-07-09'},
-  {id:3,name:'Wireless Earbuds Pro — Shopify Listing',type:'Product Description',words:220,date:'2025-07-08'},
-  {id:4,name:'Facebook Ads — New Collection Q3',type:'Ad Copy',words:90,date:'2025-07-07'},
-  {id:5,name:'SEO Meta Tags — 5 Landing Pages',type:'SEO Meta Generator',words:320,date:'2025-07-06'},
-  {id:6,name:'LinkedIn Post — Agency Case Study',type:'Social Media Posts',words:160,date:'2025-07-05'},
-];
-
-function renderDocuments() {
-  const stored = localStorage.getItem('msm_docs');
-  if (stored) savedDocs = JSON.parse(stored);
-  const all = [...SAMPLE_DOCS, ...savedDocs];
-  document.getElementById('doc-tbody').innerHTML = all.map(d => {
-    const style = TYPE_STYLE[d.type] || 'background:var(--cream2);color:var(--slate)';
-    const date = typeof d.date === 'string' ? d.date.substring(0,10) : new Date(d.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    return `<tr>
-      <td style="font-weight:600;color:var(--navy)">${d.name}</td>
-      <td><span class="doc-type-tag" style="${style}">${d.type}</span></td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mist)">${(d.words||0).toLocaleString()}</td>
-      <td style="font-size:12px;color:var(--mist)">${date}</td>
-      <td>
-        <button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:11px" onclick="toast('Opening editor…','success')">Edit</button>
-      </td>
-    </tr>`;
-  }).join('');
+async function publishDocShopify(docId) {
+  try {
+    const res=await fetch('/api/integrations/shopify/publish',{method:'POST',headers:authHeaders(),body:JSON.stringify({docId})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error);
+    toast(`✓ Pushed to Shopify! View: ${data.adminUrl}`,'success');
+  } catch(e){toast('Error: '+e.message,'error');}
 }
 
-// ── Settings ──────────────────────────────────────────────
-function showSetting(sec, el) {
-  document.querySelectorAll('.sn-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-  ['general','api','brand','team','notif','password','wordpress','shopify','developer'].forEach(s => {
-    const el2 = document.getElementById('sc-' + s);
-    if (el2) el2.style.display = s === sec ? 'block' : 'none';
+// ── Settings ─────────────────────────────────────────────
+function showSetting(sec,el) {
+  document.querySelectorAll('.sn-item').forEach(i=>i.classList.remove('active')); el.classList.add('active');
+  ['general','api','brand','team','notif','password','wordpress','shopify','developer'].forEach(s=>{
+    const e=document.getElementById('sc-'+s);if(e)e.style.display=s===sec?'block':'none';
   });
-  if (sec === 'general' && currentUser) {
-    const inputs = document.querySelectorAll('#sc-general input');
-    if (inputs[0]) inputs[0].value = currentUser.name || '';
-    if (inputs[1]) inputs[1].value = currentUser.email || '';
-  }
-  if (sec === 'brand' && currentUser) {
-    const inputs = document.querySelectorAll('#sc-brand input, #sc-brand textarea');
-    if (inputs[0]) inputs[0].value = currentUser.brand_name || '';
-    if (inputs[1]) inputs[1].value = currentUser.brand_desc || '';
-  }
-  if (sec === 'team') loadTeam();
-  if (sec === 'developer') loadDevKeys();
-  if (sec === 'wordpress' && currentUser) updateWPStatus(currentUser.has_wp);
-  if (sec === 'shopify' && currentUser) updateShopifyStatus(currentUser.has_shopify);
+  if(sec==='general'&&currentUser){const inputs=document.querySelectorAll('#sc-general input');if(inputs[0])inputs[0].value=currentUser.name||'';if(inputs[1])inputs[1].value=currentUser.email||'';}
+  if(sec==='brand'&&currentUser){const inputs=document.querySelectorAll('#sc-brand input, #sc-brand textarea');if(inputs[0])inputs[0].value=currentUser.brand_name||'';if(inputs[1])inputs[1].value=currentUser.brand_desc||'';}
+  if(sec==='developer'&&currentUser?.api_key){showDevKey(currentUser.api_key);}
+  if(sec==='wordpress'&&currentUser)updateWPStatus(currentUser.has_wp);
+  if(sec==='shopify'&&currentUser)updateShopifyStatus(currentUser.has_shopify);
+  if(sec==='team')loadTeam();
 }
 
-async function saveApiKey() {
-  const k = document.getElementById('api-key-field').value.trim();
-  if (!k.startsWith('gsk_')) { toast('Invalid Groq key — must start with gsk_', 'error'); return; }
-  try {
-    await fetch('/api/keys', { method:'PUT', headers: authHeaders(), body: JSON.stringify({ groq_key: k }) });
-    document.getElementById('api-ok').textContent = '✓ Groq API key saved';
-    document.getElementById('api-ok').classList.add('show');
-    toast('✓ Groq API key saved!', 'success');
-  } catch(e) { toast('Error saving key', 'error'); }
+async function saveSettings(){
+  const inputs=document.querySelectorAll('#sc-general input');
+  const name=inputs[0]?.value;
+  const res=await fetch('/api/auth/me',{method:'PUT',headers:authHeaders(),body:JSON.stringify({name})});
+  const data=await res.json();
+  if(res.ok){if(currentUser)currentUser.name=name;applyUser(currentUser);toast('Settings saved!','success');}
+  else toast('Error: '+data.error,'error');
+}
+
+async function saveBrandVoice(){
+  const inputs=document.querySelectorAll('#sc-brand input, #sc-brand textarea');
+  const brand_name=inputs[0]?.value;const brand_desc=inputs[1]?.value;
+  const toneEl=document.querySelector('#sc-brand .tone-tag.on');
+  const brand_tone=toneEl?.textContent||'Professional';
+  await fetch('/api/auth/me',{method:'PUT',headers:authHeaders(),body:JSON.stringify({brand_name,brand_desc,brand_tone})});
+  toast('Brand voice saved!','success');
+}
+
+async function saveApiKey(){
+  const k=document.getElementById('api-key-field')?.value.trim();
+  if(!k?.startsWith('gsk_')){toast('Invalid Groq key — must start with gsk_','error');return;}
+  const res=await fetch('/api/keys',{method:'PUT',headers:authHeaders(),body:JSON.stringify({groq_key:k})});
+  if(res.ok){const el=document.getElementById('api-ok');if(el){el.textContent='✓ Groq key saved';el.classList.add('show');}toast('✓ Groq API key saved!','success');}
+  else toast('Error saving key','error');
+}
+
+async function changePassword(){
+  const current=document.getElementById('pw-current')?.value;
+  const newPw=document.getElementById('pw-new')?.value;
+  const confirm=document.getElementById('pw-confirm')?.value;
+  if(!current||!newPw||!confirm){toast('All fields required','error');return;}
+  if(newPw!==confirm){toast('New passwords do not match','error');return;}
+  if(newPw.length<8){toast('Password must be at least 8 characters','error');return;}
+  const res=await fetch('/api/auth/password',{method:'PUT',headers:authHeaders(),body:JSON.stringify({currentPassword:current,newPassword:newPw})});
+  const data=await res.json();
+  if(res.ok){document.getElementById('pw-current').value='';document.getElementById('pw-new').value='';document.getElementById('pw-confirm').value='';toast('✓ Password updated!','success');}
+  else toast('Error: '+data.error,'error');
 }
 
 // ── WordPress Integration ─────────────────────────────────
-async function connectWordPress() {
-  const wp_url = document.getElementById('wp-url').value.trim();
-  const wp_username = document.getElementById('wp-user').value.trim();
-  const wp_app_password = document.getElementById('wp-pass').value.trim();
-  if (!wp_url || !wp_username || !wp_app_password) { toast('All WordPress fields required', 'error'); return; }
-  const btn = document.querySelector('#sc-wordpress .btn-primary');
-  btn.textContent = 'Connecting…'; btn.disabled = true;
-  try {
-    const res = await fetch('/api/wordpress/connect', { method:'POST', headers: authHeaders(), body: JSON.stringify({ wp_url, wp_username, wp_app_password }) });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    toast('✓ ' + data.message, 'success');
-    currentUser.has_wp = true;
-    updateWPStatus(true, wp_url);
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
-  finally { btn.textContent = 'Connect WordPress'; btn.disabled = false; }
+function updateWPStatus(connected,url='') {
+  const status=document.getElementById('wp-connected-status');
+  const disconnectBtn=document.getElementById('wp-disconnect-btn');
+  if(!status) return;
+  if(connected){status.innerHTML=`<div style="background:var(--teal-bg);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--teal);margin-bottom:16px">✓ WordPress is connected ${url?'— '+url:''}</div>`;if(disconnectBtn)disconnectBtn.style.display='inline-flex';}
+  else{status.innerHTML='';if(disconnectBtn)disconnectBtn.style.display='none';}
 }
 
-function updateWPStatus(connected, url) {
-  const status = document.getElementById('wp-connected-status');
-  const disconnectBtn = document.getElementById('wp-disconnect-btn');
-  if (connected) {
-    status.innerHTML = `<div style="background:var(--teal-bg);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--teal);margin-bottom:16px">✓ Connected to <strong>${url || 'WordPress site'}</strong></div>`;
-    if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
-  } else {
-    status.innerHTML = '';
-    if (disconnectBtn) disconnectBtn.style.display = 'none';
-  }
+async function connectWordPress() {
+  const url=document.getElementById('wp-url')?.value.trim();
+  const username=document.getElementById('wp-user')?.value.trim();
+  const password=document.getElementById('wp-pass')?.value.trim();
+  if(!url||!username||!password){toast('All WordPress fields required','error');return;}
+  const btn=document.querySelector('#sc-wordpress .btn-primary');
+  if(btn){btn.textContent='Connecting…';btn.disabled=true;}
+  try {
+    const res=await fetch('/api/integrations/wordpress/connect',{method:'POST',headers:authHeaders(),body:JSON.stringify({url,username,password})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error);
+    if(currentUser)currentUser.has_wp=true;
+    updateWPStatus(true,url);
+    toast('✓ '+data.message,'success');
+  } catch(e){toast('Error: '+e.message,'error');}
+  finally{if(btn){btn.textContent='Connect WordPress';btn.disabled=false;}}
 }
 
 async function disconnectWordPress() {
-  if (!confirm('Disconnect WordPress?')) return;
-  await fetch('/api/wordpress/disconnect', { method:'DELETE', headers: authHeaders() });
-  currentUser.has_wp = false;
+  if(!confirm('Disconnect WordPress?'))return;
+  await fetch('/api/integrations/wordpress/disconnect',{method:'DELETE',headers:authHeaders()});
+  if(currentUser)currentUser.has_wp=false;
   updateWPStatus(false);
-  toast('WordPress disconnected', '');
-}
-
-async function publishToWordPress(docId, title) {
-  const status = prompt('Publish as:', 'draft');
-  if (!status) return;
-  const res = await fetch('/api/wordpress/publish', { method:'POST', headers: authHeaders(), body: JSON.stringify({ docId, title, status }) });
-  const data = await res.json();
-  if (res.ok) toast(`✓ Published to WordPress! View at: ${data.postUrl}`, 'success');
-  else toast('Error: ' + data.error, 'error');
+  document.getElementById('wp-url').value='';document.getElementById('wp-user').value='';document.getElementById('wp-pass').value='';
+  toast('WordPress disconnected','');
 }
 
 // ── Shopify Integration ───────────────────────────────────
-async function connectShopify() {
-  const shopify_domain = document.getElementById('shopify-domain').value.trim();
-  const shopify_token = document.getElementById('shopify-token').value.trim();
-  if (!shopify_domain || !shopify_token) { toast('All Shopify fields required', 'error'); return; }
-  const btn = document.querySelector('#sc-shopify .btn-primary');
-  btn.textContent = 'Connecting…'; btn.disabled = true;
-  try {
-    const res = await fetch('/api/shopify/connect', { method:'POST', headers: authHeaders(), body: JSON.stringify({ shopify_domain, shopify_token }) });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    toast('✓ ' + data.message, 'success');
-    currentUser.has_shopify = true;
-    updateShopifyStatus(true, shopify_domain);
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
-  finally { btn.textContent = 'Connect Shopify'; btn.disabled = false; }
+function updateShopifyStatus(connected,domain='') {
+  const status=document.getElementById('shopify-connected-status');
+  const disconnectBtn=document.getElementById('shopify-disconnect-btn');
+  if(!status) return;
+  if(connected){status.innerHTML=`<div style="background:var(--teal-bg);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--teal);margin-bottom:16px">✓ Shopify is connected ${domain?'— '+domain:''}</div>`;if(disconnectBtn)disconnectBtn.style.display='inline-flex';}
+  else{status.innerHTML='';if(disconnectBtn)disconnectBtn.style.display='none';}
 }
 
-function updateShopifyStatus(connected, domain) {
-  const status = document.getElementById('shopify-connected-status');
-  const disconnectBtn = document.getElementById('shopify-disconnect-btn');
-  if (connected) {
-    status.innerHTML = `<div style="background:var(--teal-bg);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--teal);margin-bottom:16px">✓ Connected to <strong>${domain || 'Shopify store'}</strong></div>`;
-    if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
-  } else {
-    status.innerHTML = '';
-    if (disconnectBtn) disconnectBtn.style.display = 'none';
-  }
+async function connectShopify() {
+  const store=document.getElementById('shopify-domain')?.value.trim();
+  const token=document.getElementById('shopify-token')?.value.trim();
+  if(!store||!token){toast('Store domain and token required','error');return;}
+  const btn=document.querySelector('#sc-shopify .btn-primary');
+  if(btn){btn.textContent='Connecting…';btn.disabled=true;}
+  try {
+    const res=await fetch('/api/integrations/shopify/connect',{method:'POST',headers:authHeaders(),body:JSON.stringify({store,token})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error);
+    if(currentUser)currentUser.has_shopify=true;
+    updateShopifyStatus(true,store);
+    toast('✓ '+data.message,'success');
+  } catch(e){toast('Error: '+e.message,'error');}
+  finally{if(btn){btn.textContent='Connect Shopify';btn.disabled=false;}}
 }
 
 async function disconnectShopify() {
-  if (!confirm('Disconnect Shopify?')) return;
-  await fetch('/api/shopify/disconnect', { method:'DELETE', headers: authHeaders() });
-  currentUser.has_shopify = false;
+  if(!confirm('Disconnect Shopify?'))return;
+  await fetch('/api/integrations/shopify/disconnect',{method:'DELETE',headers:authHeaders()});
+  if(currentUser)currentUser.has_shopify=false;
   updateShopifyStatus(false);
-  toast('Shopify disconnected', '');
+  document.getElementById('shopify-domain').value='';document.getElementById('shopify-token').value='';
+  toast('Shopify disconnected','');
 }
 
-async function publishToShopify(docId, title) {
-  const res = await fetch('/api/shopify/publish', { method:'POST', headers: authHeaders(), body: JSON.stringify({ docId, productTitle: title }) });
-  const data = await res.json();
-  if (res.ok) toast('✓ Published to Shopify!', 'success');
-  else toast('Error: ' + data.error, 'error');
-}
-
-// ── Developer API Keys ────────────────────────────────────
-async function loadDevKeys() {
-  const res = await fetch('/api/developer/keys', { headers: authHeaders() });
-  const data = await res.json();
-  const display = document.getElementById('dev-key-display');
-  if (!data.keys?.length) {
-    display.innerHTML = '<div style="font-size:13px;color:var(--mist);margin-bottom:16px">No API keys yet. Generate one to get started.</div>';
-    document.getElementById('dev-enable-btn').style.display = 'inline-flex';
-    document.getElementById('dev-regen-btn').style.display = 'none';
-    document.getElementById('dev-disable-btn').style.display = 'none';
-    return;
-  }
-  display.innerHTML = `<div style="margin-bottom:16px">
-    <table style="width:100%;border-collapse:collapse;font-size:13px">
-      <thead><tr style="background:var(--cream)">
-        <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--fog)">Name</th>
-        <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--fog)">Key Preview</th>
-        <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--fog)">API Calls</th>
-        <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--fog)">Status</th>
-        <th style="padding:8px 12px;border-bottom:1px solid var(--fog)">Action</th>
-      </tr></thead>
-      <tbody>${data.keys.map(k=>`<tr>
-        <td style="padding:9px 12px;border-bottom:1px solid var(--fog);font-weight:600">${k.name}</td>
-        <td style="padding:9px 12px;border-bottom:1px solid var(--fog);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange)">${k.key_preview}</td>
-        <td style="padding:9px 12px;border-bottom:1px solid var(--fog);color:var(--mist)">${k.calls_made}</td>
-        <td style="padding:9px 12px;border-bottom:1px solid var(--fog)"><span style="background:${k.is_active?'var(--teal-bg)':'var(--red-bg)'};color:${k.is_active?'var(--teal)':'var(--red)'};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">${k.is_active?'Active':'Disabled'}</span></td>
-        <td style="padding:9px 12px;border-bottom:1px solid var(--fog)"><button class="btn btn-outline btn-sm" onclick="revokeKey(${k.id})">Revoke</button></td>
-      </tr>`).join('')}</tbody>
-    </table>
-  </div>`;
-  document.getElementById('dev-enable-btn').style.display = 'inline-flex';
-  document.getElementById('dev-regen-btn').style.display = 'none';
-  document.getElementById('dev-disable-btn').style.display = 'none';
+// ── Developer API ─────────────────────────────────────────
+function showDevKey(key) {
+  const el=document.getElementById('dev-key-display');
+  if(!el) return;
+  el.innerHTML=`<div style="background:var(--navy);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:16px"><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.8px;margin-bottom:8px">YOUR API KEY</div><div style="display:flex;align-items:center;gap:10px"><code style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a8d8a8;flex:1;word-break:break-all">${key}</code><button class="btn btn-outline btn-sm" style="flex-shrink:0;color:white;border-color:rgba(255,255,255,.2)" onclick="navigator.clipboard.writeText('${key}').then(()=>toast('Copied!','success'))">Copy</button></div></div>`;
+  const enableBtn=document.getElementById('dev-enable-btn');
+  const regenBtn=document.getElementById('dev-regen-btn');
+  if(enableBtn)enableBtn.style.display='none';
+  if(regenBtn)regenBtn.style.display='inline-flex';
 }
 
 async function enableDevApi() {
-  const name = prompt('Name this API key (e.g. "My App", "Production"):');
-  if (!name) return;
-  const res = await fetch('/api/developer/keys', { method:'POST', headers: authHeaders(), body: JSON.stringify({ name }) });
-  const data = await res.json();
-  if (!res.ok) { toast(data.error, 'error'); return; }
-  alert(`✅ API Key Created!\n\n${data.key}\n\n⚠️ Save this key now — it will NOT be shown again!`);
-  toast('API key created! Save it now.', 'success');
-  loadDevKeys();
+  if(currentUser?.api_key){showDevKey(currentUser.api_key);return;}
+  toast('API key not found. Try logging out and back in.','error');
 }
 
-async function revokeKey(id) {
-  if (!confirm('Revoke this API key? Any apps using it will stop working.')) return;
-  await fetch(`/api/developer/keys/${id}`, { method:'DELETE', headers: authHeaders() });
-  toast('API key revoked', '');
-  loadDevKeys();
+async function regenDevApi() {
+  if(!confirm('Regenerate API key? Old key stops working immediately.'))return;
+  const res=await fetch('/api/auth/regenerate-key',{method:'POST',headers:authHeaders()});
+  const data=await res.json();
+  if(res.ok){if(currentUser)currentUser.api_key=data.api_key;showDevKey(data.api_key);toast('✓ New API key generated!','success');}
+  else toast('Error: '+data.error,'error');
 }
 
-function regenDevApi() { enableDevApi(); }
-function disableDevApi() { revokeKey(); }
+function disableDevApi(){toast('To disable API access contact support.','');}
 
-// ── Team Workspace ────────────────────────────────────────
+// ── Team ─────────────────────────────────────────────────
 async function loadTeam() {
-  const res = await fetch('/api/team', { headers: authHeaders() });
-  const data = await res.json();
-  const sc = document.getElementById('sc-team');
-  if (!sc) return;
-  if (!data.team) {
-    sc.innerHTML = `<div class="sc-title">Team Workspace</div>
-      <div style="text-align:center;padding:32px 20px">
-        <div style="font-size:48px;margin-bottom:14px;opacity:.4">👥</div>
-        <div style="font-size:16px;font-weight:700;color:var(--navy2);margin-bottom:8px">Create Your Team</div>
-        <div style="font-size:13px;color:var(--mist);max-width:300px;margin:0 auto 20px;line-height:1.6">Collaborate with teammates. Share brand voices, work on content together, manage client accounts.</div>
-        <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto">
-          <input class="f-input" id="team-name-input" placeholder="Team / Agency Name">
-          <button class="btn btn-primary" style="justify-content:center" onclick="createTeam()">Create Team</button>
+  const container=document.getElementById('sc-team');
+  if(!container) return;
+  try {
+    const res=await fetch('/api/teams/mine',{headers:authHeaders()});
+    const data=await res.json();
+    if(!data.team){
+      container.innerHTML=`<div class="sc-title">Team Workspace</div>
+        <div style="text-align:center;padding:40px 20px">
+          <div style="font-size:40px;margin-bottom:12px;opacity:.4">👥</div>
+          <div style="font-size:15px;font-weight:700;color:var(--navy2);margin-bottom:8px">No Team Yet</div>
+          <div style="font-size:13px;color:var(--mist);max-width:300px;margin:0 auto 20px;line-height:1.6">Create a team to collaborate with your colleagues and share brand voices.</div>
+          <div style="display:flex;gap:10px;justify-content:center">
+            <input class="f-input" id="team-name-input" placeholder="Enter team name" style="max-width:200px">
+            <button class="btn btn-primary" onclick="createTeam()">Create Team</button>
+          </div>
+        </div>`;
+    } else {
+      container.innerHTML=`<div class="sc-title">Team: ${data.team.name}</div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px">Members (${data.members.length})</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${data.members.map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);border-radius:var(--r-sm)">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white">${m.name.charAt(0)}</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--navy)">${m.name}</div><div style="font-size:11px;color:var(--mist)">${m.email} · ${m.role}</div></div>
+              ${m.id!==currentUser?.id?`<button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:11px" onclick="removeMember(${m.id})">Remove</button>`:'<span style="font-size:11px;color:var(--mist)">(you)</span>'}
+            </div>`).join('')}
+          </div>
         </div>
-      </div>`;
-  } else {
-    sc.innerHTML = `<div class="sc-title">Team Workspace</div>
-      <div style="background:var(--teal-bg);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:14px 16px;font-size:14px;font-weight:600;color:var(--teal);margin-bottom:20px">✓ ${data.team.name}</div>
-      <div style="margin-bottom:20px">
-        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">Team Members (${data.members.length})</div>
-        ${data.members.map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--fog)">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange-bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--orange)">${m.name.charAt(0).toUpperCase()}</div>
-          <div style="flex:1"><div style="font-size:13px;font-weight:600">${m.name}</div><div style="font-size:11px;color:var(--mist)">${m.email}</div></div>
-          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--orange-bg);color:var(--orange)">${m.role.toUpperCase()}</span>
-        </div>`).join('')}
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
-        <div class="f-label">Invite Team Member (by email)</div>
-        <div style="display:flex;gap:10px">
-          <input class="f-input" id="invite-email" placeholder="colleague@company.com" style="flex:1">
-          <button class="btn btn-primary" onclick="inviteTeamMember()">Invite</button>
-        </div>
-        <button class="btn btn-outline" onclick="leaveTeam()" style="margin-top:8px">Leave Team</button>
-      </div>`;
-  }
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <input class="f-input" id="invite-email" placeholder="colleague@email.com" style="flex:1">
+          <button class="btn btn-primary" onclick="inviteMember()">Invite</button>
+        </div>`;
+    }
+  } catch(e){console.log('Team err:',e.message);}
 }
 
-async function createTeam() {
-  const name = document.getElementById('team-name-input')?.value.trim();
-  if (!name) { toast('Team name required', 'error'); return; }
-  const res = await fetch('/api/team/create', { method:'POST', headers: authHeaders(), body: JSON.stringify({ name }) });
-  const data = await res.json();
-  if (res.ok) { toast('Team created!', 'success'); loadTeam(); }
-  else toast(data.error, 'error');
+async function createTeam(){
+  const name=document.getElementById('team-name-input')?.value.trim();
+  if(!name){toast('Team name required','error');return;}
+  const res=await fetch('/api/teams',{method:'POST',headers:authHeaders(),body:JSON.stringify({name})});
+  if(res.ok){toast('Team created!','success');loadTeam();}
+  else{const d=await res.json();toast('Error: '+d.error,'error');}
 }
 
-async function inviteTeamMember() {
-  const email = document.getElementById('invite-email')?.value.trim();
-  if (!email) { toast('Email required', 'error'); return; }
-  const res = await fetch('/api/team/invite', { method:'POST', headers: authHeaders(), body: JSON.stringify({ email }) });
-  const data = await res.json();
-  if (res.ok) { toast('✓ ' + data.message, 'success'); loadTeam(); }
-  else toast(data.error, 'error');
+async function inviteMember(){
+  const email=document.getElementById('invite-email')?.value.trim();
+  if(!email){toast('Email required','error');return;}
+  const res=await fetch('/api/teams/invite',{method:'POST',headers:authHeaders(),body:JSON.stringify({email})});
+  const data=await res.json();
+  if(res.ok){toast('✓ '+data.message,'success');document.getElementById('invite-email').value='';loadTeam();}
+  else toast('Error: '+data.error,'error');
 }
 
-async function leaveTeam() {
-  if (!confirm('Leave this team?')) return;
-  await fetch('/api/team/leave', { method:'DELETE', headers: authHeaders() });
-  toast('Left team', ''); loadTeam();
+async function removeMember(userId){
+  if(!confirm('Remove this member from the team?'))return;
+  await fetch(`/api/teams/members/${userId}`,{method:'DELETE',headers:authHeaders()});
+  toast('Member removed','');loadTeam();
 }
 
-// ── Bulk Generation ───────────────────────────────────────
-document.getElementById('bulk-inputs')?.addEventListener('input', function() {
-  const lines = this.value.split('\n').filter(l => l.trim()).length;
-  const countEl = document.getElementById('bulk-count');
-  if (countEl) countEl.textContent = `${lines} item${lines !== 1 ? 's' : ''} entered (max 20)`;
-});
+// ── Bulk Generate ─────────────────────────────────────────
+function initBulkPage() {
+  const textarea=document.getElementById('bulk-inputs');
+  if(textarea){textarea.addEventListener('input',()=>{const lines=textarea.value.split('\n').filter(l=>l.trim());document.getElementById('bulk-count').textContent=lines.length+' items entered';});}
+}
 
 async function startBulkGenerate() {
-  const toolSelect = document.getElementById('bulk-tool');
-  const toneSelect = document.getElementById('bulk-tone');
-  const inputsEl = document.getElementById('bulk-inputs');
-  if (!toolSelect || !inputsEl) return;
+  const toolId=document.getElementById('bulk-tool')?.value;
+  const tone=document.getElementById('bulk-tone')?.value||'Professional';
+  const rawInput=document.getElementById('bulk-inputs')?.value||'';
+  const lines=rawInput.split('\n').filter(l=>l.trim());
+  if(!lines.length){toast('Enter at least one item','error');return;}
+  if(lines.length>20){toast('Maximum 20 items per batch','error');return;}
 
-  const toolId = toolSelect.value;
-  const toolName = toolSelect.options[toolSelect.selectedIndex].text;
-  const tone = toneSelect?.value || 'Professional';
-  const lines = inputsEl.value.split('\n').filter(l => l.trim());
+  const toolName=document.getElementById('bulk-tool')?.options[document.getElementById('bulk-tool').selectedIndex]?.text||toolId;
+  const items=lines.map((line,i)=>({label:`Item ${i+1}: ${line.substring(0,40)}`,prompt:`Write ${toolName} for: ${line}. Tone: ${tone}. Be specific and high-quality.`}));
 
-  if (!lines.length) { toast('Please enter at least one item', 'error'); return; }
-  if (lines.length > 20) { toast('Maximum 20 items allowed', 'error'); return; }
-
-  const items = lines.map((line, i) => ({
-    title: `${toolName} — ${line.substring(0, 50)}`,
-    prompt: `Write a ${toolName.toLowerCase()} for: ${line}. Tone: ${tone}. Be specific, compelling, and conversion-focused.`
-  }));
-
-  document.getElementById('bulk-empty').style.display = 'none';
-  document.getElementById('bulk-progress').style.display = 'block';
-  document.getElementById('bulk-results').style.display = 'none';
-  document.getElementById('bulk-progress-text').textContent = 'Starting bulk generation…';
+  document.getElementById('bulk-empty').style.display='none';
+  document.getElementById('bulk-results').style.display='none';
+  document.getElementById('bulk-done-actions').style.display='none';
+  document.getElementById('bulk-progress').style.display='block';
+  document.getElementById('bulk-progress-bar').style.width='5%';
+  document.getElementById('bulk-progress-text').textContent='Starting...';
 
   try {
-    const res = await fetch('/api/bulk/generate', {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ items, toolId, toolName, tone })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-
-    toast(`⚡ Bulk job started! Generating ${items.length} items…`, 'success');
-    pollBulkJob(data.jobId, items.length);
-  } catch(e) {
-    document.getElementById('bulk-progress').style.display = 'none';
-    document.getElementById('bulk-empty').style.display = 'flex';
-    toast('Error: ' + e.message, 'error');
+    const res=await fetch('/api/bulk/generate',{method:'POST',headers:authHeaders(),body:JSON.stringify({items,toolId,toolName,tone})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error);
+    bulkJobId=data.jobId;
+    pollBulkStatus(data.jobId,lines.length);
+    toast('⚡ Bulk generation started!','success');
+  } catch(e){
+    document.getElementById('bulk-progress').style.display='none';
+    document.getElementById('bulk-empty').style.display='flex';
+    toast('Error: '+e.message,'error');
   }
 }
 
-async function pollBulkJob(jobId, total) {
-  const poll = async () => {
-    const res = await fetch(`/api/bulk/status/${jobId}`, { headers: authHeaders() });
-    const job = await res.json();
-    const pct = total > 0 ? Math.round((job.completed / total) * 100) : 0;
-    document.getElementById('bulk-progress-bar').style.width = pct + '%';
-    document.getElementById('bulk-progress-pct').textContent = pct + '%';
-    document.getElementById('bulk-progress-text').textContent = `Generating ${job.completed} of ${total} items…`;
-
-    if (job.status === 'completed') {
-      document.getElementById('bulk-progress').style.display = 'none';
-      const results = job.results || [];
-      const container = document.getElementById('bulk-results');
-      container.innerHTML = results.map(r => `
-        <div style="background:var(--cream);border:1px solid var(--fog);border-radius:var(--r-sm);padding:14px;display:flex;align-items:center;gap:10px">
-          <span style="font-size:18px">${r.success ? '✅' : '❌'}</span>
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:600;color:var(--navy)">${r.title||'Item '+(r.index+1)}</div>
-            <div style="font-size:11px;color:var(--mist)">${r.success ? r.wordCount+' words — saved to Documents' : 'Error: '+r.error}</div>
-          </div>
-        </div>`).join('');
-      container.style.display = 'flex';
-      const done = results.filter(r=>r.success).length;
-      toast(`✓ Bulk complete! ${done}/${total} generated and saved to Documents`, 'success');
-      return;
-    }
-    setTimeout(poll, 1500);
-  };
-  poll();
+async function pollBulkStatus(jobId,total) {
+  clearInterval(bulkPollTimer);
+  bulkPollTimer=setInterval(async()=>{
+    try {
+      const res=await fetch(`/api/bulk/status/${jobId}`,{headers:authHeaders()});
+      const data=await res.json();
+      const pct=total>0?Math.round((data.completed/total)*100):0;
+      document.getElementById('bulk-progress-bar').style.width=pct+'%';
+      document.getElementById('bulk-progress-text').textContent=`Processing ${data.completed} of ${total}...`;
+      document.getElementById('bulk-progress-pct').textContent=pct+'%';
+      if(data.status==='completed'){
+        clearInterval(bulkPollTimer);
+        document.getElementById('bulk-progress').style.display='none';
+        showBulkResults(data.results||[]);
+      }
+    } catch(e){clearInterval(bulkPollTimer);}
+  },2000);
 }
 
-function exportBulkCSV() { toast('Documents saved. Go to Documents tab to view them.', ''); }
+function showBulkResults(results) {
+  const container=document.getElementById('bulk-results');
+  container.innerHTML=results.map((r,i)=>`
+    <div style="background:var(--white);border:1px solid var(--fog);border-radius:var(--r-sm);overflow:hidden;box-shadow:var(--shadow-sm)">
+      <div style="background:var(--cream);padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;font-weight:700;color:var(--navy)">${r.input}</span>
+        ${!r.error?`<button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:11px" onclick="navigator.clipboard.writeText(this.closest('div').nextElementSibling.textContent).then(()=>toast('Copied!','success'))">📋 Copy</button>`:''}
+      </div>
+      <div style="padding:14px;font-size:13px;line-height:1.7;color:${r.error?'var(--red)':'var(--navy2)'}">${r.error?'❌ '+r.error:escHtml(r.output||'')}</div>
+    </div>`).join('');
+  container.style.display='flex';
+  container.style.flexDirection='column';
+  document.getElementById('bulk-done-actions').style.display='block';
+  toast(`✓ Bulk generation complete! ${results.filter(r=>!r.error).length}/${results.length} succeeded`,'success');
+}
 
-// ── Change Password ───────────────────────────────────────
-async function changePassword() {
-  const current = document.getElementById('pw-current')?.value;
-  const newPw = document.getElementById('pw-new')?.value;
-  const confirm = document.getElementById('pw-confirm')?.value;
-  if (!current || !newPw) { toast('All fields required', 'error'); return; }
-  if (newPw !== confirm) { toast('Passwords do not match', 'error'); return; }
-  if (newPw.length < 8) { toast('Password must be at least 8 characters', 'error'); return; }
-  const res = await fetch('/api/auth/password', { method:'PUT', headers: authHeaders(), body: JSON.stringify({ currentPassword: current, newPassword: newPw }) });
-  const data = await res.json();
-  if (res.ok) { toast('Password changed successfully!', 'success'); document.getElementById('pw-current').value=''; document.getElementById('pw-new').value=''; document.getElementById('pw-confirm').value=''; }
-  else toast(data.error, 'error');
+function exportBulkCSV() {
+  const results=document.querySelectorAll('#bulk-results > div');
+  if(!results.length){toast('No results to export','error');return;}
+  let csv='Input,Output\n';
+  results.forEach(r=>{
+    const input=r.querySelector('span')?.textContent||'';
+    const output=r.querySelectorAll('div')[1]?.textContent||'';
+    csv+=`"${input.replace(/"/g,'""')}","${output.replace(/"/g,'""')}"\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bulk-generated.csv';a.click();
+  toast('CSV downloaded!','success');
 }
 
 // ── Toast ─────────────────────────────────────────────────
 let toastTimer;
-function toast(msg, type) {
+function toast(msg,type){
   clearTimeout(toastTimer);
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show ' + (type || '');
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
-}
-
-// ════════════════════════════════════════════════════
-//  REAL AUTH & DATA — connects to server API
-// ════════════════════════════════════════════════════
-let currentUser = null;
-function getToken() { return localStorage.getItem('msm_token') || ''; }
-function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
-
-async function initApp() {
-  // Handle Google OAuth redirect
-  const params = new URLSearchParams(window.location.search);
-  const urlToken = params.get('token');
-  if (urlToken) { localStorage.setItem('msm_token', urlToken); window.history.replaceState({}, '', '/app.html'); }
-
-  if (!getToken()) { window.location.href = '/login.html'; return; }
-
-  try {
-    const res = await fetch('/api/auth/me', { headers: authHeaders() });
-    if (!res.ok) { localStorage.removeItem('msm_token'); window.location.href = '/login.html'; return; }
-    currentUser = await res.json();
-    applyUser(currentUser);
-    loadStats();
-  } catch (err) { window.location.href = '/login.html'; }
-}
-
-function applyUser(u) {
-  // Sidebar
-  const n = document.querySelector('.u-name');
-  const p = document.querySelector('.u-plan');
-  const a = document.querySelector('.u-avatar');
-  if (n) n.textContent = u.name;
-  if (p) p.textContent = `${u.plan.charAt(0).toUpperCase()+u.plan.slice(1)} Plan · ${(u.credits||0).toLocaleString()} credits`;
-  if (a) {
-    if (u.avatar) a.innerHTML = `<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
-    else a.textContent = u.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-  }
-  // Topbar credits
-  const c = document.getElementById('cred-count');
-  if (c) c.textContent = (u.credits||0).toLocaleString()+' credits';
-  credits = u.credits || 0;
-  // Dashboard greeting
-  const g = document.querySelector('.banner-title');
-  if (g) g.textContent = `Welcome back, ${u.name.split(' ')[0]}`;
-}
-
-async function loadStats() {
-  try {
-    const res = await fetch('/api/stats', { headers: authHeaders() });
-    if (!res.ok) return;
-    const s = await res.json();
-    const vals = document.querySelectorAll('.m-card-val');
-    if (vals[0]) vals[0].textContent = s.totalWords >= 1000 ? Math.round(s.totalWords/1000)+'K' : (s.totalWords||0);
-    if (vals[1]) vals[1].textContent = s.totalDocuments || 0;
-    if (vals[2]) vals[2].textContent = (s.creditsUsed||0).toLocaleString();
-    if (vals[3]) { vals[3].textContent = s.topTool || 'None yet'; vals[3].style.fontSize='16px'; }
-    const deltas = document.querySelectorAll('.m-card-delta');
-    if (deltas[1]) deltas[1].textContent = `+${s.docsThisWeek||0} this week`;
-    if (deltas[2]) deltas[2].textContent = `${(s.creditsRemaining||0).toLocaleString()} remaining`;
-    const pct = s.creditsMax > 0 ? Math.round(((s.creditsUsed||0)/s.creditsMax)*100) : 0;
-    const fill = document.querySelector('.progress-fill');
-    const pctEl = document.querySelector('.progress-pct');
-    if (fill) fill.style.width = pct+'%';
-    if (pctEl) pctEl.textContent = pct+'%';
-    const note = document.querySelector('.progress-note');
-    if (note) note.textContent = `${(s.creditsUsed||0).toLocaleString()} used · ${(s.creditsRemaining||0).toLocaleString()} remaining`;
-    if (s.recentDocuments && s.recentDocuments.length > 0) renderRecentDocs(s.recentDocuments);
-    else {
-      const panel = document.querySelector('.panel-body');
-      if (panel) panel.innerHTML = `<div style="padding:24px;text-align:center;color:var(--mist);font-size:13px">No documents yet — create your first piece of content!</div>`;
-    }
-  } catch (err) { console.log('Stats err:', err.message); }
-}
-
-function renderRecentDocs(docs) {
-  const panel = document.querySelector('.panel-body');
-  if (!panel) return;
-  const icons = {'Blog Writer':'✍️','Email Campaign':'📧','Product Description':'🛍️','Ad Copy':'🎯','Social Media Posts':'📱','Sales Outreach Email':'💼','SEO Meta Generator':'🔍','Landing Page Copy':'🚀','Content Rewriter':'🔄','Keyword Cluster Builder':'💡'};
-  const bgs   = {'Blog Writer':'#EEF2FF','Email Campaign':'#ECFDF5','Product Description':'#FFF1F2','Ad Copy':'var(--orange-bg)','Social Media Posts':'#FEF3C7'};
-  const tcs   = {'Blog Writer':'#4F46E5','Email Campaign':'#059669','Product Description':'#E11D48','Ad Copy':'var(--orange)','Social Media Posts':'#B45309'};
-  panel.innerHTML = docs.map(d => {
-    const icon = icons[d.tool_name]||'📄';
-    const bg = bgs[d.tool_name]||'var(--cream2)';
-    const tc = tcs[d.tool_name]||'var(--slate)';
-    const date = new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    return `<div class="recent-row"><div class="rr-ico" style="background:${bg}">${icon}</div><div class="rr-info"><div class="rr-name">${d.title}</div><div class="rr-meta">${d.tool_name||'Content'} · ${date} · ${(d.word_count||0).toLocaleString()} words</div></div><span class="rr-badge" style="background:${bg};color:${tc}">${(d.tool_name||'Doc').split(' ')[0]}</span></div>`;
-  }).join('');
-}
-
-async function renderDocuments() {
-  try {
-    const res = await fetch('/api/documents', { headers: authHeaders() });
-    if (!res.ok) return;
-    const data = await res.json();
-    const docs = data.documents || [];
-    const tbody = document.getElementById('doc-tbody');
-    if (!tbody) return;
-    if (docs.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--mist)">No documents yet. Start creating content with AI Tools!</td></tr>`;
-      return;
-    }
-    tbody.innerHTML = docs.map(d => {
-      const style = TYPE_STYLE[d.tool_name]||'background:var(--cream2);color:var(--slate)';
-      const date = new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-      return `<tr><td style="font-weight:600;color:var(--navy)">${d.title}</td><td><span class="doc-type-tag" style="${style}">${d.tool_name||'Content'}</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mist)">${(d.word_count||0).toLocaleString()}</td><td style="font-size:12px;color:var(--mist)">${date}</td><td><button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:11px" onclick="deleteDoc(${d.id},this)">🗑 Delete</button></td></tr>`;
-    }).join('');
-  } catch(err) { console.log('Docs err:', err.message); }
-}
-
-async function deleteDoc(id, btn) {
-  if (!confirm('Delete this document?')) return;
-  btn.textContent = '...';
-  await fetch(`/api/documents/${id}`, { method:'DELETE', headers: authHeaders() });
-  renderDocuments();
-  toast('Document deleted','');
-}
-
-async function saveSettings() {
-  const inputs = document.querySelectorAll('#sc-general input');
-  const name = inputs[0]?.value;
-  await fetch('/api/auth/me', { method:'PUT', headers: authHeaders(), body: JSON.stringify({ name }) });
-  if (currentUser) { currentUser.name = name; applyUser(currentUser); }
-  toast('Settings saved!', 'success');
-}
-
-async function saveBrandVoice() {
-  const inputs = document.querySelectorAll('#sc-brand input, #sc-brand textarea');
-  const brand_name = inputs[0]?.value;
-  const brand_desc = inputs[1]?.value;
-  const toneEl = document.querySelector('#sc-brand .tone-tag.on');
-  const brand_tone = toneEl?.textContent || 'Professional';
-  await fetch('/api/auth/me', { method:'PUT', headers: authHeaders(), body: JSON.stringify({ brand_name, brand_desc, brand_tone }) });
-  toast('Brand voice saved!', 'success');
-}
-
-function logout() {
-  localStorage.removeItem('msm_token');
-  window.location.href = '/login.html';
-}
-
-// ════════════════════════════════════════════════════
-//  BULK GENERATION
-// ════════════════════════════════════════════════════
-let bulkResults = [];
-
-document.addEventListener('input', () => {
-  const ta = document.getElementById('bulk-inputs');
-  if (!ta) return;
-  const lines = ta.value.split('\n').filter(l=>l.trim());
-  const el = document.getElementById('bulk-count');
-  if (el) el.textContent = `${Math.min(lines.length,20)} items entered${lines.length>20?' (max 20, rest will be ignored)':''}`;
-});
-
-async function startBulkGenerate() {
-  const inputsRaw = document.getElementById('bulk-inputs')?.value || '';
-  const lines = inputsRaw.split('\n').filter(l=>l.trim()).slice(0,20);
-  if (!lines.length) { toast('Please enter at least one item', 'error'); return; }
-
-  const toolId   = document.getElementById('bulk-tool')?.value || 'product-desc';
-  const tone     = document.getElementById('bulk-tone')?.value || 'Professional';
-  const toolName = document.getElementById('bulk-tool')?.options[document.getElementById('bulk-tool').selectedIndex]?.text || 'Content';
-
-  // Build prompts based on tool
-  const toolPrompts = {
-    'product-desc': item => `Write a standard (130-160 word) product description for: ${item}. Focus on benefits. Tone: ${tone}.`,
-    'social-media': item => `Write an engaging Instagram post about: ${item}. Include hashtags. Tone: ${tone}.`,
-    'email-copy':   item => `Write a promotional email subject line and short body for: ${item}. Tone: ${tone}.`,
-    'blog-writer':  item => `Write a blog post introduction and outline for: ${item}. Tone: ${tone}.`,
-    'ad-copy':      item => `Write a Facebook ad (headline + body + CTA) for: ${item}. Tone: ${tone}.`,
-    'seo-meta':     item => `Write an SEO title tag (55 chars) and meta description (155 chars) for: ${item}.`,
-  };
-
-  const inputs = lines.map(line => ({ prompt: (toolPrompts[toolId]||toolPrompts['product-desc'])(line), label: line }));
-
-  document.getElementById('bulk-empty').style.display = 'none';
-  document.getElementById('bulk-progress').style.display = 'block';
-  document.getElementById('bulk-results').style.display = 'none';
-
-  try {
-    const res = await fetch('/api/bulk/generate', {
-      method: 'POST', headers: authHeaders(),
-      body: JSON.stringify({ toolId, toolName, inputs, tone })
-    });
-    if (!res.ok) { const e=await res.json(); throw new Error(e.error||'Bulk failed'); }
-    const data = await res.json();
-    pollBulkJob(data.jobId, lines.length);
-  } catch(e) {
-    document.getElementById('bulk-progress').style.display = 'none';
-    document.getElementById('bulk-empty').style.display = 'flex';
-    toast('Error: '+e.message, 'error');
-  }
-}
-
-async function pollBulkJob(jobId, total) {
-  const interval = setInterval(async () => {
-    try {
-      const res = await fetch(`/api/bulk/${jobId}`, { headers: authHeaders() });
-      const job = await res.json();
-      const pct = Math.round((job.completed/total)*100);
-      document.getElementById('bulk-progress-bar').style.width = pct+'%';
-      document.getElementById('bulk-progress-pct').textContent = pct+'%';
-      document.getElementById('bulk-progress-text').textContent = `Processing ${job.completed} of ${total}...`;
-
-      if (job.status === 'completed') {
-        clearInterval(interval);
-        document.getElementById('bulk-progress').style.display = 'none';
-        renderBulkResults(job.outputs||[]);
-        toast(`✓ ${total} items generated and saved!`, 'success');
-      }
-    } catch(e) { clearInterval(interval); }
-  }, 1500);
-}
-
-function renderBulkResults(outputs) {
-  bulkResults = outputs;
-  const container = document.getElementById('bulk-results');
-  container.innerHTML = outputs.map((o,i) => `
-    <div style="background:var(--cream);border:1px solid var(--fog);border-radius:var(--r-sm);padding:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:11px;font-weight:700;color:var(--orange);font-family:'JetBrains Mono',monospace">ITEM ${i+1}</div>
-        <div style="font-size:11px;color:var(--mist)">${o.label||''}</div>
-        <button class="icon-btn" onclick="navigator.clipboard.writeText(this.closest('div').nextElementSibling?.textContent||'').then(()=>toast('Copied!','success'))">📋</button>
-      </div>
-      <div style="font-size:13px;line-height:1.7;color:var(--navy2);white-space:pre-wrap">${o.status==='error'?'❌ Error: '+o.error:escHtml(o.text||'')}</div>
-    </div>`).join('');
-  container.style.display = 'flex';
-  document.getElementById('bulk-done-actions').style.display = 'block';
-}
-
-function exportBulkCSV() {
-  if (!bulkResults.length) return;
-  const csv = 'Item,Content\n' + bulkResults.map(o =>
-    `"${(o.label||'').replace(/"/g,'""')}","${(o.text||'').replace(/"/g,'""').replace(/\n/g,' ')}"`
-  ).join('\n');
-  const blob = new Blob([csv], { type:'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='msm-ai-bulk-export.csv'; a.click();
-  URL.revokeObjectURL(url);
-  toast('CSV exported!', 'success');
-}
-
-// ════════════════════════════════════════════════════
-//  SEO SCORER — in the editor output panel
-// ════════════════════════════════════════════════════
-async function scoreSEO(content, keyword) {
-  if (!content||!keyword) return;
-  try {
-    const res = await fetch('/api/seo/score', {
-      method:'POST', headers: authHeaders(),
-      body: JSON.stringify({ content, keyword })
-    });
-    const data = await res.json();
-    return data;
-  } catch(e) { return null; }
-}
-
-// ════════════════════════════════════════════════════
-//  WORDPRESS INTEGRATION
-// ════════════════════════════════════════════════════
-async function connectWordPress() {
-  const url  = document.getElementById('wp-url')?.value.trim();
-  const user = document.getElementById('wp-user')?.value.trim();
-  const pass = document.getElementById('wp-pass')?.value.trim();
-  if (!url||!user||!pass) { toast('All fields required', 'error'); return; }
-  try {
-    const res = await fetch('/api/integrations/wordpress/connect', {
-      method:'POST', headers: authHeaders(),
-      body: JSON.stringify({ url, username:user, password:pass })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    toast('✓ '+data.message, 'success');
-    document.getElementById('wp-connected-status').innerHTML = `<div style="background:var(--teal-bg);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--teal);margin-bottom:16px">✓ WordPress connected — ${url}</div>`;
-    document.getElementById('wp-disconnect-btn').style.display = 'inline-flex';
-    if (currentUser) currentUser.has_wp = true;
-  } catch(e) { toast('Error: '+e.message, 'error'); }
-}
-
-async function disconnectWordPress() {
-  await fetch('/api/integrations/wordpress/disconnect', { method:'DELETE', headers: authHeaders() });
-  document.getElementById('wp-connected-status').innerHTML = '';
-  document.getElementById('wp-disconnect-btn').style.display = 'none';
-  document.getElementById('wp-url').value = '';
-  document.getElementById('wp-user').value = '';
-  document.getElementById('wp-pass').value = '';
-  toast('WordPress disconnected', '');
-}
-
-async function publishToWordPress(title, content) {
-  try {
-    const res = await fetch('/api/integrations/wordpress/publish', {
-      method:'POST', headers: authHeaders(),
-      body: JSON.stringify({ title, content, status:'draft' })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    toast(`✓ Published to WordPress as draft! View: ${data.link}`, 'success');
-  } catch(e) { toast('WordPress error: '+e.message, 'error'); }
-}
-
-// ════════════════════════════════════════════════════
-//  SHOPIFY INTEGRATION
-// ════════════════════════════════════════════════════
-async function connectShopify() {
-  const domain = document.getElementById('shopify-domain')?.value.trim();
-  const token  = document.getElementById('shopify-token')?.value.trim();
-  if (!domain||!token) { toast('Domain and token required', 'error'); return; }
-  try {
-    const res = await fetch('/api/integrations/shopify/connect', {
-      method:'POST', headers: authHeaders(),
-      body: JSON.stringify({ store: domain, token: token })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    toast('✓ '+data.message, 'success');
-    document.getElementById('shopify-connected-status').innerHTML = `<div style="background:var(--teal-bg);border:1px solid rgba(26,143,122,.2);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--teal);margin-bottom:16px">✓ Shopify connected — ${domain}</div>`;
-    document.getElementById('shopify-disconnect-btn').style.display = 'inline-flex';
-    if (currentUser) currentUser.has_shopify = true;
-  } catch(e) { toast('Error: '+e.message, 'error'); }
-}
-
-async function disconnectShopify() {
-  await fetch('/api/integrations/shopify/disconnect', { method:'DELETE', headers: authHeaders() });
-  document.getElementById('shopify-connected-status').innerHTML = '';
-  document.getElementById('shopify-disconnect-btn').style.display = 'none';
-  document.getElementById('shopify-domain').value = '';
-  document.getElementById('shopify-token').value = '';
-  toast('Shopify disconnected', '');
-}
-
-// ════════════════════════════════════════════════════
-//  DEVELOPER API
-// ════════════════════════════════════════════════════
-async function enableDevApi() {
-  try {
-    // API key is already generated on signup — just show it
-    const res = await fetch('/api/keys', { headers: authHeaders() });
-    const data = await res.json();
-    if (data.api_key) {
-      showApiKey(data.api_key);
-      document.getElementById('dev-enable-btn').style.display = 'none';
-      document.getElementById('dev-regen-btn').style.display = 'inline-flex';
-      document.getElementById('dev-disable-btn').style.display = 'none';
-    }
-    toast('✓ Your API key is ready to use!', 'success');
-  } catch(e) { toast('Error: '+e.message, 'error'); }
-}
-
-async function regenDevApi() {
-  if (!confirm('Regenerate your API key? Your old key will stop working immediately.')) return;
-  try {
-    const res = await fetch('/api/auth/regenerate-key', { method:'POST', headers: authHeaders() });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    showApiKey(data.api_key);
-    if (currentUser) currentUser.api_key = data.api_key;
-    toast('✓ New API key generated!', 'success');
-  } catch(e) { toast('Error: '+e.message, 'error'); }
-}
-
-async function disableDevApi() {
-  toast('To fully disable API access, contact support.', '');
-}
-
-function showApiKey(key) {
-  document.getElementById('dev-key-display').innerHTML = `
-    <div style="background:var(--navy);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:16px">
-      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.8px;margin-bottom:8px">YOUR API KEY — COPY NOW</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#a8d8a8;flex:1;word-break:break-all">${key}</code>
-        <button class="btn btn-outline btn-sm" style="flex-shrink:0;color:white;border-color:rgba(255,255,255,.2)" onclick="navigator.clipboard.writeText('${key}').then(()=>toast('API key copied!','success'))">Copy</button>
-      </div>
-    </div>`;
-}
-
-async function loadDevUsage() {
-  try {
-    const res = await fetch('/api/keys', { headers: authHeaders() });
-    const data = await res.json();
-    if (data.api_key && currentUser) {
-      showApiKey(data.api_key);
-      document.getElementById('dev-enable-btn').style.display = 'none';
-      document.getElementById('dev-regen-btn').style.display = 'inline-flex';
-    }
-    const usageEl = document.getElementById('dev-usage-stats');
-    if (usageEl) usageEl.innerHTML = '';
-  } catch(e) {}
-}
-
-// ════════════════════════════════════════════════════
-//  PASSWORD CHANGE
-// ════════════════════════════════════════════════════
-async function changePassword() {
-  const current = document.getElementById('pw-current')?.value;
-  const newPw   = document.getElementById('pw-new')?.value;
-  const confirm = document.getElementById('pw-confirm')?.value;
-  if (!current||!newPw||!confirm) { toast('All fields required', 'error'); return; }
-  if (newPw !== confirm) { toast('New passwords do not match', 'error'); return; }
-  if (newPw.length < 8) { toast('Password must be at least 8 characters', 'error'); return; }
-  try {
-    const res = await fetch('/api/auth/password', {
-      method:'PUT', headers: authHeaders(),
-      body: JSON.stringify({ currentPassword:current, newPassword:newPw })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    document.getElementById('pw-current').value = '';
-    document.getElementById('pw-new').value = '';
-    document.getElementById('pw-confirm').value = '';
-    toast('✓ Password updated successfully!', 'success');
-  } catch(e) { toast('Error: '+e.message, 'error'); }
-}
-
-// ════════════════════════════════════════════════════
-//  PUBLISH BUTTONS in output panel
-// ════════════════════════════════════════════════════
-function addPublishButtons(blockEl, variantText) {
-  if (!currentUser?.has_wp && !currentUser?.has_shopify) return;
-  const acts = blockEl.querySelector('.rb-acts');
-  if (!acts) return;
-  if (currentUser?.has_wp) {
-    const wpBtn = document.createElement('button');
-    wpBtn.className = 'icon-btn';
-    wpBtn.title = 'Publish to WordPress';
-    wpBtn.textContent = '🌐';
-    wpBtn.onclick = () => {
-      const title = currentTool?.form?.name + ' — ' + new Date().toLocaleDateString();
-      publishToWordPress(title, variantText);
-    };
-    acts.appendChild(wpBtn);
-  }
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast show '+(type||'');
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3800);
 }
 
 // ── Init ──────────────────────────────────────────────────
