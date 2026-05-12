@@ -770,7 +770,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 .plan-features li{font-size:12px;color:var(--steel);padding:5px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
 .plan-features li::before{content:'✓';color:var(--teal);font-weight:800;flex-shrink:0}
 
-/* ══ TOAST ══════════════════════════════════════ */
+[data-theme="dark"] .dash-banner {
+  background:linear-gradient(135deg,#0A1525 0%,#1A2D42 100%);
+}
+[data-theme="dark"] .banner-hello { color:rgba(255,255,255,0.6); }
+[data-theme="dark"] .banner-title { color:#FFFFFF; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+[data-theme="dark"] .banner-sub { color:rgba(255,255,255,0.7); }
+[data-theme="dark"] .dash-banner::before { background:radial-gradient(ellipse,rgba(255,122,74,.2) 0%,transparent 70%); }
 .toast{
   position:fixed;bottom:22px;right:22px;
   background:var(--navy);color:white;
@@ -869,7 +875,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
           <!-- Language Toggle -->
           <button onclick="toggleLang();event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
             <span id="pm-lang-flag" style="font-size:16px">🇲🇾</span>
-            <span id="pm-lang-label" data-i18n-pm="lang_current">Bahasa Malaysia</span>
+            <span id="pm-lang-label">Bahasa Malaysia</span>
             <span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(26,143,122,0.2);color:#2BBFA0" id="pm-lang-badge">BM</span>
           </button>
           <!-- Settings -->
@@ -917,108 +923,69 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   <!-- ══ DASHBOARD PAGE ══ -->
   <div class="page active" id="page-dashboard">
     <div class="dash-banner">
-      <div class="banner-hello">Good day ☀</div>
+      <div class="banner-hello" data-i18n="dash_hello">Good day ☀</div>
       <div class="banner-title">Welcome back, John</div>
-      <div class="banner-sub">Your AI marketing engine is ready. You've created 312 pieces of content this month — keep the momentum going.</div>
+      <div class="banner-sub" data-i18n="dash_sub">Your AI marketing engine is ready.</div>
     </div>
     <div class="metrics-grid">
       <div class="m-card">
-        <div class="m-card-label">Words Generated</div>
-        <div class="m-card-val">148K</div>
-        <div class="m-card-delta delta-up">↑ 23% this month</div>
+        <div class="m-card-label" data-i18n="metric_words">Words Generated</div>
+        <div class="m-card-val">0</div>
+        <div class="m-card-delta delta-up">↑ 23% <span data-i18n="dash_this_month">this month</span></div>
       </div>
       <div class="m-card">
-        <div class="m-card-label">Documents</div>
-        <div class="m-card-val">312</div>
-        <div class="m-card-delta delta-up">+18 this week</div>
+        <div class="m-card-label" data-i18n="metric_docs">Documents</div>
+        <div class="m-card-val">0</div>
+        <div class="m-card-delta delta-up">+0 <span data-i18n="dash_this_week">this week</span></div>
       </div>
       <div class="m-card">
-        <div class="m-card-label">Credits Used</div>
-        <div class="m-card-val">5,180</div>
-        <div class="m-card-delta delta-neu">4,820 remaining</div>
+        <div class="m-card-label" data-i18n="metric_credits">Credits Used</div>
+        <div class="m-card-val">0</div>
+        <div class="m-card-delta delta-neu">0 <span data-i18n="dash_remaining">remaining</span></div>
       </div>
       <div class="m-card">
-        <div class="m-card-label">Top Tool</div>
-        <div class="m-card-val" style="font-size:18px;line-height:1.4">Blog Writer</div>
-        <div class="m-card-delta delta-neu">47 uses</div>
+        <div class="m-card-label" data-i18n="metric_toptool">Top Tool</div>
+        <div class="m-card-val" style="font-size:18px;line-height:1.4">-</div>
+        <div class="m-card-delta delta-neu">0 <span data-i18n="dash_uses">uses</span></div>
       </div>
     </div>
     <div class="dash-grid">
       <div class="panel">
         <div class="panel-head">
-          <div class="panel-title">Recent Documents</div>
-          <div class="panel-action" onclick="goTo('documents')">View all →</div>
+          <div class="panel-title" data-i18n="dash_recent">Recent Documents</div>
+          <div class="panel-action" onclick="goTo('documents')" data-i18n="dash_viewall">View all →</div>
         </div>
-        <div class="panel-body">
-          <div class="recent-row" onclick="openTool('blog-writer')">
-            <div class="rr-ico" style="background:#EEF2FF">✍️</div>
-            <div class="rr-info">
-              <div class="rr-name">10 Ways to Boost E-Commerce Sales in 2025</div>
-              <div class="rr-meta">Blog Post · 2h ago · 1,240 words</div>
-            </div>
-            <span class="rr-badge" style="background:#EEF2FF;color:#4F46E5">Blog</span>
-          </div>
-          <div class="recent-row" onclick="openTool('email-copy')">
-            <div class="rr-ico" style="background:#ECFDF5">📧</div>
-            <div class="rr-info">
-              <div class="rr-name">Summer Sale Email Campaign — July 2025</div>
-              <div class="rr-meta">Email · Yesterday · 380 words</div>
-            </div>
-            <span class="rr-badge" style="background:#ECFDF5;color:#059669">Email</span>
-          </div>
-          <div class="recent-row" onclick="openTool('product-desc')">
-            <div class="rr-ico" style="background:#FFF1F2">🛍️</div>
-            <div class="rr-info">
-              <div class="rr-name">Wireless Earbuds Pro — Product Description</div>
-              <div class="rr-meta">Product · 2 days ago · 220 words</div>
-            </div>
-            <span class="rr-badge" style="background:#FFF1F2;color:#E11D48">Product</span>
-          </div>
-          <div class="recent-row" onclick="openTool('ad-copy')">
-            <div class="rr-ico" style="background:var(--orange-bg)">🎯</div>
-            <div class="rr-info">
-              <div class="rr-name">Facebook Ad — New Collection Launch</div>
-              <div class="rr-meta">Ad Copy · 3 days ago · 90 words</div>
-            </div>
-            <span class="rr-badge" style="background:var(--orange-bg);color:var(--orange)">Ad</span>
-          </div>
-          <div class="recent-row" onclick="openTool('seo-meta')">
-            <div class="rr-ico" style="background:#EFF6FF">🔍</div>
-            <div class="rr-info">
-              <div class="rr-name">SEO Meta Tags — 5 Landing Pages</div>
-              <div class="rr-meta">SEO · 4 days ago · 320 words</div>
-            </div>
-            <span class="rr-badge" style="background:#EFF6FF;color:#2563EB">SEO</span>
-          </div>
+        <div class="panel-body" id="recent-docs-panel">
+          <div style="padding:24px;text-align:center;color:var(--mist);font-size:13px" data-i18n="no_docs">No documents yet — create your first piece of content!</div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div class="panel">
-          <div class="panel-head"><div class="panel-title">Quick Create</div></div>
+          <div class="panel-head"><div class="panel-title" data-i18n="dash_quickcreate">Quick Create</div></div>
           <div class="quick-grid">
             <button class="q-tile" onclick="openTool('blog-writer')">
-              <div class="qt-ic">✍️</div><div class="qt-nm">Blog Post</div>
+              <div class="qt-ic">✍️</div><div class="qt-nm" data-i18n="qt_blog">Blog Post</div>
             </button>
             <button class="q-tile" onclick="openTool('social-media')">
-              <div class="qt-ic">📱</div><div class="qt-nm">Social Post</div>
+              <div class="qt-ic">📱</div><div class="qt-nm" data-i18n="qt_social">Social Post</div>
             </button>
             <button class="q-tile" onclick="openTool('email-copy')">
-              <div class="qt-ic">📧</div><div class="qt-nm">Email Copy</div>
+              <div class="qt-ic">📧</div><div class="qt-nm" data-i18n="qt_email">Email Copy</div>
             </button>
             <button class="q-tile" onclick="openTool('ad-copy')">
-              <div class="qt-ic">🎯</div><div class="qt-nm">Ad Copy</div>
+              <div class="qt-ic">🎯</div><div class="qt-nm" data-i18n="qt_ad">Ad Copy</div>
             </button>
           </div>
         </div>
         <div class="panel">
-          <div class="panel-head"><div class="panel-title">Credit Usage</div></div>
+          <div class="panel-head"><div class="panel-title" data-i18n="dash_credit_usage">Credit Usage</div></div>
           <div class="progress-wrap">
             <div class="progress-row">
-              <div class="progress-label">Monthly Credits</div>
-              <div class="progress-pct">51.8%</div>
+              <div class="progress-label" data-i18n="dash_credits_label">Monthly Credits</div>
+              <div class="progress-pct" id="credit-pct">0%</div>
             </div>
-            <div class="progress-track"><div class="progress-fill" style="width:51.8%"></div></div>
-            <div class="progress-note">5,180 used · 4,820 remaining · Resets in 14 days</div>
+            <div class="progress-track"><div class="progress-fill" id="credit-fill" style="width:0%"></div></div>
+            <div class="progress-note" id="credit-note" data-i18n="dash_credit_note">0 used · 0 remaining</div>
           </div>
         </div>
       </div>
@@ -1675,13 +1642,14 @@ function updateProfileMenuLabels() {
   const themeStatus = document.getElementById('pm-theme-status');
   if (themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
   if (themeLabel) themeLabel.textContent = isDark ? (isBM ? 'Mod Cerah' : 'Light Mode') : (isBM ? 'Mod Gelap' : 'Dark Mode');
-  if (themeStatus) themeStatus.textContent = isDark ? 'GELAP' : 'CERAH';
+  if (themeStatus) themeStatus.textContent = isDark ? (isBM ? 'GELAP' : 'DARK') : (isBM ? 'CERAH' : 'LIGHT');
 
   const langFlag = document.getElementById('pm-lang-flag');
   const langLabel = document.getElementById('pm-lang-label');
   const langBadge = document.getElementById('pm-lang-badge');
+  // Show the OTHER language (what you'll switch TO)
   if (langFlag) langFlag.textContent = isBM ? '🇬🇧' : '🇲🇾';
-  if (langLabel) langLabel.textContent = isBM ? 'Switch to English' : 'Tukar ke Bahasa Malaysia';
+  if (langLabel) langLabel.textContent = isBM ? 'English' : 'Bahasa Malaysia';
   if (langBadge) langBadge.textContent = isBM ? 'EN' : 'BM';
 }
 
@@ -1704,28 +1672,34 @@ async function loadStats() {
     if (vals[0]) vals[0].textContent = s.totalWords>=1000?Math.round(s.totalWords/1000)+'K':(s.totalWords||0);
     if (vals[1]) vals[1].textContent = s.totalDocuments||0;
     if (vals[2]) vals[2].textContent = (s.creditsUsed||0).toLocaleString();
-    if (vals[3]) { vals[3].textContent = s.topTool||'None yet'; vals[3].style.fontSize='16px'; }
+    if (vals[3]) { vals[3].textContent = s.topTool||'-'; vals[3].style.fontSize='16px'; }
     const deltas = document.querySelectorAll('.m-card-delta');
-    if (deltas[1]) deltas[1].textContent = `+${s.docsThisWeek||0} this week`;
-    if (deltas[2]) deltas[2].textContent = `${(s.creditsRemaining||0).toLocaleString()} remaining`;
+    if (deltas[0]) deltas[0].innerHTML = `↑ 23% <span data-i18n="dash_this_month">${t('dash_this_month')}</span>`;
+    if (deltas[1]) deltas[1].innerHTML = `+${s.docsThisWeek||0} <span data-i18n="dash_this_week">${t('dash_this_week')}</span>`;
+    if (deltas[2]) deltas[2].innerHTML = `${(s.creditsRemaining||0).toLocaleString()} <span data-i18n="dash_remaining">${t('dash_remaining')}</span>`;
+    if (deltas[3]) deltas[3].innerHTML = `${s.topTool&&s.topTool!=='-'?'47':0} <span data-i18n="dash_uses">${t('dash_uses')}</span>`;
+
+    // Credit progress bar
     const pct = s.creditsMax>0?Math.round(((s.creditsUsed||0)/s.creditsMax)*100):0;
-    const fill = document.querySelector('.progress-fill');
-    const pctEl = document.querySelector('.progress-pct');
+    const fill = document.getElementById('credit-fill');
+    const pctEl = document.getElementById('credit-pct');
+    const note = document.getElementById('credit-note');
     if (fill) fill.style.width=pct+'%';
     if (pctEl) pctEl.textContent=pct+'%';
-    const note = document.querySelector('.progress-note');
-    if (note) note.textContent=`${(s.creditsUsed||0).toLocaleString()} used · ${(s.creditsRemaining||0).toLocaleString()} remaining`;
-    if (s.recentDocuments?.length>0) renderRecentDocs(s.recentDocuments);
-    else {
-      const panel=document.querySelector('.panel-body');
-      if(panel) panel.innerHTML=`<div style="padding:24px;text-align:center;color:var(--mist);font-size:13px">No documents yet — create your first piece of content!</div>`;
+    if (note) note.textContent=`${(s.creditsUsed||0).toLocaleString()} ${t('dash_this_month')} · ${(s.creditsRemaining||0).toLocaleString()} ${t('dash_remaining')}`;
+
+    // Recent documents panel
+    const panel = document.getElementById('recent-docs-panel');
+    if (!panel) return;
+    if (s.recentDocuments?.length>0) {
+      renderRecentDocsTo(panel, s.recentDocuments);
+    } else {
+      panel.innerHTML=`<div style="padding:24px;text-align:center;color:var(--mist);font-size:13px">${t('no_docs')}</div>`;
     }
   } catch(e) { console.log('Stats err:',e.message); }
 }
 
-function renderRecentDocs(docs) {
-  const panel = document.querySelector('.panel-body');
-  if (!panel) return;
+function renderRecentDocsTo(panel, docs) {
   const icons={'Blog Writer':'✍️','Email Campaign':'📧','Product Description':'🛍️','Ad Copy':'🎯','Social Media Posts':'📱','Sales Outreach Email':'💼','SEO Meta Generator':'🔍','Landing Page Copy':'🚀','Content Rewriter':'🔄','Keyword Cluster Builder':'💡'};
   const bgs={'Blog Writer':'#EEF2FF','Email Campaign':'#ECFDF5','Product Description':'#FFF1F2','Ad Copy':'var(--orange-bg)','Social Media Posts':'#FEF3C7'};
   const tcs={'Blog Writer':'#4F46E5','Email Campaign':'#059669','Product Description':'#E11D48','Ad Copy':'var(--orange)','Social Media Posts':'#B45309'};
@@ -1734,7 +1708,7 @@ function renderRecentDocs(docs) {
     const bg=bgs[d.tool_name]||'var(--cream2)';
     const tc=tcs[d.tool_name]||'var(--slate)';
     const date=new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    return `<div class="recent-row"><div class="rr-ico" style="background:${bg}">${icon}</div><div class="rr-info"><div class="rr-name">${d.title}</div><div class="rr-meta">${d.tool_name||'Content'} · ${date} · ${(d.word_count||0).toLocaleString()} words</div></div><span class="rr-badge" style="background:${bg};color:${tc}">${(d.tool_name||'Doc').split(' ')[0]}</span></div>`;
+    return `<div class="recent-row"><div class="rr-ico" style="background:${bg}">${icon}</div><div class="rr-info"><div class="rr-name">${d.title}</div><div class="rr-meta">${d.tool_name||'Content'} · ${date} · ${(d.word_count||0).toLocaleString()} ${t('metric_words').toLowerCase()}</div></div><span class="rr-badge" style="background:${bg};color:${tc}">${(d.tool_name||'Doc').split(' ')[0]}</span></div>`;
   }).join('');
 }
 
@@ -2405,7 +2379,16 @@ const TRANSLATIONS = {
     dash_viewall: 'View all →',
     dash_quickcreate: 'Quick Create',
     dash_credits_label: 'Monthly Credits',
-    dash_credit_note: 'used · {r} remaining',
+    // Dashboard extras
+    dash_this_month: 'this month',
+    dash_this_week: 'this week',
+    dash_remaining: 'remaining',
+    dash_uses: 'uses',
+    dash_credit_usage: 'Credit Usage',
+    qt_blog: 'Blog Post',
+    qt_social: 'Social Post',
+    qt_email: 'Email Copy',
+    qt_ad: 'Ad Copy',
 
     // Tools page
     tools_title: 'AI Tools',
@@ -2618,7 +2601,16 @@ const TRANSLATIONS = {
     dash_viewall: 'Lihat semua →',
     dash_quickcreate: 'Cipta Pantas',
     dash_credits_label: 'Kredit Bulanan',
-    dash_credit_note: 'digunakan · {r} berbaki',
+    // Dashboard extras
+    dash_this_month: 'bulan ini',
+    dash_this_week: 'minggu ini',
+    dash_remaining: 'berbaki',
+    dash_uses: 'kali guna',
+    dash_credit_usage: 'Penggunaan Kredit',
+    qt_blog: 'Siaran Blog',
+    qt_social: 'Siaran Sosial',
+    qt_email: 'Salinan E-mel',
+    qt_ad: 'Salinan Iklan',
 
     // Tools page
     tools_title: 'Alat AI',
@@ -2878,72 +2870,59 @@ function applyTranslations() {
 }
 
 function updatePageTexts() {
-  // Dashboard
+  // Dashboard banner
+  const bannerHello = document.querySelector('.banner-hello');
+  if (bannerHello) bannerHello.textContent = t('dash_hello');
   const bannerSub = document.querySelector('.banner-sub');
-  if (bannerSub) bannerSub.textContent = t('dash_sub', { n: '312' });
+  if (bannerSub) bannerSub.textContent = t('dash_sub');
 
-  const metricLabels = document.querySelectorAll('.m-card-label');
-  const metricKeys = ['metric_words', 'metric_docs', 'metric_credits', 'metric_toptool'];
-  metricLabels.forEach((el, i) => { if (metricKeys[i]) el.textContent = t(metricKeys[i]); });
+  // Quick Create tiles
+  const qtiles = document.querySelectorAll('.qt-nm');
+  const qtKeys = ['qt_blog','qt_social','qt_email','qt_ad'];
+  qtiles.forEach((el,i) => { if(qtKeys[i]) el.textContent = t(qtKeys[i]); });
 
-  const panelHead = document.querySelector('.panel-head .panel-title');
-  if (panelHead) panelHead.textContent = t('dash_recent');
+  // Panel titles (Recent Docs, Quick Create, Credit Usage)
+  const panelTitles = document.querySelectorAll('.panel-title');
+  panelTitles.forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key) el.textContent = t(key);
+  });
 
-  const panelAction = document.querySelector('.panel-action');
-  if (panelAction) panelAction.textContent = t('dash_viewall');
+  // Panel actions
+  const panelActions = document.querySelectorAll('.panel-action');
+  panelActions.forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key) el.textContent = t(key);
+  });
 
-  // Tools page
-  const toolsTitle = document.querySelector('#page-tools .page-title');
-  if (toolsTitle) toolsTitle.textContent = t('tools_title');
-  const toolsSub = document.querySelector('#page-tools .page-subtitle');
-  if (toolsSub) toolsSub.textContent = t('tools_sub');
+  // No docs message
+  const noDocsEl = document.querySelector('#recent-docs-panel div[data-i18n="no_docs"]');
+  if (noDocsEl) noDocsEl.textContent = t('no_docs');
 
-  // Chat page
-  const chatTitle = document.querySelector('#page-chat .section-title, #page-chat div[style*="font-size:22px"]');
-  // Done via data-i18n for main elements
-
-  // Docs page
-  const docsTitle = document.querySelector('#page-documents .docs-title');
-  if (docsTitle) docsTitle.textContent = t('docs_title');
-
-  // Settings page
-  const settingsTitle = document.querySelector('#page-settings .page-title, #page-settings .topbar-title');
-  if (settingsTitle) settingsTitle.textContent = t('settings_title');
-
-  // Billing
-  const billingTitle = document.querySelector('.billing-shell > div:first-child');
-  if (billingTitle && billingTitle.tagName !== 'DIV') billingTitle.textContent = t('billing_title');
-
-  // Editor
-  const backBtn = document.querySelector('.back-btn');
-  if (backBtn) backBtn.textContent = t('back_tools');
-
-  const generateBtn = document.querySelector('.form-footer .btn-primary');
-  if (generateBtn) generateBtn.textContent = t('btn_generate');
-
-  const outTabs = document.querySelectorAll('.out-tab');
-  if (outTabs[0]) outTabs[0].textContent = t('out_output');
-  if (outTabs[1]) outTabs[1].textContent = t('out_edit');
-
-  const copyAllBtn = document.querySelector('[onclick="copyAllOutput()"]');
-  if (copyAllBtn) copyAllBtn.textContent = t('btn_copy_all');
-
-  const saveDocBtn = document.querySelector('[onclick="saveToDocuments()"]');
-  if (saveDocBtn) saveDocBtn.textContent = t('btn_save_doc');
-
-  const oeLabel = document.querySelector('.oe-label');
-  if (oeLabel) oeLabel.textContent = t('out_empty_text');
-
-  const loaderText = document.querySelector('.loader-text');
-  if (loaderText) loaderText.textContent = t('generating');
-
-  // Update variant select if it exists
-  const variantSelect = document.getElementById('ff-variants');
-  if (variantSelect) {
-    variantSelect.options[0].text = t('var1');
-    variantSelect.options[1].text = t('var2');
-    if (variantSelect.options[2]) variantSelect.options[2].text = t('var3');
+  // Credit note
+  const creditNote = document.getElementById('credit-note');
+  if (creditNote && currentUser) {
+    creditNote.textContent = `${(currentUser.credits_max - currentUser.credits)||0} ${t('dash_this_month')} · ${currentUser.credits||0} ${t('dash_remaining')}`;
   }
+
+  // Credit label
+  const creditLabel = document.querySelector('.progress-label');
+  if (creditLabel) creditLabel.textContent = t('dash_credits_label');
+
+  // Topbar buttons
+  const newContentBtn = document.querySelector('[data-i18n="btn_new_content"]');
+  if (newContentBtn) newContentBtn.textContent = t('btn_new_content');
+
+  // Settings nav items
+  updateSettingsNav();
+  // Category pills
+  updateCategoryPills();
+  // Bulk texts
+  updateBulkPageTexts();
+
+  // Sign out label
+  const signoutEl = document.getElementById('signout-label');
+  if (signoutEl) signoutEl.textContent = t('signout_label');
 }
 
 function updateSettingsNav() {
