@@ -850,22 +850,52 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   </button>
 
   <div class="sb-bottom">
-    <!-- Controls row -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px 10px;">
-      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
-      <button class="lang-toggle" id="lang-btn" onclick="toggleLang()">
-        <span class="lang-flag" id="lang-flag">🇲🇾</span>
-        <span id="lang-label">BM</span>
-      </button>
-    </div>
-    <!-- User tile -->
-    <div class="user-tile" onclick="logout()" title="Klik untuk log keluar / Click to sign out">
-      <div class="u-avatar"></div>
-      <div class="u-info">
-        <div class="u-name">Loading...</div>
-        <div class="u-plan">Loading...</div>
+    <!-- Profile tile with dropdown -->
+    <div style="position:relative">
+      <!-- Profile Menu Dropdown -->
+      <div id="profile-menu" style="display:none;position:absolute;bottom:calc(100% + 8px);left:10px;right:10px;background:#1A2D42;border:1px solid rgba(255,255,255,0.12);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:100;">
+        <!-- User info header -->
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08)">
+          <div style="font-size:13px;font-weight:700;color:white" id="pm-name">Loading...</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px" id="pm-email">...</div>
+        </div>
+        <!-- Dark/Light Mode -->
+        <div style="padding:6px">
+          <button onclick="toggleTheme();event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
+            <span id="pm-theme-icon" style="font-size:16px">🌙</span>
+            <span id="pm-theme-label" data-i18n-pm="theme_dark">Mod Gelap</span>
+            <span id="pm-theme-status" style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(232,98,42,0.2);color:#FF7A4A">ON</span>
+          </button>
+          <!-- Language Toggle -->
+          <button onclick="toggleLang();event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
+            <span id="pm-lang-flag" style="font-size:16px">🇲🇾</span>
+            <span id="pm-lang-label" data-i18n-pm="lang_current">Bahasa Malaysia</span>
+            <span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(26,143,122,0.2);color:#2BBFA0" id="pm-lang-badge">BM</span>
+          </button>
+          <!-- Settings -->
+          <button onclick="goTo('settings');event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
+            <span style="font-size:16px">⚙️</span>
+            <span data-i18n="nav_settings">Settings</span>
+          </button>
+        </div>
+        <!-- Divider + Logout -->
+        <div style="border-top:1px solid rgba(255,255,255,0.08);padding:6px">
+          <button onclick="logout();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,100,100,0.8);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(192,57,43,0.1)'" onmouseout="this.style.background='none'">
+            <span style="font-size:16px">🚪</span>
+            <span id="signout-label" data-i18n="signout_label">Log keluar</span>
+          </button>
+        </div>
       </div>
-      <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-left:auto" id="signout-label">Log keluar</span>
+
+      <!-- Clickable user tile -->
+      <div class="user-tile" onclick="toggleProfileMenu(event)" style="cursor:pointer">
+        <div class="u-avatar"></div>
+        <div class="u-info">
+          <div class="u-name">Loading...</div>
+          <div class="u-plan">Loading...</div>
+        </div>
+        <span style="font-size:14px;color:rgba(255,255,255,0.4);margin-left:auto">⌃</span>
+      </div>
     </div>
   </div>
 </nav>
@@ -1607,12 +1637,63 @@ function applyUser(u) {
     if (u.avatar) a.innerHTML = `<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
     else a.textContent = u.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
   }
+  // Populate profile menu
+  const pmName = document.getElementById('pm-name');
+  const pmEmail = document.getElementById('pm-email');
+  if (pmName) pmName.textContent = u.name;
+  if (pmEmail) pmEmail.textContent = u.email;
+
   const c = document.getElementById('cred-count');
   if (c) c.textContent = (u.credits||0).toLocaleString()+' credits';
   credits = u.credits || 0;
   const g = document.querySelector('.banner-title');
-  if (g) g.textContent = `Welcome back, ${u.name.split(' ')[0]}`;
+  if (g) g.textContent = `${t('dash_welcome')}, ${u.name.split(' ')[0]}`;
 }
+
+// ── Profile Menu ─────────────────────────────────────────
+function toggleProfileMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('profile-menu');
+  if (!menu) return;
+  const isOpen = menu.style.display === 'block';
+  menu.style.display = isOpen ? 'none' : 'block';
+  // Update theme/lang labels in menu
+  updateProfileMenuLabels();
+}
+
+function closeProfileMenu() {
+  const menu = document.getElementById('profile-menu');
+  if (menu) menu.style.display = 'none';
+}
+
+function updateProfileMenuLabels() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const isBM = currentLang === 'bm';
+
+  const themeIcon = document.getElementById('pm-theme-icon');
+  const themeLabel = document.getElementById('pm-theme-label');
+  const themeStatus = document.getElementById('pm-theme-status');
+  if (themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
+  if (themeLabel) themeLabel.textContent = isDark ? (isBM ? 'Mod Cerah' : 'Light Mode') : (isBM ? 'Mod Gelap' : 'Dark Mode');
+  if (themeStatus) themeStatus.textContent = isDark ? 'GELAP' : 'CERAH';
+
+  const langFlag = document.getElementById('pm-lang-flag');
+  const langLabel = document.getElementById('pm-lang-label');
+  const langBadge = document.getElementById('pm-lang-badge');
+  if (langFlag) langFlag.textContent = isBM ? '🇬🇧' : '🇲🇾';
+  if (langLabel) langLabel.textContent = isBM ? 'Switch to English' : 'Tukar ke Bahasa Malaysia';
+  if (langBadge) langBadge.textContent = isBM ? 'EN' : 'BM';
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('profile-menu');
+  if (menu && menu.style.display === 'block') {
+    if (!menu.contains(e.target) && !e.target.closest('.user-tile')) {
+      menu.style.display = 'none';
+    }
+  }
+});
 
 async function loadStats() {
   try {
@@ -1669,10 +1750,17 @@ function goTo(page) {
   });
   const pg=document.getElementById('page-'+page);
   if(pg) pg.classList.add('active');
-  document.getElementById('topbar-title').textContent=PAGE_TITLES[page]||page;
-  if(page==='tools') renderTools(TOOLS);
+  // Update title with translation
+  const titleMap={dashboard:'nav_dashboard',tools:'nav_tools',editor:'nav_tools',chat:'nav_chat',documents:'nav_documents',seo:'nav_seo',bulk:'nav_bulk',templates:'nav_templates',settings:'nav_settings',billing:'nav_billing'};
+  const titleEl=document.getElementById('topbar-title');
+  if(titleEl) titleEl.textContent = (typeof t==='function') ? t(titleMap[page]||'nav_dashboard') : (PAGE_TITLES[page]||page);
+  // Close profile menu
+  const pm=document.getElementById('profile-menu');
+  if(pm) pm.style.display='none';
+  if(page==='tools') { renderTools(TOOLS); setTimeout(()=>{if(typeof updateCategoryPills==='function')updateCategoryPills();},50); }
   if(page==='documents') renderDocuments();
-  if(page==='bulk') initBulkPage();
+  if(page==='bulk') { initBulkPage(); setTimeout(()=>{if(typeof updateBulkPageTexts==='function')updateBulkPageTexts();},50); }
+  setTimeout(()=>{if(typeof updatePageTexts==='function')updatePageTexts();},80);
 }
 
 // ── Tool Catalogue ───────────────────────────────────────
@@ -2282,13 +2370,12 @@ function initTheme() {
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('msm_theme', theme);
-  const btn = document.getElementById('theme-btn');
-  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
 }
 
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'light';
   setTheme(current === 'dark' ? 'light' : 'dark');
+  updateProfileMenuLabels();
 }
 
 // ════════════════════════════════════════════════════
@@ -2893,8 +2980,8 @@ function toggleLang() {
   currentLang = currentLang === 'bm' ? 'en' : 'bm';
   localStorage.setItem('msm_lang', currentLang);
   applyTranslations();
-  // Re-render tools with updated language context (tool names stay in English for SEO)
   renderTools(TOOLS);
+  updateProfileMenuLabels();
   toast(currentLang === 'bm' ? '🇲🇾 Bahasa Malaysia diaktifkan' : '🇬🇧 English activated', 'success');
 }
 
@@ -2902,26 +2989,6 @@ function initLang() {
   currentLang = localStorage.getItem('msm_lang') || 'bm';
   applyTranslations();
 }
-
-// Override goTo to update topbar title with correct language
-const _originalGoTo = goTo;
-function goTo(page) {
-  _originalGoTo(page);
-  setTimeout(() => {
-    const titleMap = {
-      dashboard: 'nav_dashboard', tools: 'nav_tools', editor: 'nav_tools',
-      chat: 'nav_chat', documents: 'nav_documents', seo: 'nav_seo',
-      bulk: 'nav_bulk', templates: 'nav_templates', settings: 'nav_settings', billing: 'nav_billing'
-    };
-    const topbarTitle = document.getElementById('topbar-title');
-    if (topbarTitle) topbarTitle.textContent = t(titleMap[page] || 'nav_dashboard');
-    updatePageTexts();
-  }, 10);
-}
-
-// Override toast to use translated messages
-const _originalToast = toast;
-function toast(msg, type) { _originalToast(msg, type); }
 
 // ── Init ──────────────────────────────────────────────────
 renderTools(TOOLS);
