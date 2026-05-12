@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light" data-lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-SM AI — Intelligent Marketing Platform</title>
+<title>M-SM AI — Platform Pemasaran Pintar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -48,6 +48,123 @@
   --shadow:0 4px 16px rgba(13,27,42,0.08),0 2px 6px rgba(13,27,42,0.05);
   --shadow-lg:0 12px 40px rgba(13,27,42,0.12),0 4px 12px rgba(13,27,42,0.06);
 }
+
+/* ═══ DARK MODE THEME ═══════════════════════════ */
+[data-theme="dark"] {
+  --cream:#0F1923;
+  --cream2:#141E2A;
+  --cream3:#1A2535;
+  --white:#1C2940;
+  --navy:#E8EDF2;
+  --navy2:#CDD5DE;
+  --navy3:#B0BCC8;
+  --steel:#8EA3B5;
+  --slate:#7A96AA;
+  --mist:#5A7A90;
+  --silver:#3D5A73;
+  --fog:#243B55;
+  --orange:#FF7A4A;
+  --orange2:#FF9166;
+  --orange3:#FFB090;
+  --orange-bg:rgba(255,122,74,0.12);
+  --orange-glow:rgba(255,122,74,0.2);
+  --teal:#2BBFA0;
+  --teal-bg:rgba(43,191,160,0.1);
+  --violet:#9B7FEE;
+  --gold:#E8B840;
+  --red:#E05050;
+  --red-bg:rgba(224,80,80,0.1);
+  --shadow-sm:0 1px 4px rgba(0,0,0,0.3);
+  --shadow:0 4px 20px rgba(0,0,0,0.35);
+  --shadow-lg:0 12px 40px rgba(0,0,0,0.45);
+}
+
+[data-theme="dark"] .sidebar { background:#0A1018; }
+[data-theme="dark"] .sidebar::after { background:linear-gradient(180deg,transparent,rgba(255,255,255,0.04) 30%,rgba(255,255,255,0.04) 70%,transparent); }
+[data-theme="dark"] .topbar { background:#141E2A; border-bottom-color:#243B55; }
+[data-theme="dark"] .main-area { background:#0F1923; }
+[data-theme="dark"] .panel,.dash-grid .card,[data-theme="dark"] .m-card { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .form-panel { background:#141E2A; border-right-color:#243B55; }
+[data-theme="dark"] .output-panel { background:#0F1923; }
+[data-theme="dark"] .out-header { background:#141E2A; border-bottom-color:#243B55; }
+[data-theme="dark"] .f-input,[data-theme="dark"] .f-textarea,[data-theme="dark"] .f-select { background:#243B55; border-color:#3D5A73; color:#E8EDF2; }
+[data-theme="dark"] .f-input:focus,[data-theme="dark"] .f-textarea:focus,[data-theme="dark"] .f-select:focus { background:#1C2940; }
+[data-theme="dark"] .tone-tag { background:#243B55; border-color:#3D5A73; color:#8EA3B5; }
+[data-theme="dark"] .tone-tag.on { background:rgba(255,122,74,0.15); border-color:var(--orange); color:var(--orange); }
+[data-theme="dark"] .result-block { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .rb-head { background:#141E2A; border-bottom-color:#243B55; }
+[data-theme="dark"] .chat-window { background:#141E2A; border-color:#243B55; }
+[data-theme="dark"] .msg.ai .m-bubble { background:#243B55; border-color:#3D5A73; color:#CDD5DE; }
+[data-theme="dark"] .chat-input-bar { background:#141E2A; border-color:#243B55; }
+[data-theme="dark"] .chat-ta { background:#0F1923; border-color:#243B55; color:#E8EDF2; }
+[data-theme="dark"] .doc-table-wrap { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .data-table th { background:#141E2A; color:#5A7A90; border-color:#243B55; }
+[data-theme="dark"] .data-table td { border-color:#243B55; color:#CDD5DE; }
+[data-theme="dark"] .data-table tr:hover td { background:#243B55; }
+[data-theme="dark"] .settings-nav { background:#141E2A; border-right-color:#243B55; }
+[data-theme="dark"] .settings-content { background:#0F1923; }
+[data-theme="dark"] .s-row { border-bottom-color:#243B55; }
+[data-theme="dark"] .panel { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .panel-head { border-bottom-color:#243B55; }
+[data-theme="dark"] .recent-row:hover { background:#243B55; }
+[data-theme="dark"] .q-tile { background:#141E2A; border-color:#243B55; }
+[data-theme="dark"] .q-tile:hover { background:#1C2940; }
+[data-theme="dark"] .tool-card { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .tool-card:hover { background:#243B55; border-color:var(--orange); }
+[data-theme="dark"] .tools-canvas { background:#0F1923; }
+[data-theme="dark"] .cat-strip { background:#141E2A; border-bottom-color:#243B55; }
+[data-theme="dark"] .tools-header { background:#141E2A; border-bottom-color:#243B55; }
+[data-theme="dark"] .search-bar input { background:#243B55; border-color:#3D5A73; color:#E8EDF2; }
+[data-theme="dark"] .seo-intro { background:linear-gradient(135deg,#0A1018,#141E2A); }
+[data-theme="dark"] .seo-tile { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .seo-tile:hover { background:#243B55; }
+[data-theme="dark"] .tpl-card { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .tpl-card:hover { background:#243B55; }
+[data-theme="dark"] .plan-card { background:#1C2940; border-color:#243B55; }
+[data-theme="dark"] .billing-shell { background:#0F1923; }
+[data-theme="dark"] .current-plan-banner { background:linear-gradient(135deg,#0A1018,#141E2A); }
+[data-theme="dark"] .info-box { background:rgba(255,122,74,0.07); border-color:rgba(255,122,74,0.15); color:#8EA3B5; }
+[data-theme="dark"] .btn-outline { background:#1C2940; color:#CDD5DE; border-color:#3D5A73; }
+[data-theme="dark"] .btn-outline:hover { background:#243B55; }
+[data-theme="dark"] .docs-shell { background:#0F1923; }
+[data-theme="dark"] .seo-shell { background:#0F1923; }
+[data-theme="dark"] .tpl-shell { background:#0F1923; }
+[data-theme="dark"] .billing-shell { background:#0F1923; }
+[data-theme="dark"] .chat-shell { background:#0F1923; }
+[data-theme="dark"] .settings-layout { background:#0F1923; }
+[data-theme="dark"] #output-body { background:#0F1923; }
+[data-theme="dark"] .out-body { background:#0F1923; }
+[data-theme="dark"] .edit-textarea { color:#CDD5DE; }
+[data-theme="dark"] .form-section { border-bottom-color:#243B55; }
+[data-theme="dark"] .form-head { background:#141E2A; border-bottom-color:#243B55; }
+[data-theme="dark"] .form-footer { background:#141E2A; border-top-color:#243B55; }
+[data-theme="dark"] .page-body { background:#0F1923; }
+
+/* Theme toggle button */
+.theme-toggle {
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.6);
+  cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.theme-toggle:hover{background:rgba(255,255,255,0.12);color:white;}
+
+/* Lang toggle button */
+.lang-toggle {
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.6);
+  cursor:pointer;font-size:11px;font-weight:700;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all .2s;letter-spacing:.5px;flex-shrink:0;
+}
+.lang-toggle:hover{background:rgba(255,255,255,0.12);color:white;}
+.lang-flag{font-size:14px;}
 html,body{height:100%;overflow:hidden;background:var(--cream)}
 body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;flex-direction:column}
 
@@ -689,57 +806,66 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     </div>
   </div>
 
-  <div class="sb-section">Main</div>
+  <div class="sb-section" data-i18n="nav_main">Main</div>
   <button class="sb-item active" onclick="goTo('dashboard')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="6" height="6" rx="1.3"/><rect x="10" y="2" width="6" height="6" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
-    Dashboard
+    <span data-i18n="nav_dashboard">Dashboard</span>
   </button>
   <button class="sb-item" onclick="goTo('tools')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 5a3 3 0 01-4 2.83V16a1.5 1.5 0 01-3 0V7.83A3 3 0 1110 5V12a.5.5 0 001 0V5z"/></svg>
-    AI Tools
+    <span data-i18n="nav_tools">AI Tools</span>
     <span class="sb-badge">40+</span>
   </button>
   <button class="sb-item" onclick="goTo('chat')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 9c0 3.866-2.686 7-6 7a5.97 5.97 0 01-3-.8L3 16l.8-3A6 6 0 113 9c0-3.314 2.686-6 6-6s6 2.686 6 6z"/></svg>
-    AI Chat
+    <span data-i18n="nav_chat">AI Chat</span>
   </button>
 
-  <div class="sb-section">Content</div>
+  <div class="sb-section" data-i18n="nav_content">Content</div>
   <button class="sb-item" onclick="goTo('documents')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 2H5a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V7l-4-5z"/><path d="M10 2v5h5"/></svg>
-    Documents
+    <span data-i18n="nav_documents">Documents</span>
   </button>
   <button class="sb-item" onclick="goTo('seo')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.5" cy="7.5" r="4.5"/><path d="M13.5 13.5l-2.5-2.5"/></svg>
-    SEO Suite
+    <span data-i18n="nav_seo">SEO Suite</span>
   </button>
   <button class="sb-item" onclick="goTo('bulk')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="14" height="3" rx="1"/><rect x="2" y="7.5" width="14" height="3" rx="1"/><rect x="2" y="13" width="14" height="3" rx="1"/></svg>
-    Bulk Generate
+    <span data-i18n="nav_bulk">Bulk Generate</span>
   </button>
   <button class="sb-item" onclick="goTo('templates')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="14" height="5" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
-    Templates
+    <span data-i18n="nav_templates">Templates</span>
   </button>
 
-  <div class="sb-section">Account</div>
+  <div class="sb-section" data-i18n="nav_account">Account</div>
   <button class="sb-item" onclick="goTo('settings')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="2.5"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42"/></svg>
-    Settings
+    <span data-i18n="nav_settings">Settings</span>
   </button>
   <button class="sb-item" onclick="goTo('billing')">
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="4" width="14" height="11" rx="2"/><path d="M2 8h14"/></svg>
-    Billing
+    <span data-i18n="nav_billing">Billing</span>
   </button>
 
   <div class="sb-bottom">
-    <div class="user-tile" onclick="logout()" title="Click to sign out">
+    <!-- Controls row -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px 10px;">
+      <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
+      <button class="lang-toggle" id="lang-btn" onclick="toggleLang()">
+        <span class="lang-flag" id="lang-flag">🇲🇾</span>
+        <span id="lang-label">BM</span>
+      </button>
+    </div>
+    <!-- User tile -->
+    <div class="user-tile" onclick="logout()" title="Klik untuk log keluar / Click to sign out">
       <div class="u-avatar"></div>
       <div class="u-info">
         <div class="u-name">Loading...</div>
         <div class="u-plan">Loading...</div>
       </div>
-      <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-left:auto">Sign out</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.3);margin-left:auto" id="signout-label">Log keluar</span>
     </div>
   </div>
 </nav>
@@ -749,13 +875,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 
   <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-title" id="topbar-title" data-i18n="nav_dashboard">Dashboard</div>
     <div class="cred-chip">
       <div class="cred-dot"></div>
       <span id="cred-count">Loading...</span>
     </div>
-    <button class="btn btn-outline btn-sm" onclick="goTo('settings')" style="gap:5px">⚙ Settings</button>
-    <button class="btn btn-primary btn-sm" onclick="goTo('tools')">＋ New Content</button>
+    <button class="btn btn-outline btn-sm" onclick="goTo('settings')" style="gap:5px">⚙ <span data-i18n="nav_settings">Settings</span></button>
+    <button class="btn btn-primary btn-sm" onclick="goTo('tools')"><span data-i18n="btn_new_content">＋ New Content</span></button>
   </div>
 
   <!-- ══ DASHBOARD PAGE ══ -->
@@ -2145,8 +2271,662 @@ function toast(msg,type){
   toastTimer=setTimeout(()=>el.classList.remove('show'),3800);
 }
 
+// ════════════════════════════════════════════════════
+//  DARK MODE
+// ════════════════════════════════════════════════════
+function initTheme() {
+  const saved = localStorage.getItem('msm_theme') || 'light';
+  setTheme(saved);
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('msm_theme', theme);
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// ════════════════════════════════════════════════════
+//  BAHASA MALAYSIA TRANSLATION SYSTEM
+// ════════════════════════════════════════════════════
+const TRANSLATIONS = {
+  en: {
+    // Nav
+    nav_main: 'Main', nav_dashboard: 'Dashboard', nav_tools: 'AI Tools',
+    nav_chat: 'AI Chat', nav_content: 'Content', nav_documents: 'Documents',
+    nav_seo: 'SEO Suite', nav_bulk: 'Bulk Generate', nav_templates: 'Templates',
+    nav_account: 'Account', nav_settings: 'Settings', nav_billing: 'Billing',
+    signout_label: 'Sign out',
+
+    // Topbar
+    btn_new_content: '＋ New Content',
+
+    // Dashboard
+    dash_hello: 'Good day ☀',
+    dash_welcome: 'Welcome back',
+    dash_sub: "Your AI marketing engine is ready. You've created {n} pieces of content this month — keep the momentum going.",
+    metric_words: 'WORDS GENERATED',
+    metric_docs: 'DOCUMENTS',
+    metric_credits: 'CREDITS USED',
+    metric_toptool: 'TOP TOOL',
+    dash_recent: 'Recent Documents',
+    dash_viewall: 'View all →',
+    dash_quickcreate: 'Quick Create',
+    dash_credits_label: 'Monthly Credits',
+    dash_credit_note: 'used · {r} remaining',
+
+    // Tools page
+    tools_title: 'AI Tools',
+    tools_sub: '40+ tools to create any marketing content in seconds',
+    tools_search: 'Search tools...',
+    cat_all: 'All Tools', cat_blog: '✍️ Blog & Long-form', cat_social: '📱 Social Media',
+    cat_email: '📧 Email', cat_ads: '🎯 Ads & PPC', cat_ecom: '🛍️ eCommerce',
+    cat_sales: '💼 Sales', cat_rewrite: '🔄 Rewrite', cat_seo: '🔍 SEO',
+
+    // Editor
+    back_tools: '← Back',
+    btn_generate: '✦ Generate Content',
+    out_output: 'Output', out_edit: 'Edit',
+    btn_copy_all: '📋 Copy All', btn_save_doc: '💾 Save Doc',
+    out_empty_text: 'Fill in the details on the left and click Generate to create your content',
+    generating: 'Crafting your content…',
+    lbl_tone: 'Tone of Voice', lbl_variants: 'Number of Variants',
+    var1: '1 variant', var2: '2 variants', var3: '3 variants',
+    variant_label: 'Variant',
+    btn_copy: '📋', btn_save: '💾', btn_regen: '🔄', btn_wp: '🌐',
+
+    // Chat
+    chat_title: 'AI Chat',
+    chat_sub: 'Your expert marketing AI — always ready to help',
+    chat_clear: '🗑 Clear Chat',
+    chat_placeholder: 'Ask me anything about marketing, content, SEO…',
+    chat_send: 'Send →',
+    chat_greeting: "Hi there! I'm M-SM AI, your intelligent marketing assistant. I can help you with:\n\n• Writing and editing any marketing content\n• Blog posts, email sequences, ad campaigns\n• SEO strategy and keyword research\n• Brand voice and messaging strategy\n• Social media content and captions\n• Sales copy and product descriptions\n\nWhat are you working on today?",
+    chat_cleared: 'Chat cleared! What would you like to create today?',
+
+    // Documents
+    docs_title: 'Documents',
+    docs_sub: 'All your AI-generated content in one place',
+    btn_new_doc: '＋ New Document',
+    col_title: 'Title', col_type: 'Type', col_words: 'Words',
+    col_created: 'Created', col_actions: 'Actions',
+    no_docs: 'No documents yet. Start creating content with AI Tools!',
+    filter_all: 'All', filter_blog: 'Blog Posts', filter_email: 'Emails',
+    filter_social: 'Social', filter_ads: 'Ads', filter_product: 'Products',
+
+    // SEO
+    seo_title: 'SEO Suite',
+    seo_sub: 'Rank higher on Google and AI search results',
+    seo_intro_title: 'SEO Suite',
+    seo_intro_sub: 'Dominate search results with AI-powered SEO tools.',
+    seo_meta_title: 'SEO Meta Generator',
+    seo_meta_desc: 'Generate click-worthy title tags and meta descriptions.',
+    seo_keyword_title: 'Keyword Cluster Builder',
+    seo_keyword_desc: 'Build complete keyword strategies with clusters and intent mapping.',
+    seo_article_title: 'SEO Article Writer',
+    seo_article_desc: 'Write complete long-form articles with proper structure.',
+    seo_optimizer_title: 'Content Optimizer',
+    seo_optimizer_desc: 'Rewrite and optimize existing content for better rankings.',
+
+    // Bulk
+    bulk_title: 'Bulk Generate',
+    bulk_sub: 'Generate up to 20 pieces of content at once',
+    bulk_tool_label: 'Select Tool',
+    bulk_tone_label: 'Tone',
+    bulk_inputs_label: 'Items to Generate (one per line, max 20)',
+    bulk_inputs_ph: 'e.g. Write a product description for Blue Running Shoes\nWrite a product description for Red Sneakers\nWrite a product description for White Trainers',
+    bulk_count: '0 items entered',
+    btn_bulk_generate: '⚡ Generate All',
+    bulk_processing: 'Processing {n} of {t}...',
+    bulk_done: '✓ Bulk generation complete! {s}/{t} succeeded',
+    btn_export_csv: '📥 Export CSV',
+    bulk_empty_text: 'Enter your items above and click Generate All',
+
+    // Templates
+    tpl_title: 'Custom Templates',
+    tpl_sub: 'Save your best prompts and reuse them for any client or campaign',
+    btn_new_tpl: '＋ New Template',
+    tpl_use: 'Use Template →',
+
+    // Settings
+    settings_title: 'Settings',
+    sn_general: '⚙️ General', sn_api: '🔑 API Key', sn_password: '🔒 Password',
+    sn_brand: '🎨 Brand Voice', sn_team: '👥 Team', sn_wordpress: '🔌 WordPress',
+    sn_shopify: '🛍️ Shopify', sn_developer: '👨‍💻 Developer API', sn_notif: '🔔 Notifications',
+    sc_general_title: 'General Settings',
+    lbl_fullname: 'Full Name', lbl_fullname_desc: 'Displayed across the platform',
+    lbl_email: 'Email Address', lbl_email_desc: 'Used for login and billing',
+    lbl_lang: 'Default Language', lbl_lang_desc: 'Language for generated content',
+    lbl_tone_def: 'Default Tone', lbl_tone_desc: 'Applied to all new content',
+    btn_save_changes: 'Save Changes',
+    sc_api_title: 'API Configuration',
+    lbl_groq: 'Your Groq API Key (Optional)',
+    lbl_groq_desc: 'Add your own free Groq key from console.groq.com',
+    btn_save_key: 'Save Key',
+    api_info: '✅ The platform already has a built-in Groq AI key — all tools work out of the box for free.',
+    sc_password_title: 'Change Password',
+    lbl_current_pw: 'Current Password',
+    lbl_new_pw: 'New Password',
+    lbl_confirm_pw: 'Confirm New Password',
+    btn_change_pw: 'Change Password',
+    sc_brand_title: 'Brand Voice',
+    lbl_brand_name: 'Brand / Company Name',
+    lbl_brand_desc_field: 'Brand Description',
+    lbl_tone_voice: 'Tone of Voice',
+    lbl_target_audience: 'Target Audience',
+    btn_save_brand: 'Save Brand Voice',
+    sc_team_title: 'Team Workspace',
+    sc_wp_title: 'WordPress Integration',
+    lbl_wp_url: 'WordPress Site URL',
+    lbl_wp_user: 'WordPress Username',
+    lbl_wp_pass: 'Application Password',
+    btn_connect_wp: 'Connect WordPress',
+    btn_disconnect: 'Disconnect',
+    wp_info: '💡 Use an Application Password from WordPress Admin → Users → Profile',
+    sc_shopify_title: 'Shopify Integration',
+    lbl_shopify_domain: 'Shopify Store Domain',
+    lbl_shopify_token: 'Admin API Access Token',
+    btn_connect_shopify: 'Connect Shopify',
+    shopify_info: '💡 Get your token from Shopify Admin → Apps → Develop apps',
+    sc_dev_title: 'Developer API',
+    dev_desc: 'Use M-SM AI\'s AI tools inside your own apps via our REST API.',
+    btn_show_key: 'Show My API Key',
+    btn_regen_key: '🔄 Regenerate Key',
+    dev_base_url: 'Base URL',
+    dev_auth: 'Authentication',
+    dev_auth_desc: 'Add header: X-API-Key: your_api_key',
+    dev_rate: 'Rate Limit: 120 requests/minute',
+    sc_notif_title: 'Notifications',
+    notif_weekly: 'Weekly Usage Report',
+    notif_weekly_desc: 'Get a summary of your content creation every Monday',
+    notif_credits: 'Credit Low Alert',
+    notif_credits_desc: 'Notify when credits fall below 1,000',
+    notif_features: 'New Feature Announcements',
+    notif_features_desc: 'Be first to know about new AI tools',
+    notif_tips: 'Marketing Tips',
+    notif_tips_desc: 'Receive weekly marketing best practices',
+    btn_save_notif: 'Save Preferences',
+
+    // Billing
+    billing_title: 'Billing & Plans',
+    billing_sub: 'Choose the plan that powers your marketing',
+    current_plan: 'Active Plan',
+    credits_this_month: 'Credits This Month',
+    plan_tag_free: 'Free', plan_tag_pro: 'Current Plan ✓', plan_tag_agency: 'Most Powerful',
+    plan_name_starter: 'Starter', plan_name_pro: 'Professional', plan_name_agency: 'Agency',
+    plan_price_mo: '/mo',
+    btn_downgrade: 'Downgrade', btn_active: 'Active Plan', btn_upgrade: 'Upgrade to Agency →',
+
+    // Toasts / messages
+    toast_saved: 'Settings saved!',
+    toast_brand_saved: 'Brand voice saved!',
+    toast_copied: 'Copied to clipboard!',
+    toast_all_copied: 'All copied!',
+    toast_doc_saved: 'Saved to Documents ✓',
+    toast_deleted: 'Deleted',
+    toast_generated: '✓ Content generated successfully',
+    toast_regen: 'Regenerated ✓',
+    toast_key_saved: '✓ Groq API key saved!',
+    toast_pw_changed: '✓ Password updated!',
+    toast_wp_disconnected: 'WordPress disconnected',
+    toast_shopify_disconnected: 'Shopify disconnected',
+    toast_team_created: 'Team created!',
+    toast_member_removed: 'Member removed',
+    toast_new_key: '✓ New API key generated!',
+    toast_pw_mismatch: 'New passwords do not match',
+    toast_pw_short: 'Password must be at least 8 characters',
+    toast_field_required: 'Please fill in the first field',
+    toast_bulk_started: '⚡ Bulk generation started!',
+    toast_csv_downloaded: 'CSV downloaded!',
+    confirm_delete: 'Delete this document?',
+    confirm_regen_key: 'Regenerate API key? Old key stops working immediately.',
+    confirm_remove_member: 'Remove this member from the team?',
+    confirm_wp_disconnect: 'Disconnect WordPress?',
+    confirm_shopify_disconnect: 'Disconnect Shopify?',
+    publish_as: 'Publish as (draft or publish):',
+    publish_default: 'draft',
+
+    // Plan features
+    feat_credits_free: '2,500 credits / month',
+    feat_credits_pro: '10,000 credits / month',
+    feat_credits_agency: 'Unlimited credits',
+    feat_tools_basic: '20 core AI tools',
+    feat_tools_all: 'All 40+ AI tools',
+    feat_chat: 'AI Chat (Groq-powered)',
+    feat_storage: 'Basic document storage',
+    feat_seo: 'Full SEO suite',
+    feat_brand: 'Brand Voice training',
+    feat_templates: 'Custom templates',
+    feat_api: 'API access',
+    feat_priority: 'Priority support',
+    feat_team: '5 team seats',
+    feat_whitelabel: 'White-label exports',
+  },
+
+  bm: {
+    // Nav
+    nav_main: 'Utama', nav_dashboard: 'Papan Pemuka', nav_tools: 'Alat AI',
+    nav_chat: 'Sembang AI', nav_content: 'Kandungan', nav_documents: 'Dokumen',
+    nav_seo: 'Suite SEO', nav_bulk: 'Jana Pukal', nav_templates: 'Templat',
+    nav_account: 'Akaun', nav_settings: 'Tetapan', nav_billing: 'Pengebilan',
+    signout_label: 'Log keluar',
+
+    // Topbar
+    btn_new_content: '＋ Kandungan Baru',
+
+    // Dashboard
+    dash_hello: 'Selamat datang ☀',
+    dash_welcome: 'Selamat kembali',
+    dash_sub: "Enjin pemasaran AI anda sedia. Anda telah mencipta {n} kandungan bulan ini — teruskan momentum!",
+    metric_words: 'PATAH PERKATAAN DIJANA',
+    metric_docs: 'DOKUMEN',
+    metric_credits: 'KREDIT DIGUNAKAN',
+    metric_toptool: 'ALAT TERBAIK',
+    dash_recent: 'Dokumen Terkini',
+    dash_viewall: 'Lihat semua →',
+    dash_quickcreate: 'Cipta Pantas',
+    dash_credits_label: 'Kredit Bulanan',
+    dash_credit_note: 'digunakan · {r} berbaki',
+
+    // Tools page
+    tools_title: 'Alat AI',
+    tools_sub: '40+ alat untuk mencipta sebarang kandungan pemasaran dalam beberapa saat',
+    tools_search: 'Cari alat...',
+    cat_all: 'Semua Alat', cat_blog: '✍️ Blog & Artikel', cat_social: '📱 Media Sosial',
+    cat_email: '📧 E-mel', cat_ads: '🎯 Iklan & PPC', cat_ecom: '🛍️ e-Dagang',
+    cat_sales: '💼 Jualan', cat_rewrite: '🔄 Tulis Semula', cat_seo: '🔍 SEO',
+
+    // Editor
+    back_tools: '← Kembali',
+    btn_generate: '✦ Jana Kandungan',
+    out_output: 'Output', out_edit: 'Edit',
+    btn_copy_all: '📋 Salin Semua', btn_save_doc: '💾 Simpan Dokumen',
+    out_empty_text: 'Isi butiran di sebelah kiri dan klik Jana untuk mencipta kandungan anda',
+    generating: 'Menggubal kandungan anda…',
+    lbl_tone: 'Nada Suara', lbl_variants: 'Bilangan Variasi',
+    var1: '1 variasi', var2: '2 variasi', var3: '3 variasi',
+    variant_label: 'Variasi',
+    btn_copy: '📋', btn_save: '💾', btn_regen: '🔄', btn_wp: '🌐',
+
+    // Chat
+    chat_title: 'Sembang AI',
+    chat_sub: 'Pakar pemasaran AI anda — sedia membantu 24/7',
+    chat_clear: '🗑 Kosongkan Sembang',
+    chat_placeholder: 'Tanya saya apa sahaja tentang pemasaran, kandungan, SEO…',
+    chat_send: 'Hantar →',
+    chat_greeting: "Hai! Saya M-SM AI, pembantu pemasaran pintar anda. Saya boleh membantu anda dengan:\n\n• Menulis dan mengedit sebarang kandungan pemasaran\n• Siaran blog, urutan e-mel, kempen iklan\n• Strategi SEO dan penyelidikan kata kunci\n• Suara jenama dan strategi pemesejan\n• Kandungan dan kapsyen media sosial\n• Salinan jualan dan penerangan produk\n\nApa yang sedang anda usahakan hari ini?",
+    chat_cleared: 'Sembang dikosongkan! Apa yang ingin anda cipta hari ini?',
+
+    // Documents
+    docs_title: 'Dokumen',
+    docs_sub: 'Semua kandungan yang dijana AI anda di satu tempat',
+    btn_new_doc: '＋ Dokumen Baru',
+    col_title: 'Tajuk', col_type: 'Jenis', col_words: 'Patah Perkataan',
+    col_created: 'Dicipta', col_actions: 'Tindakan',
+    no_docs: 'Tiada dokumen lagi. Mula mencipta kandungan dengan Alat AI!',
+    filter_all: 'Semua', filter_blog: 'Siaran Blog', filter_email: 'E-mel',
+    filter_social: 'Sosial', filter_ads: 'Iklan', filter_product: 'Produk',
+
+    // SEO
+    seo_title: 'Suite SEO',
+    seo_sub: 'Kedudukan lebih tinggi di Google dan hasil carian AI',
+    seo_intro_title: 'Suite SEO',
+    seo_intro_sub: 'Kuasai hasil carian dengan alat SEO berkuasa AI.',
+    seo_meta_title: 'Penjana Meta SEO',
+    seo_meta_desc: 'Jana tag tajuk dan penerangan meta yang menarik klik.',
+    seo_keyword_title: 'Pembina Gugusan Kata Kunci',
+    seo_keyword_desc: 'Bina strategi kata kunci lengkap dengan pemetaan niat.',
+    seo_article_title: 'Penulis Artikel SEO',
+    seo_article_desc: 'Tulis artikel panjang lengkap dengan struktur yang betul.',
+    seo_optimizer_title: 'Pengoptimum Kandungan',
+    seo_optimizer_desc: 'Tulis semula dan optimumkan kandungan sedia ada.',
+
+    // Bulk
+    bulk_title: 'Jana Pukal',
+    bulk_sub: 'Jana sehingga 20 kandungan serentak',
+    bulk_tool_label: 'Pilih Alat',
+    bulk_tone_label: 'Nada',
+    bulk_inputs_label: 'Item untuk Dijana (satu setiap baris, maks 20)',
+    bulk_inputs_ph: 'cth. Tulis penerangan produk untuk Kasut Lari Biru\nTulis penerangan produk untuk Sneaker Merah\nTulis penerangan produk untuk Kasut Latihan Putih',
+    bulk_count: '0 item dimasukkan',
+    btn_bulk_generate: '⚡ Jana Semua',
+    bulk_processing: 'Memproses {n} daripada {t}...',
+    bulk_done: '✓ Jana pukal selesai! {s}/{t} berjaya',
+    btn_export_csv: '📥 Eksport CSV',
+    bulk_empty_text: 'Masukkan item anda di atas dan klik Jana Semua',
+
+    // Templates
+    tpl_title: 'Templat Tersuai',
+    tpl_sub: 'Simpan gesaan terbaik anda dan gunakan semula untuk mana-mana klien atau kempen',
+    btn_new_tpl: '＋ Templat Baru',
+    tpl_use: 'Guna Templat →',
+
+    // Settings
+    settings_title: 'Tetapan',
+    sn_general: '⚙️ Umum', sn_api: '🔑 Kunci API', sn_password: '🔒 Kata Laluan',
+    sn_brand: '🎨 Suara Jenama', sn_team: '👥 Pasukan', sn_wordpress: '🔌 WordPress',
+    sn_shopify: '🛍️ Shopify', sn_developer: '👨‍💻 API Pembangun', sn_notif: '🔔 Pemberitahuan',
+    sc_general_title: 'Tetapan Umum',
+    lbl_fullname: 'Nama Penuh', lbl_fullname_desc: 'Dipaparkan merentasi platform',
+    lbl_email: 'Alamat E-mel', lbl_email_desc: 'Digunakan untuk log masuk dan pengebilan',
+    lbl_lang: 'Bahasa Lalai', lbl_lang_desc: 'Bahasa untuk kandungan yang dijana',
+    lbl_tone_def: 'Nada Lalai', lbl_tone_desc: 'Digunakan untuk semua kandungan baru',
+    btn_save_changes: 'Simpan Perubahan',
+    sc_api_title: 'Konfigurasi API',
+    lbl_groq: 'Kunci API Groq Anda (Pilihan)',
+    lbl_groq_desc: 'Tambah kunci Groq percuma anda dari console.groq.com',
+    btn_save_key: 'Simpan Kunci',
+    api_info: '✅ Platform ini sudah mempunyai kunci Groq AI terbina — semua alat berfungsi secara percuma.',
+    sc_password_title: 'Tukar Kata Laluan',
+    lbl_current_pw: 'Kata Laluan Semasa',
+    lbl_new_pw: 'Kata Laluan Baru',
+    lbl_confirm_pw: 'Sahkan Kata Laluan Baru',
+    btn_change_pw: 'Tukar Kata Laluan',
+    sc_brand_title: 'Suara Jenama',
+    lbl_brand_name: 'Nama Jenama / Syarikat',
+    lbl_brand_desc_field: 'Penerangan Jenama',
+    lbl_tone_voice: 'Nada Suara',
+    lbl_target_audience: 'Sasaran Audiens',
+    btn_save_brand: 'Simpan Suara Jenama',
+    sc_team_title: 'Ruang Kerja Pasukan',
+    sc_wp_title: 'Integrasi WordPress',
+    lbl_wp_url: 'URL Tapak WordPress',
+    lbl_wp_user: 'Nama Pengguna WordPress',
+    lbl_wp_pass: 'Kata Laluan Aplikasi',
+    btn_connect_wp: 'Sambung WordPress',
+    btn_disconnect: 'Putuskan Sambungan',
+    wp_info: '💡 Gunakan Kata Laluan Aplikasi dari WordPress Admin → Pengguna → Profil',
+    sc_shopify_title: 'Integrasi Shopify',
+    lbl_shopify_domain: 'Domain Kedai Shopify',
+    lbl_shopify_token: 'Token Akses API Admin',
+    btn_connect_shopify: 'Sambung Shopify',
+    shopify_info: '💡 Dapatkan token anda dari Shopify Admin → Aplikasi → Bangunkan aplikasi',
+    sc_dev_title: 'API Pembangun',
+    dev_desc: 'Gunakan alat AI M-SM AI dalam aplikasi anda sendiri melalui REST API kami.',
+    btn_show_key: 'Tunjukkan Kunci API Saya',
+    btn_regen_key: '🔄 Jana Semula Kunci',
+    dev_base_url: 'URL Asas',
+    dev_auth: 'Pengesahan',
+    dev_auth_desc: 'Tambah pengepala: X-API-Key: kunci_api_anda',
+    dev_rate: 'Had Kadar: 120 permintaan/minit',
+    sc_notif_title: 'Pemberitahuan',
+    notif_weekly: 'Laporan Penggunaan Mingguan',
+    notif_weekly_desc: 'Dapatkan ringkasan penciptaan kandungan anda setiap Isnin',
+    notif_credits: 'Amaran Kredit Rendah',
+    notif_credits_desc: 'Beritahu apabila kredit jatuh di bawah 1,000',
+    notif_features: 'Pengumuman Ciri Baru',
+    notif_features_desc: 'Jadilah yang pertama tahu tentang alat AI baru',
+    notif_tips: 'Tips Pemasaran',
+    notif_tips_desc: 'Terima amalan terbaik pemasaran mingguan',
+    btn_save_notif: 'Simpan Keutamaan',
+
+    // Billing
+    billing_title: 'Pengebilan & Pelan',
+    billing_sub: 'Pilih pelan yang memacu pemasaran anda',
+    current_plan: 'Pelan Aktif',
+    credits_this_month: 'Kredit Bulan Ini',
+    plan_tag_free: 'Percuma', plan_tag_pro: 'Pelan Semasa ✓', plan_tag_agency: 'Paling Berkuasa',
+    plan_name_starter: 'Pemula', plan_name_pro: 'Profesional', plan_name_agency: 'Agensi',
+    plan_price_mo: '/bln',
+    btn_downgrade: 'Turun Taraf', btn_active: 'Pelan Aktif', btn_upgrade: 'Naik Taraf ke Agensi →',
+
+    // Toasts / messages
+    toast_saved: 'Tetapan disimpan!',
+    toast_brand_saved: 'Suara jenama disimpan!',
+    toast_copied: 'Disalin ke papan klip!',
+    toast_all_copied: 'Semua disalin!',
+    toast_doc_saved: 'Disimpan ke Dokumen ✓',
+    toast_deleted: 'Dipadam',
+    toast_generated: '✓ Kandungan berjaya dijana',
+    toast_regen: 'Dijana semula ✓',
+    toast_key_saved: '✓ Kunci API Groq disimpan!',
+    toast_pw_changed: '✓ Kata laluan dikemas kini!',
+    toast_wp_disconnected: 'WordPress diputuskan',
+    toast_shopify_disconnected: 'Shopify diputuskan',
+    toast_team_created: 'Pasukan dicipta!',
+    toast_member_removed: 'Ahli dikeluarkan',
+    toast_new_key: '✓ Kunci API baru dijana!',
+    toast_pw_mismatch: 'Kata laluan baru tidak sepadan',
+    toast_pw_short: 'Kata laluan mestilah sekurang-kurangnya 8 aksara',
+    toast_field_required: 'Sila isi medan pertama',
+    toast_bulk_started: '⚡ Jana pukal dimulakan!',
+    toast_csv_downloaded: 'CSV dimuat turun!',
+    confirm_delete: 'Padam dokumen ini?',
+    confirm_regen_key: 'Jana semula kunci API? Kunci lama akan berhenti berfungsi serta-merta.',
+    confirm_remove_member: 'Keluarkan ahli ini dari pasukan?',
+    confirm_wp_disconnect: 'Putuskan sambungan WordPress?',
+    confirm_shopify_disconnect: 'Putuskan sambungan Shopify?',
+    publish_as: 'Terbit sebagai (draf atau terbit):',
+    publish_default: 'draf',
+
+    // Plan features
+    feat_credits_free: '2,500 kredit / bulan',
+    feat_credits_pro: '10,000 kredit / bulan',
+    feat_credits_agency: 'Kredit tanpa had',
+    feat_tools_basic: '20 alat AI teras',
+    feat_tools_all: 'Semua 40+ alat AI',
+    feat_chat: 'Sembang AI (dikuasakan Groq)',
+    feat_storage: 'Storan dokumen asas',
+    feat_seo: 'Suite SEO penuh',
+    feat_brand: 'Latihan Suara Jenama',
+    feat_templates: 'Templat tersuai',
+    feat_api: 'Akses API',
+    feat_priority: 'Sokongan keutamaan',
+    feat_team: '5 tempat duduk pasukan',
+    feat_whitelabel: 'Eksport white-label',
+  }
+};
+
+let currentLang = localStorage.getItem('msm_lang') || 'bm';
+
+function t(key, vars = {}) {
+  const lang = currentLang;
+  let str = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['en'][key] || key;
+  Object.entries(vars).forEach(([k, v]) => { str = str.replace(`{${k}}`, v); });
+  return str;
+}
+
+function applyTranslations() {
+  // Apply all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const translation = t(key);
+    if (translation) el.textContent = translation;
+  });
+
+  // Update sign out label
+  const signoutEl = document.getElementById('signout-label');
+  if (signoutEl) signoutEl.textContent = t('signout_label');
+
+  // Update language button
+  const langBtn = document.getElementById('lang-btn');
+  const langFlag = document.getElementById('lang-flag');
+  const langLabel = document.getElementById('lang-label');
+  if (langFlag) langFlag.textContent = currentLang === 'bm' ? '🇬🇧' : '🇲🇾';
+  if (langLabel) langLabel.textContent = currentLang === 'bm' ? 'EN' : 'BM';
+
+  // Update html lang attribute
+  document.documentElement.lang = currentLang === 'bm' ? 'ms' : 'en';
+
+  // Update topbar title
+  const topbarTitle = document.getElementById('topbar-title');
+  if (topbarTitle) {
+    const currentPage = document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard';
+    const titleMap = {
+      dashboard: 'nav_dashboard', tools: 'nav_tools', editor: 'nav_tools',
+      chat: 'nav_chat', documents: 'nav_documents', seo: 'nav_seo',
+      bulk: 'nav_bulk', templates: 'nav_templates', settings: 'nav_settings', billing: 'nav_billing'
+    };
+    topbarTitle.textContent = t(titleMap[currentPage] || 'nav_dashboard');
+  }
+
+  // Update search placeholder
+  const searchInput = document.getElementById('search-tools-input');
+  if (searchInput) searchInput.placeholder = t('tools_search');
+
+  // Update chat placeholder
+  const chatTa = document.getElementById('chat-ta');
+  if (chatTa) chatTa.placeholder = t('chat_placeholder');
+
+  // Update page titles and subtitles dynamically
+  updatePageTexts();
+
+  // Update bulk page
+  updateBulkPageTexts();
+
+  // Update settings nav items
+  updateSettingsNav();
+
+  // Update category pills
+  updateCategoryPills();
+
+  // Update topbar buttons
+  const credChip = document.getElementById('cred-count');
+  // credits display stays as numbers, no translation needed
+}
+
+function updatePageTexts() {
+  // Dashboard
+  const bannerSub = document.querySelector('.banner-sub');
+  if (bannerSub) bannerSub.textContent = t('dash_sub', { n: '312' });
+
+  const metricLabels = document.querySelectorAll('.m-card-label');
+  const metricKeys = ['metric_words', 'metric_docs', 'metric_credits', 'metric_toptool'];
+  metricLabels.forEach((el, i) => { if (metricKeys[i]) el.textContent = t(metricKeys[i]); });
+
+  const panelHead = document.querySelector('.panel-head .panel-title');
+  if (panelHead) panelHead.textContent = t('dash_recent');
+
+  const panelAction = document.querySelector('.panel-action');
+  if (panelAction) panelAction.textContent = t('dash_viewall');
+
+  // Tools page
+  const toolsTitle = document.querySelector('#page-tools .page-title');
+  if (toolsTitle) toolsTitle.textContent = t('tools_title');
+  const toolsSub = document.querySelector('#page-tools .page-subtitle');
+  if (toolsSub) toolsSub.textContent = t('tools_sub');
+
+  // Chat page
+  const chatTitle = document.querySelector('#page-chat .section-title, #page-chat div[style*="font-size:22px"]');
+  // Done via data-i18n for main elements
+
+  // Docs page
+  const docsTitle = document.querySelector('#page-documents .docs-title');
+  if (docsTitle) docsTitle.textContent = t('docs_title');
+
+  // Settings page
+  const settingsTitle = document.querySelector('#page-settings .page-title, #page-settings .topbar-title');
+  if (settingsTitle) settingsTitle.textContent = t('settings_title');
+
+  // Billing
+  const billingTitle = document.querySelector('.billing-shell > div:first-child');
+  if (billingTitle && billingTitle.tagName !== 'DIV') billingTitle.textContent = t('billing_title');
+
+  // Editor
+  const backBtn = document.querySelector('.back-btn');
+  if (backBtn) backBtn.textContent = t('back_tools');
+
+  const generateBtn = document.querySelector('.form-footer .btn-primary');
+  if (generateBtn) generateBtn.textContent = t('btn_generate');
+
+  const outTabs = document.querySelectorAll('.out-tab');
+  if (outTabs[0]) outTabs[0].textContent = t('out_output');
+  if (outTabs[1]) outTabs[1].textContent = t('out_edit');
+
+  const copyAllBtn = document.querySelector('[onclick="copyAllOutput()"]');
+  if (copyAllBtn) copyAllBtn.textContent = t('btn_copy_all');
+
+  const saveDocBtn = document.querySelector('[onclick="saveToDocuments()"]');
+  if (saveDocBtn) saveDocBtn.textContent = t('btn_save_doc');
+
+  const oeLabel = document.querySelector('.oe-label');
+  if (oeLabel) oeLabel.textContent = t('out_empty_text');
+
+  const loaderText = document.querySelector('.loader-text');
+  if (loaderText) loaderText.textContent = t('generating');
+
+  // Update variant select if it exists
+  const variantSelect = document.getElementById('ff-variants');
+  if (variantSelect) {
+    variantSelect.options[0].text = t('var1');
+    variantSelect.options[1].text = t('var2');
+    if (variantSelect.options[2]) variantSelect.options[2].text = t('var3');
+  }
+}
+
+function updateSettingsNav() {
+  const navItems = document.querySelectorAll('.sn-item');
+  const navKeys = ['sn_general', 'sn_api', 'sn_password', 'sn_brand', 'sn_team', 'sn_wordpress', 'sn_shopify', 'sn_developer', 'sn_notif'];
+  navItems.forEach((el, i) => {
+    if (navKeys[i]) el.textContent = t(navKeys[i]);
+  });
+}
+
+function updateCategoryPills() {
+  const pills = document.querySelectorAll('.cat-pill');
+  const pillKeys = ['cat_all', 'cat_blog', 'cat_social', 'cat_email', 'cat_ads', 'cat_ecom', 'cat_sales', 'cat_rewrite', 'cat_seo'];
+  pills.forEach((el, i) => {
+    if (pillKeys[i]) el.textContent = t(pillKeys[i]);
+  });
+}
+
+function updateBulkPageTexts() {
+  const bulkToolLabel = document.querySelector('#page-bulk .f-label');
+  if (bulkToolLabel) bulkToolLabel.textContent = t('bulk_tool_label');
+
+  const bulkInputs = document.getElementById('bulk-inputs');
+  if (bulkInputs) bulkInputs.placeholder = t('bulk_inputs_ph');
+
+  const bulkBtn = document.querySelector('[onclick="startBulkGenerate()"]');
+  if (bulkBtn) bulkBtn.textContent = t('btn_bulk_generate');
+
+  const exportBtn = document.querySelector('[onclick="exportBulkCSV()"]');
+  if (exportBtn) exportBtn.textContent = t('btn_export_csv');
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'bm' ? 'en' : 'bm';
+  localStorage.setItem('msm_lang', currentLang);
+  applyTranslations();
+  // Re-render tools with updated language context (tool names stay in English for SEO)
+  renderTools(TOOLS);
+  toast(currentLang === 'bm' ? '🇲🇾 Bahasa Malaysia diaktifkan' : '🇬🇧 English activated', 'success');
+}
+
+function initLang() {
+  currentLang = localStorage.getItem('msm_lang') || 'bm';
+  applyTranslations();
+}
+
+// Override goTo to update topbar title with correct language
+const _originalGoTo = goTo;
+function goTo(page) {
+  _originalGoTo(page);
+  setTimeout(() => {
+    const titleMap = {
+      dashboard: 'nav_dashboard', tools: 'nav_tools', editor: 'nav_tools',
+      chat: 'nav_chat', documents: 'nav_documents', seo: 'nav_seo',
+      bulk: 'nav_bulk', templates: 'nav_templates', settings: 'nav_settings', billing: 'nav_billing'
+    };
+    const topbarTitle = document.getElementById('topbar-title');
+    if (topbarTitle) topbarTitle.textContent = t(titleMap[page] || 'nav_dashboard');
+    updatePageTexts();
+  }, 10);
+}
+
+// Override toast to use translated messages
+const _originalToast = toast;
+function toast(msg, type) { _originalToast(msg, type); }
+
 // ── Init ──────────────────────────────────────────────────
 renderTools(TOOLS);
+initTheme();
+initLang();
 initApp();
 </script>
 </body>
