@@ -102,7 +102,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);
       <div class="benefit-item">
         <div class="benefit-icon" style="background:rgba(255,107,53,.12)">✦</div>
         <div class="benefit-text">
-          <div class="benefit-title">Free plan — no credit card needed</div>
+          <div class="benefit-title">No credit card needed to get started</div>
           <div class="benefit-desc">Get 2,500 credits every month, free forever.</div>
         </div>
       </div>
@@ -165,24 +165,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);
         <div class="pw-hint" id="pw-hint"></div>
       </div>
 
-      <div style="margin-bottom:14px">
-        <div class="form-label" style="display:block;margin-bottom:8px">Choose Your Plan</div>
-        <div class="plan-chooser">
-          <div class="plan-opt selected" onclick="selectPlan('free',this)">
-            <div class="plan-opt-name">Free</div>
-            <div class="plan-opt-price">$0/mo</div>
-          </div>
-          <div class="plan-opt" onclick="selectPlan('pro',this)">
-            <div class="plan-opt-name">Pro</div>
-            <div class="plan-opt-price">$49/mo</div>
-          </div>
-          <div class="plan-opt" onclick="selectPlan('agency',this)">
-            <div class="plan-opt-name">Agency</div>
-            <div class="plan-opt-price">$99/mo</div>
-          </div>
-        </div>
-      </div>
-
       <div class="terms-row">
         <input type="checkbox" id="terms-check" required>
         <div class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand M-EasyMarketing AI may send product updates to my email.</div>
@@ -207,7 +189,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);
 </div>
 
 <script>
-let selectedPlan = 'free';
+let selectedPlan = 'free'; // plan selection removed
 
 function selectPlan(plan, el) {
   selectedPlan = plan;
@@ -270,7 +252,7 @@ async function handleSignup(e) {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: `${firstName} ${lastName}`, email, password, plan: selectedPlan })
+      body: JSON.stringify({ name: `${firstName} ${lastName}`, email, password })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Registration failed');

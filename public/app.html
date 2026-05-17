@@ -850,10 +850,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="2.5"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42"/></svg>
     <span data-i18n="nav_settings">Settings</span>
   </button>
-  <button class="sb-item" onclick="goTo('billing')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="4" width="14" height="11" rx="2"/><path d="M2 8h14"/></svg>
-    <span data-i18n="nav_billing">Billing</span>
-  </button>
 
   <div class="sb-bottom">
     <!-- Profile tile with dropdown -->
@@ -1321,7 +1317,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
             <div style="font-size:48px;margin-bottom:14px;opacity:.4">👥</div>
             <div style="font-size:16px;font-weight:700;color:var(--navy2);margin-bottom:8px">Upgrade to Team Plan</div>
             <div style="font-size:13px;color:var(--mist);max-width:300px;margin:0 auto 20px;line-height:1.6">Invite teammates, share brand voices, assign roles, and collaborate on content — all in one workspace.</div>
-            <button class="btn btn-primary" onclick="goTo('billing')">View Plans →</button>
+            
           </div>
         </div>
 
@@ -1420,71 +1416,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
           <div style="margin-top:20px" id="dev-usage-stats"></div>
         </div>
 
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ BILLING PAGE ══ -->
-  <div class="page" id="page-billing">
-    <div class="billing-shell">
-      <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:6px">Billing & Plans</div>
-      <div style="font-size:13px;color:var(--mist);margin-bottom:22px">Choose the plan that powers your marketing</div>
-      <div class="current-plan-banner">
-        <div class="cpb-left">
-          <div class="cpb-tag">Active Plan</div>
-          <div class="cpb-name">Pro Plan</div>
-          <div class="cpb-price">$99 / month · Renews August 1, 2025</div>
-        </div>
-        <div class="cpb-right">
-          <div class="cpb-cred-label">Credits This Month</div>
-          <div class="cpb-cred-val">4,820 / 10,000</div>
-          <div class="cpb-bar"><div class="cpb-fill" style="width:48.2%"></div></div>
-        </div>
-      </div>
-      <div class="plan-cards-grid">
-        <div class="plan-card">
-          <div class="plan-card-tag">Free</div>
-          <div class="plan-card-name">Starter</div>
-          <div class="plan-price-row"><span class="plan-price-curr">$</span><span class="plan-price-amt">0</span></div>
-          <ul class="plan-features">
-            <li>2,500 credits / month</li>
-            <li>20 core AI tools</li>
-            <li>1 user seat</li>
-            <li>Basic templates</li>
-            <li>Email support</li>
-          </ul>
-          <button class="btn btn-outline" style="width:100%;justify-content:center">Downgrade</button>
-        </div>
-        <div class="plan-card featured">
-          <div class="plan-card-tag" style="color:var(--orange)">Current Plan ✓</div>
-          <div class="plan-card-name">Pro</div>
-          <div class="plan-price-row"><span class="plan-price-curr">$</span><span class="plan-price-amt">99</span><span class="plan-price-period">/mo</span></div>
-          <ul class="plan-features">
-            <li>10,000 credits / month</li>
-            <li>All 40+ AI tools</li>
-            <li>Full SEO suite</li>
-            <li>Brand Voice training</li>
-            <li>Custom templates</li>
-            <li>API access</li>
-            <li>Priority support</li>
-          </ul>
-          <button class="btn btn-primary" style="width:100%;justify-content:center" disabled>Active Plan</button>
-        </div>
-        <div class="plan-card" style="border-top:3px solid var(--violet)">
-          <div class="plan-card-tag" style="color:var(--violet)">Most Powerful</div>
-          <div class="plan-card-name">Agency</div>
-          <div class="plan-price-row"><span class="plan-price-curr">$</span><span class="plan-price-amt">249</span><span class="plan-price-period">/mo</span></div>
-          <ul class="plan-features">
-            <li>Unlimited credits</li>
-            <li>Team collaboration (10 seats)</li>
-            <li>White-label exports</li>
-            <li>Workflow automation</li>
-            <li>Advanced analytics</li>
-            <li>Dedicated account manager</li>
-            <li>SLA support</li>
-          </ul>
-          <button class="btn btn-navy" style="width:100%;justify-content:center;background:var(--violet)" onclick="toast('Upgrade email sent! Check your inbox.','success')">Upgrade to Agency →</button>
-        </div>
       </div>
     </div>
   </div>
@@ -1725,7 +1656,7 @@ function goTo(page) {
   const pg=document.getElementById('page-'+page);
   if(pg) pg.classList.add('active');
   // Update title with translation
-  const titleMap={dashboard:'nav_dashboard',tools:'nav_tools',editor:'nav_tools',chat:'nav_chat',documents:'nav_documents',seo:'nav_seo',bulk:'nav_bulk',templates:'nav_templates',settings:'nav_settings',billing:'nav_billing'};
+  const titleMap={dashboard:'nav_dashboard',tools:'nav_tools',editor:'nav_tools',chat:'nav_chat',documents:'nav_documents',seo:'nav_seo',bulk:'nav_bulk',templates:'nav_templates',settings:'nav_settings'};
   const titleEl=document.getElementById('topbar-title');
   if(titleEl) titleEl.textContent = (typeof t==='function') ? t(titleMap[page]||'nav_dashboard') : (PAGE_TITLES[page]||page);
   // Close profile menu
@@ -2361,7 +2292,7 @@ const TRANSLATIONS = {
     nav_main: 'Main', nav_dashboard: 'Dashboard', nav_tools: 'AI Tools',
     nav_chat: 'AI Chat', nav_content: 'Content', nav_documents: 'Documents',
     nav_seo: 'SEO Suite', nav_bulk: 'Bulk Generate', nav_templates: 'Templates',
-    nav_account: 'Account', nav_settings: 'Settings', nav_billing: 'Billing',
+    nav_account: 'Account', nav_settings: 'Settings', 
     signout_label: 'Sign out',
 
     // Topbar
@@ -2583,7 +2514,7 @@ const TRANSLATIONS = {
     nav_main: 'Utama', nav_dashboard: 'Papan Pemuka', nav_tools: 'Alat AI',
     nav_chat: 'Sembang AI', nav_content: 'Kandungan', nav_documents: 'Dokumen',
     nav_seo: 'Suite SEO', nav_bulk: 'Jana Pukal', nav_templates: 'Templat',
-    nav_account: 'Akaun', nav_settings: 'Tetapan', nav_billing: 'Pengebilan',
+    nav_account: 'Akaun', nav_settings: 'Tetapan', 
     signout_label: 'Log keluar',
 
     // Topbar
@@ -2839,7 +2770,7 @@ function applyTranslations() {
     const titleMap = {
       dashboard: 'nav_dashboard', tools: 'nav_tools', editor: 'nav_tools',
       chat: 'nav_chat', documents: 'nav_documents', seo: 'nav_seo',
-      bulk: 'nav_bulk', templates: 'nav_templates', settings: 'nav_settings', billing: 'nav_billing'
+      bulk: 'nav_bulk', templates: 'nav_templates', settings: 'nav_settings'
     };
     topbarTitle.textContent = t(titleMap[currentPage] || 'nav_dashboard');
   }

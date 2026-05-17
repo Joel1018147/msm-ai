@@ -324,7 +324,6 @@ footer{
   <div class="nav-links">
     <a href="#systems">Our Systems</a>
     <a href="#why">Why Us</a>
-    <a href="https://msm-ai-production.up.railway.app/app.html#page-billing">Pricing</a>
   </div>
   <div class="nav-cta">
     <a href="https://msm-ai-production.up.railway.app/login.html" class="btn btn-ghost">Sign In</a>
@@ -846,7 +845,7 @@ window.addEventListener('DOMContentLoaded', () => {
   </div>
   <div class="cw-quick" id="cw-quick">
     <button class="cw-quick-btn" onclick="quickSend('What can M-EasyMarketing AI+ do?')">What can you do?</button>
-    <button class="cw-quick-btn" onclick="quickSend('How much does it cost?')">Pricing?</button>
+    
     <button class="cw-quick-btn" onclick="quickSend('How do I get started?')">Get started</button>
     <button class="cw-quick-btn" onclick="quickSend('What AI tools are available?')">AI Tools</button>
   </div>
@@ -942,7 +941,7 @@ async function cwSend() {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
-    const systemMsg = `You are M-EasyMarketing AI+, a friendly and knowledgeable marketing assistant for the M-EasyMarketing AI+ platform. You help visitors understand what the platform does, its 8 AI systems (M-EasyContent, M-EasySocial, M-EasyMail, M-EasyAds, M-EasySEO, M-EasyCommerce, M-EasySales, M-EasyTools), pricing plans (Free, Pro RM49/month, Agency RM199/month), and how to get started. Be concise, helpful, and encourage users to sign up. Platform URL: https://msm-ai-production.up.railway.app`;
+    const systemMsg = `You are M-EasyMarketing AI+, a friendly and knowledgeable marketing assistant for the M-EasyMarketing AI+ platform. You help visitors understand what the platform does, its 8 AI systems (M-EasyContent, M-EasySocial, M-EasyMail, M-EasyAds, M-EasySEO, M-EasyCommerce, M-EasySales, M-EasyTools), and how to get started. Pricing plans are coming soon — encourage users to sign up for free. Be concise, helpful, and encourage users to sign up. Platform URL: https://msm-ai-production.up.railway.app`;
 
     let responseText = '';
 
