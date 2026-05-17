@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M-EasyMarketing AI — Admin Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--cream:#FAF8F4;--cream2:#F2EFE8;--white:#fff;--navy:#0D1B2A;--navy2:#1A2D42;--slate:#607D94;--mist:#8EA3B5;--fog:#D4DFE8;--orange:#E8622A;--orange2:#F07340;--orange-bg:rgba(232,98,42,0.08);--teal:#1A8F7A;--teal-bg:rgba(26,143,122,0.08);--red:#C0392B;--red-bg:rgba(192,57,43,0.08);--violet:#6B4FBB;--gold:#C9941A;--r:12px;--r-sm:8px;}
@@ -12,7 +12,7 @@ html,body{height:100%;background:var(--cream);font-family:'Plus Jakarta Sans',sa
 body{display:flex;flex-direction:column}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--fog);border-radius:3px}
 .topbar{height:58px;background:var(--white);border-bottom:1px solid var(--fog);display:flex;align-items:center;padding:0 28px;gap:16px;box-shadow:0 1px 3px rgba(13,27,42,0.08);flex-shrink:0;}
-.topbar-logo{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--navy);flex:1}
+.topbar-logo{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--navy);flex:1}
 .topbar-logo em{font-style:normal;color:var(--orange)}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
 .btn-primary{background:var(--orange);color:white}.btn-primary:hover{background:var(--orange2)}
@@ -28,12 +28,12 @@ body{display:flex;flex-direction:column}
 .nav-bottom{margin-top:auto;padding:12px 0 0;border-top:1px solid rgba(255,255,255,.06)}
 .admin-main{flex:1;overflow-y:auto;padding:28px}
 .page{display:none}.page.active{display:block}
-.page-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:4px}
+.page-title{font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px;margin-bottom:4px}
 .page-sub{font-size:13px;color:var(--mist);margin-bottom:24px}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
 .stat-card{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);padding:18px 20px;box-shadow:0 1px 3px rgba(13,27,42,0.08)}
 .stat-label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mist);margin-bottom:8px}
-.stat-val{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--navy);margin-bottom:3px;letter-spacing:-.5px}
+.stat-val{font-family:'Libre Baskerville',serif;font-size:30px;font-weight:700;color:var(--navy);margin-bottom:3px;letter-spacing:-.5px}
 .stat-note{font-size:12px;color:var(--teal)}
 .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
 .chart-card{background:var(--white);border:1px solid var(--fog);border-radius:var(--r);padding:20px;box-shadow:0 1px 3px rgba(13,27,42,0.08)}
@@ -54,7 +54,7 @@ body{display:flex;flex-direction:column}
 .modal-overlay{position:fixed;inset:0;background:rgba(13,27,42,.5);z-index:100;display:none;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:var(--white);border-radius:var(--r);padding:28px;width:100%;max-width:440px;box-shadow:0 12px 40px rgba(13,27,42,.2);position:relative}
-.modal-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--navy);margin-bottom:20px}
+.modal-title{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--navy);margin-bottom:20px}
 .modal-close{position:absolute;top:16px;right:16px;border:none;background:none;cursor:pointer;font-size:18px;color:var(--mist)}
 .form-group{margin-bottom:14px}
 .form-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mist);margin-bottom:6px;display:block}
