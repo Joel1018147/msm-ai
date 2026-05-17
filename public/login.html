@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign In — M-SM AI</title>
+<title>Sign In — M-EasyMarketing AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -179,7 +179,7 @@ body{
 <div class="left-panel">
   <a href="index.html" class="left-logo">
     <div class="left-logo-badge">M</div>
-    M-SM <em>AI</em>
+    M-EasyMarketing <em>AI</em>
   </a>
   <div class="left-content">
     <div class="left-headline">
@@ -201,7 +201,7 @@ body{
       </div>
     </div>
     <div class="left-testimonial">
-      <div class="testi-quote">"Signed up on Monday, had 5 blog posts done by Wednesday. M-SM AI is the best marketing investment I've made this year."</div>
+      <div class="testi-quote">"Signed up on Monday, had 5 blog posts done by Wednesday. M-EasyMarketing AI is the best marketing investment I've made this year."</div>
       <div class="testi-person">
         <div class="testi-av">JW</div>
         <div>
@@ -211,7 +211,7 @@ body{
       </div>
     </div>
   </div>
-  <div class="left-bottom">© 2025 M-SM AI · <a href="#" style="color:inherit">Privacy</a> · <a href="#" style="color:inherit">Terms</a></div>
+  <div class="left-bottom">© 2025 M-EasyMarketing AI · <a href="#" style="color:inherit">Privacy</a> · <a href="#" style="color:inherit">Terms</a></div>
 </div>
 
 <!-- RIGHT PANEL -->
@@ -257,7 +257,7 @@ body{
       </button>
     </div>
     <div class="auth-footer">
-      New to M-SM AI? <a href="signup.html">Create a free account</a>
+      New to M-EasyMarketing AI? <a href="signup.html">Create a free account</a>
     </div>
   </div>
 </div>
@@ -292,7 +292,7 @@ async function handleLogin(e) {
 
     sucMsg.textContent = `Welcome back, ${data.user.name}! Redirecting to dashboard…`;
     sucMsg.style.display = 'block';
-    setTimeout(() => window.location.href = 'app.html', 1200);
+    setTimeout(() => window.location.href = getRedirect(), 1200);
 
   } catch (err) {
     errMsg.textContent = err.message;
@@ -308,6 +308,12 @@ function togglePw(id, btn) {
   btn.textContent = input.type === 'password' ? '👁' : '🙈';
 }
 
+
+// Handle redirect after login
+function getRedirect() {
+  return new URLSearchParams(window.location.search).get('redirect') || 'app.html';
+}
+
 function socialLogin(provider) {
   window.location.href = `/api/auth/${provider.toLowerCase()}`;
 }
@@ -321,7 +327,7 @@ function socialLogin(provider) {
   if (token) {
     localStorage.setItem('msm_token', token);
     if (name) localStorage.setItem('msm_user', JSON.stringify({ name: decodeURIComponent(name) }));
-    window.location.href = 'app.html';
+    window.location.href = getRedirect();
     return;
   }
   if (error) {

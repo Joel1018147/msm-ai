@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Account — M-SM AI</title>
+<title>Create Account — M-EasyMarketing AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -93,11 +93,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);
 <div class="left-panel">
   <a href="index.html" class="left-logo">
     <div class="left-logo-badge">M</div>
-    M-SM <em>AI</em>
+    M-EasyMarketing <em>AI</em>
   </a>
   <div class="left-content">
     <div class="left-headline">Start Creating<br><span class="hl">10× Faster</span><br>Today</div>
-    <div class="left-desc">Join 2,400+ marketers and agencies using M-SM AI to create high-converting content in seconds.</div>
+    <div class="left-desc">Join 2,400+ marketers and agencies using M-EasyMarketing AI to create high-converting content in seconds.</div>
     <div class="benefits-list">
       <div class="benefit-item">
         <div class="benefit-icon" style="background:rgba(255,107,53,.12)">✦</div>
@@ -129,7 +129,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);
       </div>
     </div>
   </div>
-  <div class="left-bottom">© 2025 M-SM AI · <a href="#" style="color:inherit">Privacy</a> · <a href="#" style="color:inherit">Terms</a></div>
+  <div class="left-bottom">© 2025 M-EasyMarketing AI · <a href="#" style="color:inherit">Privacy</a> · <a href="#" style="color:inherit">Terms</a></div>
 </div>
 
 <div class="right-panel">
@@ -185,7 +185,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);
 
       <div class="terms-row">
         <input type="checkbox" id="terms-check" required>
-        <div class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand M-SM AI may send product updates to my email.</div>
+        <div class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand M-EasyMarketing AI may send product updates to my email.</div>
       </div>
 
       <button type="submit" class="btn-submit" id="signup-btn">Create Free Account →</button>
@@ -277,7 +277,7 @@ async function handleSignup(e) {
 
     localStorage.setItem('msm_token', data.token);
     localStorage.setItem('msm_user', JSON.stringify(data.user));
-    sucMsg.textContent = `Account created! Welcome to M-SM AI, ${firstName}! Redirecting…`;
+    sucMsg.textContent = `Account created! Welcome to M-EasyMarketing AI, ${firstName}! Redirecting…`;
     sucMsg.style.display = 'block';
     setTimeout(() => window.location.href = 'app.html', 1400);
   } catch (err) {

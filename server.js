@@ -1,6 +1,6 @@
 /**
  * ╔══════════════════════════════════════════════════════════════╗
- * ║     M-SM AI — Full Production Server v4.0                   ║
+ * ║     M-EasyMarketing AI — Full Production Server v4.0                   ║
  * ║     PostgreSQL + Groq AI + Google OAuth + Stripe            ║
  * ║     WordPress/Shopify Integration + Developer API           ║
  * ║     Admin Dashboard + Team Workspaces + Analytics          ║
@@ -20,7 +20,7 @@ const { Pool }  = require('pg');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET    = process.env.JWT_SECRET || 'msm-ai-dev-secret';
+const JWT_SECRET    = process.env.JWT_SECRET || 'measymarketing-ai-dev-secret';
 const GROQ_KEY      = process.env.GROQ_API_KEY;
 const GOOGLE_ID     = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -323,7 +323,7 @@ app.post('/api/chat', requireApiKey, apiLimiter, async (req, res) => {
     const groqKey = req.user.groq_key || GROQ_KEY;
     if (!groqKey) return res.status(400).json({ error: 'Groq API key not configured' });
     if (req.user.credits < 1) return res.status(402).json({ error: 'No credits remaining' });
-    const systemPrompt = `You are M-SM AI, an expert marketing strategist and copywriter. Help with content creation, SEO, email marketing, social media, ad campaigns, and brand strategy. Be specific and actionable. User brand: ${req.user.brand_name || 'Not set'}. Tone: ${req.user.brand_tone || 'Professional'}.`;
+    const systemPrompt = `You are M-EasyMarketing AI, an expert marketing strategist and copywriter. Help with content creation, SEO, email marketing, social media, ad campaigns, and brand strategy. Be specific and actionable. User brand: ${req.user.brand_name || 'Not set'}. Tone: ${req.user.brand_tone || 'Professional'}.`;
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST', headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model, max_tokens: 1024, temperature: 0.7, messages: [{ role: 'system', content: systemPrompt }, ...messages.slice(-20)] })
@@ -347,7 +347,7 @@ async function generateWithGroq(user, prompt, toolId, toolName, tone, variants =
     ? prompt + `\n\nGenerate ${variants} distinct variants labeled: ═══ VARIANT 1 ═══, ═══ VARIANT 2 ═══, etc.`
     : prompt;
 
-  const systemPrompt = `You are M-SM AI, an elite marketing copywriter with 15+ years experience. Tone: ${tone || 'Professional'}. Brand: ${user.brand_desc || 'General marketing'}. Be persuasive, specific, and conversion-focused.`;
+  const systemPrompt = `You are M-EasyMarketing AI, an elite marketing copywriter with 15+ years experience. Tone: ${tone || 'Professional'}. Brand: ${user.brand_desc || 'General marketing'}. Be persuasive, specific, and conversion-focused.`;
 
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST', headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
@@ -764,7 +764,7 @@ app.post('/api/admin/users/:id/reset-credits', requireAuth, requireAdmin, async 
 // ════════════════════════════════════════════════════
 app.get('/api/docs', (req, res) => {
   res.json({
-    name: 'M-SM AI Developer API',
+    name: 'M-EasyMarketing AI Developer API',
     version: '4.0.0',
     baseUrl: APP_URL,
     authentication: 'Add header: X-API-Key: your_api_key',
@@ -789,7 +789,7 @@ app.get('/api/docs', (req, res) => {
 app.get('/api/health', async (req, res) => {
   const users = await db.getOne('SELECT COUNT(*) as c FROM users');
   const docs  = await db.getOne('SELECT COUNT(*) as c FROM documents');
-  res.json({ status: 'ok', app: 'M-SM AI', version: '4.0.0', database: 'PostgreSQL', users: parseInt(users.c), documents: parseInt(docs.c), groq: !!GROQ_KEY, google: !!GOOGLE_ID, timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', app: 'M-EasyMarketing AI', version: '4.0.0', database: 'PostgreSQL', users: parseInt(users.c), documents: parseInt(docs.c), groq: !!GROQ_KEY, google: !!GOOGLE_ID, timestamp: new Date().toISOString() });
 });
 
 // Page routes
@@ -801,7 +801,7 @@ app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'si
 app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════════════════╗
-║       M-SM AI — Full Platform Server v4.0       ║
+║       M-EasyMarketing AI — Full Platform Server v4.0       ║
 ╠══════════════════════════════════════════════════╣
 ║  URL:  http://localhost:${PORT}                      ║
 ╠══════════════════════════════════════════════════╣

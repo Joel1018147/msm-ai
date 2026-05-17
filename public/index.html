@@ -3,777 +3,630 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-SM AI — The AI Marketing Platform That Does It All</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<title>M-EasyMarketing AI+ — One Platform. Eight Powerful Systems.</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300;1,600;1,900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 :root{
-  --black:#080810;
-  --dark:#0E0E18;
-  --dark2:#141422;
-  --card:#1A1A2E;
-  --card2:#1F1F35;
-  --border:rgba(255,255,255,0.07);
-  --border2:rgba(255,255,255,0.12);
-  --text:#F0F0FF;
-  --text2:#A0A0C0;
-  --text3:#606080;
-  --orange:#FF6B35;
-  --orange2:#FF8C5A;
-  --orange3:rgba(255,107,53,0.12);
-  --orange4:rgba(255,107,53,0.06);
-  --teal:#00D4AA;
-  --teal-dim:rgba(0,212,170,0.1);
-  --violet:#8B5CF6;
-  --r:14px;--r-sm:10px;--r-lg:20px;--r-xl:28px;
+  --bg:#07090F;--bg2:#0D1018;--bg3:#121620;
+  --card:#141820;--card2:#1A1F2E;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#F2F4F8;--text2:#8892A4;--text3:#4A5568;
+  --orange:#E8622A;--orange2:#FF7A45;--orange3:rgba(232,98,42,0.12);
+  --r:16px;--r-sm:10px;--r-xs:7px;
+  --font:'Plus Jakarta Sans',sans-serif;
 }
-
 html{scroll-behavior:smooth}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--black);
-  color:var(--text);
-  overflow-x:hidden;
-}
-
-/* ── NOISE TEXTURE OVERLAY ── */
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;opacity:.4;
-}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:var(--font);border:none;outline:none}
 
 /* ── NAV ── */
-.nav{
+nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;padding:0 5%;height:68px;
-  background:rgba(8,8,16,0.8);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:64px;
+  background:rgba(7,9,15,0.85);
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
-  transition:all .3s;
 }
-.nav-logo{
-  display:flex;align-items:center;gap:10px;
-  font-family:'Syne',sans-serif;font-weight:800;font-size:20px;
-  color:var(--text);text-decoration:none;
-}
-.nav-logo-badge{
-  width:32px;height:32px;border-radius:9px;
-  background:linear-gradient(135deg,var(--orange),#C44414);
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
   display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:900;color:white;
-  box-shadow:0 4px 14px rgba(255,107,53,.4);
+  font-family:'Fraunces',serif;font-size:14px;font-weight:900;color:white;
 }
-.nav-logo em{font-style:normal;color:var(--orange)}
-.nav-links{display:flex;gap:4px;margin:0 auto}
-.nav-link{
-  padding:7px 16px;border-radius:var(--r-sm);
-  font-size:14px;font-weight:500;color:var(--text2);
-  text-decoration:none;transition:all .15s;
-}
-.nav-link:hover{color:var(--text);background:rgba(255,255,255,.05)}
-.nav-ctas{display:flex;gap:10px;align-items:center}
-.btn{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:9px 20px;border-radius:var(--r-sm);
-  font-size:14px;font-weight:600;cursor:pointer;
-  border:none;font-family:'DM Sans',sans-serif;transition:all .2s;
-  text-decoration:none;white-space:nowrap;
-}
+.nav-logo-text{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.nav-logo-text em{font-style:normal;color:var(--orange)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{font-size:13px;font-weight:500;color:var(--text2);transition:color .15s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--r-sm);font-size:13px;font-weight:600;transition:all .15s}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
-.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04)}
-.btn-orange{
-  background:var(--orange);color:white;
-  box-shadow:0 4px 20px rgba(255,107,53,.35);
-}
-.btn-orange:hover{background:var(--orange2);box-shadow:0 6px 28px rgba(255,107,53,.5);transform:translateY(-1px)}
-.btn-lg{padding:14px 32px;font-size:16px;border-radius:var(--r)}
-.btn-outline-orange{background:transparent;color:var(--orange);border:1px solid rgba(255,107,53,.4)}
-.btn-outline-orange:hover{background:var(--orange3);border-color:var(--orange)}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
+.btn-primary{background:var(--orange);color:white;border:1px solid var(--orange)}
+.btn-primary:hover{background:var(--orange2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,98,42,0.3)}
+.btn-lg{padding:14px 32px;font-size:15px;border-radius:var(--r)}
+.btn-outline-lg{padding:13px 31px;font-size:15px;border-radius:var(--r);background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-outline-lg:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.04)}
 
 /* ── HERO ── */
 .hero{
-  min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:100px 5% 80px;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:120px 48px 80px;text-align:center;
   position:relative;overflow:hidden;
-  text-align:center;
 }
-.hero-glow{
-  position:absolute;top:-200px;left:50%;transform:translateX(-50%);
-  width:900px;height:700px;
-  background:radial-gradient(ellipse,rgba(255,107,53,.12) 0%,transparent 65%);
-  pointer-events:none;
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 800px 600px at 50% 0%,rgba(232,98,42,0.12) 0%,transparent 65%),
+    radial-gradient(ellipse 600px 400px at 80% 80%,rgba(100,120,255,0.06) 0%,transparent 60%);
 }
-.hero-glow2{
-  position:absolute;bottom:-200px;left:20%;
-  width:600px;height:600px;
-  background:radial-gradient(ellipse,rgba(0,212,170,.06) 0%,transparent 65%);
-  pointer-events:none;
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);
+  background-size:60px 60px;
 }
-.hero-eyebrow{
+.hero-badge{
   display:inline-flex;align-items:center;gap:8px;
   padding:6px 16px;border-radius:20px;
-  background:var(--orange3);border:1px solid rgba(255,107,53,.25);
-  font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
-  color:var(--orange2);margin-bottom:24px;
-  animation:fadeUp .6s ease both;
+  background:rgba(232,98,42,0.1);border:1px solid rgba(232,98,42,0.25);
+  font-size:12px;font-weight:600;color:var(--orange2);
+  letter-spacing:.5px;margin-bottom:28px;position:relative;
 }
-.hero-eyebrow-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 2s infinite}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .hero-title{
-  font-family:'Syne',sans-serif;
-  font-size:clamp(44px,6vw,80px);
-  font-weight:800;
-  line-height:1.08;
-  letter-spacing:-2px;
-  color:var(--text);
-  margin-bottom:24px;
-  animation:fadeUp .7s .1s ease both;
-  max-width:900px;
+  font-family:'Fraunces',serif;
+  font-size:clamp(52px,7vw,88px);
+  font-weight:900;line-height:.95;
+  letter-spacing:-3px;
+  margin-bottom:12px;
+  position:relative;
 }
-.hero-title .hl{
-  background:linear-gradient(135deg,var(--orange),var(--orange2),#FFB347);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+.hero-title span{color:var(--orange)}
+.hero-title-2{
+  font-family:'Fraunces',serif;
+  font-size:clamp(52px,7vw,88px);
+  font-weight:900;line-height:.95;
+  letter-spacing:-3px;
+  color:rgba(255,255,255,0.18);
+  font-style:italic;
+  margin-bottom:36px;
+  position:relative;
 }
-.hero-sub{
-  font-size:clamp(16px,2vw,20px);color:var(--text2);
-  max-width:600px;line-height:1.7;margin-bottom:40px;
-  animation:fadeUp .7s .2s ease both;
+.hero-desc{
+  font-size:18px;font-weight:400;
+  color:var(--text2);line-height:1.7;
+  max-width:580px;margin:0 auto 48px;
+  position:relative;
 }
-.hero-ctas{
-  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
-  animation:fadeUp .7s .3s ease both;margin-bottom:60px;
+.hero-cta{display:flex;gap:12px;justify-content:center;position:relative}
+.hero-stats{
+  display:flex;align-items:center;gap:0;
+  margin-top:72px;position:relative;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
 }
-.hero-social-proof{
-  display:flex;align-items:center;gap:16px;
-  font-size:13px;color:var(--text3);
-  animation:fadeUp .7s .4s ease both;
-}
-.proof-avatars{display:flex}
-.proof-av{
-  width:30px;height:30px;border-radius:50%;border:2px solid var(--dark);
-  margin-left:-8px;background:linear-gradient(135deg,var(--violet),var(--teal));
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;color:white;
-}
-.proof-av:first-child{margin-left:0}
-.stars{color:var(--orange);font-size:14px;letter-spacing:-2px}
+.h-stat{padding:20px 36px;border-right:1px solid var(--border);text-align:center}
+.h-stat:last-child{border-right:none}
+.h-stat-num{font-family:'Fraunces',serif;font-size:30px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1}
+.h-stat-num span{color:var(--orange)}
+.h-stat-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
 
-/* Hero mockup */
-.hero-mockup{
-  width:100%;max-width:1000px;
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:var(--r-xl);overflow:hidden;
-  box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05),0 0 80px rgba(255,107,53,.08);
-  animation:fadeUp .8s .5s ease both;
-  margin-top:60px;
-}
-.mockup-bar{
-  background:var(--dark2);padding:14px 20px;
-  display:flex;align-items:center;gap:10px;
-  border-bottom:1px solid var(--border);
-}
-.mockup-dots{display:flex;gap:6px}
-.mockup-dot{width:12px;height:12px;border-radius:50%}
-.mockup-url{
-  flex:1;background:rgba(255,255,255,.05);border-radius:6px;
-  padding:6px 14px;font-size:12px;color:var(--text3);
-  text-align:center;font-family:monospace;
-}
-.mockup-inner{
-  display:grid;grid-template-columns:200px 1fr;min-height:400px;
-}
-.mockup-sidebar{
-  background:rgba(8,8,16,.6);
-  border-right:1px solid var(--border);
-  padding:16px 12px;
-}
-.ms-logo{
-  font-family:'Syne',sans-serif;font-weight:800;font-size:15px;
-  color:var(--text);padding:8px 10px;margin-bottom:12px;
-}
-.ms-logo em{font-style:normal;color:var(--orange)}
-.ms-item{
-  padding:8px 10px;border-radius:7px;
-  font-size:12px;color:var(--text3);margin-bottom:2px;
-  display:flex;align-items:center;gap:7px;
-}
-.ms-item.a{background:rgba(255,107,53,.15);color:var(--orange2)}
-.mockup-main{padding:20px;background:rgba(14,14,24,.5)}
-.mm-title{
-  font-family:'Syne',sans-serif;font-size:16px;font-weight:700;
-  color:var(--text);margin-bottom:16px;
-}
-.mm-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.mm-card{
-  background:rgba(255,255,255,.04);border:1px solid var(--border);
-  border-radius:10px;padding:14px;
-}
-.mm-card-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:2px}
-.mm-card-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.mm-card-delta{font-size:10px;color:var(--teal);margin-top:3px}
-.mm-tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.mm-tool{
-  background:rgba(255,255,255,.03);border:1px solid var(--border);
-  border-radius:8px;padding:12px 10px;text-align:center;
-  font-size:10px;color:var(--text2);cursor:pointer;transition:all .2s;
-}
-.mm-tool:hover{background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.3)}
-.mm-tool-icon{font-size:18px;margin-bottom:4px}
-
-/* ── SECTIONS ── */
-section{padding:100px 5%;position:relative}
+/* ── SYSTEMS SECTION ── */
+.systems-section{padding:100px 48px;max-width:1280px;margin:0 auto}
 .section-eyebrow{
-  font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--orange);margin-bottom:14px;
+  font-size:11px;font-weight:700;color:var(--orange);
+  letter-spacing:2.5px;text-transform:uppercase;
+  text-align:center;margin-bottom:20px;
 }
 .section-title{
-  font-family:'Syne',sans-serif;font-size:clamp(32px,4vw,52px);
-  font-weight:800;line-height:1.1;letter-spacing:-1.5px;
-  color:var(--text);margin-bottom:16px;
+  font-family:'Fraunces',serif;
+  font-size:clamp(36px,4vw,52px);
+  font-weight:900;text-align:center;
+  letter-spacing:-1.5px;line-height:1.05;
+  margin-bottom:16px;
 }
-.section-sub{font-size:16px;color:var(--text2);max-width:540px;line-height:1.7}
-
-/* ── FEATURES ── */
-.features-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
-  margin-top:56px;
+.section-sub{
+  font-size:16px;color:var(--text2);
+  text-align:center;max-width:520px;
+  margin:0 auto 64px;line-height:1.7;
 }
-.feat-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:28px;
-  transition:all .25s;position:relative;overflow:hidden;
-}
-.feat-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,107,53,.03),transparent);
-  opacity:0;transition:opacity .25s;
-}
-.feat-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.feat-card:hover::before{opacity:1}
-.feat-icon{
-  width:48px;height:48px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;margin-bottom:16px;
-}
-.feat-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px}
-.feat-desc{font-size:14px;color:var(--text2);line-height:1.65}
-
-/* ── TOOLS SHOWCASE ── */
-.tools-showcase{background:var(--dark2)}
-.tools-ticker{
-  overflow:hidden;position:relative;
-  margin-top:48px;padding:4px 0;
-}
-.tools-ticker-track{
-  display:flex;gap:10px;
-  animation:ticker 30s linear infinite;
-  width:max-content;
-}
-.tools-ticker-track2{
-  animation-direction:reverse;animation-duration:25s;
-}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.tools-ticker:hover .tools-ticker-track{animation-play-state:paused}
-.ticker-pill{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 16px;border-radius:20px;
-  background:var(--card);border:1px solid var(--border);
-  font-size:13px;font-weight:600;color:var(--text2);
-  white-space:nowrap;flex-shrink:0;
-  transition:all .2s;cursor:default;
-}
-.ticker-pill:hover{border-color:var(--orange);color:var(--text);background:var(--card2)}
-
-/* ── PRICING ── */
-.pricing-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:20px;margin-top:56px;max-width:980px;margin-left:auto;margin-right:auto;
-}
-.price-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r-xl);padding:32px;
-  position:relative;transition:all .25s;
-}
-.price-card.featured{
-  background:linear-gradient(160deg,var(--dark2),var(--card));
-  border-color:var(--orange);
-  box-shadow:0 0 0 1px var(--orange),0 20px 60px rgba(255,107,53,.2);
-}
-.price-card.featured::before{
-  content:'MOST POPULAR';
-  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
-  background:var(--orange);color:white;
-  font-size:10px;font-weight:800;letter-spacing:1px;
-  padding:4px 14px;border-radius:20px;
-}
-.price-plan{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.price-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
-.price-desc{font-size:13px;color:var(--text3);margin-bottom:20px;line-height:1.5}
-.price-amount{
-  display:flex;align-items:baseline;gap:3px;
-  margin-bottom:24px;padding-bottom:24px;
-  border-bottom:1px solid var(--border);
-}
-.price-curr{font-size:22px;font-weight:700;color:var(--text2)}
-.price-num{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;color:var(--text);line-height:1}
-.price-period{font-size:14px;color:var(--text3)}
-.price-features{list-style:none;margin-bottom:28px}
-.price-features li{
-  font-size:14px;color:var(--text2);padding:7px 0;
-  display:flex;align-items:center;gap:9px;
-  border-bottom:1px solid rgba(255,255,255,.03);
-}
-.price-features li::before{content:'✓';color:var(--teal);font-weight:800;flex-shrink:0}
-.price-features li.dim::before{content:'–';color:var(--text3)}
-.price-features li.dim{color:var(--text3)}
-
-/* ── TESTIMONIALS ── */
-.testi-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:16px;margin-top:56px;
-}
-.testi-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:24px;
-  transition:border-color .2s;
-}
-.testi-card:hover{border-color:var(--border2)}
-.testi-stars{font-size:16px;margin-bottom:12px;letter-spacing:-1px}
-.testi-text{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;font-style:italic}
-.testi-author{display:flex;align-items:center;gap:10px}
-.testi-av{
-  width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:white;flex-shrink:0;
-}
-.testi-name{font-size:13px;font-weight:700;color:var(--text)}
-.testi-role{font-size:11px;color:var(--text3)}
-
-/* ── FAQ ── */
-.faq-list{max-width:720px;margin:48px auto 0}
-.faq-item{
-  border-bottom:1px solid var(--border);
-  padding:20px 0;cursor:pointer;
-}
-.faq-q{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:16px;font-weight:600;color:var(--text);
+.systems-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
   gap:16px;
 }
-.faq-chevron{
-  width:24px;height:24px;border-radius:50%;
-  background:rgba(255,255,255,.05);
+/* System card */
+.sys-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+  cursor:pointer;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  text-decoration:none;color:inherit;
+  position:relative;
+}
+.sys-card::before{
+  content:'';
+  position:absolute;inset:0;
+  opacity:0;
+  transition:opacity .25s;
+  border-radius:inherit;
+}
+.sys-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--card-accent);
+  box-shadow:0 20px 48px rgba(0,0,0,0.4), 0 0 0 1px var(--card-accent);
+}
+.sys-card:hover::before{opacity:1}
+.sys-card:hover .sys-arrow{transform:translate(3px,-3px)}
+
+.sys-card-top{
+  padding:24px 24px 20px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg, var(--card-bg-from,rgba(255,255,255,0.02)), transparent);
+}
+.sys-icon-wrap{
+  width:48px;height:48px;border-radius:var(--r-sm);
   display:flex;align-items:center;justify-content:center;
-  font-size:12px;flex-shrink:0;transition:transform .3s;color:var(--text2);
+  font-size:22px;margin-bottom:16px;
+  background:var(--card-icon-bg);
+  border:1px solid var(--card-icon-border);
 }
-.faq-item.open .faq-chevron{transform:rotate(180deg);background:var(--orange3);color:var(--orange)}
-.faq-a{
-  font-size:14px;color:var(--text2);line-height:1.7;
-  max-height:0;overflow:hidden;transition:max-height .35s ease,padding-top .3s;
+.sys-module-tag{
+  font-size:9px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--card-accent);opacity:.7;
+  margin-bottom:6px;
 }
-.faq-item.open .faq-a{max-height:300px;padding-top:12px}
+.sys-name{font-size:15px;font-weight:700;line-height:1.3;letter-spacing:-.2px}
+.sys-name em{font-style:normal;color:var(--card-accent)}
+.sys-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-top:8px}
+
+.sys-card-features{padding:16px 24px 20px;flex:1;display:flex;flex-direction:column;gap:0}
+.sys-feat{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+  font-size:12px;line-height:1.5;
+}
+.sys-feat:last-child{border-bottom:none}
+.sys-feat-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--card-accent);flex-shrink:0;margin-top:5px;opacity:.7;
+}
+.sys-feat-name{font-weight:600;color:var(--text);margin-right:3px}
+.sys-feat-desc{color:var(--text2)}
+
+.sys-card-footer{
+  padding:14px 24px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,0.01);
+}
+.sys-cta-text{font-size:12px;font-weight:600;color:var(--card-accent)}
+.sys-arrow{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--card-accent);opacity:.15;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--card-accent);
+  transition:transform .2s;
+}
+.sys-card:hover .sys-arrow{opacity:.3}
+
+/* ── SYSTEM COLOR THEMES ── */
+.sys-content  {--card-accent:#E8622A;--card-icon-bg:rgba(232,98,42,0.1);--card-icon-border:rgba(232,98,42,0.2);--card-bg-from:rgba(232,98,42,0.04)}
+.sys-social   {--card-accent:#A855F7;--card-icon-bg:rgba(168,85,247,0.1);--card-icon-border:rgba(168,85,247,0.2);--card-bg-from:rgba(168,85,247,0.04)}
+.sys-mail     {--card-accent:#06B6D4;--card-icon-bg:rgba(6,182,212,0.1);--card-icon-border:rgba(6,182,212,0.2);--card-bg-from:rgba(6,182,212,0.04)}
+.sys-ads      {--card-accent:#F59E0B;--card-icon-bg:rgba(245,158,11,0.1);--card-icon-border:rgba(245,158,11,0.2);--card-bg-from:rgba(245,158,11,0.04)}
+.sys-seo      {--card-accent:#10B981;--card-icon-bg:rgba(16,185,129,0.1);--card-icon-border:rgba(16,185,129,0.2);--card-bg-from:rgba(16,185,129,0.04)}
+.sys-commerce {--card-accent:#F43F5E;--card-icon-bg:rgba(244,63,94,0.1);--card-icon-border:rgba(244,63,94,0.2);--card-bg-from:rgba(244,63,94,0.04)}
+.sys-sales    {--card-accent:#3B82F6;--card-icon-bg:rgba(59,130,246,0.1);--card-icon-border:rgba(59,130,246,0.2);--card-bg-from:rgba(59,130,246,0.04)}
+.sys-tools    {--card-accent:#8B5CF6;--card-icon-bg:rgba(139,92,246,0.1);--card-icon-border:rgba(139,92,246,0.2);--card-bg-from:rgba(139,92,246,0.04)}
+
+/* ── WHY SECTION ── */
+.why-section{
+  padding:100px 48px;
+  background:linear-gradient(180deg,transparent,rgba(232,98,42,0.04) 50%,transparent);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.why-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.why-text{}
+.why-tag{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.why-title{font-family:'Fraunces',serif;font-size:clamp(32px,3.5vw,46px);font-weight:900;letter-spacing:-1.5px;line-height:1.05;margin-bottom:20px}
+.why-desc{font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:32px}
+.why-points{display:flex;flex-direction:column;gap:16px}
+.why-point{display:flex;align-items:flex-start;gap:14px}
+.why-point-icon{
+  width:36px;height:36px;border-radius:var(--r-xs);
+  background:rgba(232,98,42,0.1);border:1px solid rgba(232,98,42,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;margin-top:2px;
+}
+.why-point-text{font-size:14px;line-height:1.6}
+.why-point-title{font-weight:700;color:var(--text);margin-bottom:2px}
+.why-point-desc{color:var(--text2)}
+.why-visual{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:28px;display:flex;flex-direction:column;gap:14px;
+}
+.wv-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;background:rgba(255,255,255,0.02);
+  border:1px solid var(--border);border-radius:var(--r-sm);
+}
+.wv-icon{font-size:18px;flex-shrink:0}
+.wv-name{font-size:13px;font-weight:600;flex:1}
+.wv-bar-track{flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
+.wv-bar-fill{height:100%;border-radius:3px}
+.wv-pct{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;width:36px;text-align:right}
 
 /* ── CTA SECTION ── */
 .cta-section{
-  text-align:center;
-  background:radial-gradient(ellipse at center,rgba(255,107,53,.08) 0%,transparent 70%);
+  padding:120px 48px;text-align:center;
+  position:relative;overflow:hidden;
 }
-.cta-section .section-title{margin:0 auto 16px}
-.cta-section .section-sub{margin:0 auto 36px}
+.cta-section::before{
+  content:'';position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:600px;height:400px;
+  background:radial-gradient(ellipse,rgba(232,98,42,0.12) 0%,transparent 70%);
+}
+.cta-title{font-family:'Fraunces',serif;font-size:clamp(40px,5vw,64px);font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:20px;position:relative}
+.cta-desc{font-size:16px;color:var(--text2);max-width:480px;margin:0 auto 40px;line-height:1.7;position:relative}
+.cta-btns{display:flex;gap:12px;justify-content:center;position:relative}
 
 /* ── FOOTER ── */
 footer{
-  border-top:1px solid var(--border);
-  padding:48px 5% 32px;
-  display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:40px;
-}
-.footer-brand .nav-logo{font-size:18px;display:inline-flex;margin-bottom:12px}
-.footer-desc{font-size:13px;color:var(--text3);line-height:1.7;max-width:240px;margin-bottom:16px}
-.footer-heading{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
-.footer-links{list-style:none}
-.footer-links li{margin-bottom:8px}
-.footer-links a{font-size:13px;color:var(--text3);text-decoration:none;transition:color .15s}
-.footer-links a:hover{color:var(--text)}
-.footer-bottom{
-  border-top:1px solid var(--border);
-  padding:20px 5% 0;
+  padding:32px 48px;border-top:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  margin-top:0;
 }
-.footer-copy{font-size:12px;color:var(--text3)}
-
-/* ── DIVIDER ── */
-.divider{
-  max-width:200px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--border2),transparent);
-  margin:0 auto;
-}
+.footer-copy{font-size:13px;color:var(--text3)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:13px;color:var(--text3);transition:color .15s}
+.footer-links a:hover{color:var(--text2)}
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .features-grid{grid-template-columns:1fr 1fr}
-  .pricing-grid{grid-template-columns:1fr;max-width:400px}
-  .testi-grid{grid-template-columns:1fr 1fr}
-  footer{grid-template-columns:1fr 1fr}
-  .mockup-inner{grid-template-columns:1fr}
-  .mockup-sidebar{display:none}
-  .nav-links{display:none}
+@media(max-width:1024px){
+  .systems-grid{grid-template-columns:repeat(2,1fr)}
+  .why-inner{grid-template-columns:1fr;gap:48px}
+  .why-visual{display:none}
 }
-@media(max-width:600px){
-  .features-grid{grid-template-columns:1fr}
-  .testi-grid{grid-template-columns:1fr}
-  footer{grid-template-columns:1fr}
+@media(max-width:640px){
+  nav{padding:0 20px}
+  .hero{padding:100px 20px 60px}
+  .hero-stats{flex-direction:column}
+  .h-stat{border-right:none;border-bottom:1px solid var(--border)}
+  .systems-section{padding:60px 20px}
+  .systems-grid{grid-template-columns:1fr}
+  .why-section{padding:60px 20px}
+  .cta-section{padding:80px 20px}
+  footer{flex-direction:column;gap:16px;text-align:center}
 }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav class="nav">
-  <a href="index.html" class="nav-logo">
-    <div class="nav-logo-badge">M</div>
-    M-SM <em>AI</em>
-  </a>
-  <div class="nav-links">
-    <a href="#features" class="nav-link">Features</a>
-    <a href="#tools" class="nav-link">Tools</a>
-    <a href="#pricing" class="nav-link">Pricing</a>
-    <a href="#faq" class="nav-link">FAQ</a>
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">M</div>
+    <div class="nav-logo-text">M-EasyMarketing <em>AI+</em></div>
   </div>
-  <div class="nav-ctas">
-    <a href="login.html" class="btn btn-ghost">Sign In</a>
-    <a href="signup.html" class="btn btn-orange">Start Free →</a>
+  <div class="nav-links">
+    <a href="#systems">Our Systems</a>
+    <a href="#why">Why Us</a>
+    <a href="https://msm-ai-production.up.railway.app/app.html#page-billing">Pricing</a>
+  </div>
+  <div class="nav-cta">
+    <a href="https://msm-ai-production.up.railway.app/login.html" class="btn btn-ghost">Sign In</a>
+    <a href="https://msm-ai-production.up.railway.app/signup.html" class="btn btn-primary">Start Free →</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-glow2"></div>
-  <div class="hero-eyebrow">
-    <div class="hero-eyebrow-dot"></div>
-    AI-Powered Marketing Platform
+  <div class="hero-grid"></div>
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    M-EasyMarketing AI+ — Powered by Modus AI Associates
   </div>
-  <h1 class="hero-title">
-    Write Marketing Content<br>
-    <span class="hl">10× Faster With AI</span>
-  </h1>
-  <p class="hero-sub">
-    M-SM AI generates blog posts, social media content, email campaigns, ad copy, SEO content, and more — all powered by advanced AI. Built for agencies and marketers who need results fast.
-  </p>
-  <div class="hero-ctas">
-    <a href="signup.html" class="btn btn-orange btn-lg">Get Started Free →</a>
-    <a href="#features" class="btn btn-ghost btn-lg">See How It Works</a>
+  <h1 class="hero-title">One Platform.<br><span>Eight Powerful</span></h1>
+  <div class="hero-title-2">AI+ Systems.</div>
+  <p class="hero-desc">M-EasyMarketing AI+ brings together Content, Social, Email, Ads, SEO, Commerce, Sales and Productivity tools — all in one AI-native platform built to grow your business faster.</p>
+  <div class="hero-cta">
+    <a href="#systems" class="btn btn-primary btn-lg">Explore Our Systems ↓</a>
+    <a href="https://msm-ai-production.up.railway.app/signup.html" class="btn-outline-lg btn">Start for Free →</a>
   </div>
-  <div class="hero-social-proof">
-    <div class="proof-avatars">
-      <div class="proof-av">A</div>
-      <div class="proof-av" style="background:linear-gradient(135deg,#FF6B35,#C44414)">B</div>
-      <div class="proof-av" style="background:linear-gradient(135deg,#00D4AA,#0094AA)">C</div>
-      <div class="proof-av" style="background:linear-gradient(135deg,#F59E0B,#D97706)">D</div>
-    </div>
-    <div>
-      <div class="stars">★★★★★</div>
-      <span>Trusted by 2,400+ marketers</span>
-    </div>
+  <div class="hero-stats">
+    <div class="h-stat"><div class="h-stat-num">8<span>+</span></div><div class="h-stat-label">AI Systems</div></div>
+    <div class="h-stat"><div class="h-stat-num">40<span>+</span></div><div class="h-stat-label">AI Tools</div></div>
+    <div class="h-stat"><div class="h-stat-num">100<span>%</span></div><div class="h-stat-label">Free AI (Groq)</div></div>
+    <div class="h-stat"><div class="h-stat-num">1<span>-</span>Click</div><div class="h-stat-label">Content Ready</div></div>
   </div>
+</section>
 
-  <div class="hero-mockup">
-    <div class="mockup-bar">
-      <div class="mockup-dots">
-        <div class="mockup-dot" style="background:#FF5F57"></div>
-        <div class="mockup-dot" style="background:#FFBD2E"></div>
-        <div class="mockup-dot" style="background:#28C840"></div>
+<!-- SYSTEMS SECTION -->
+<section class="systems-section" id="systems">
+  <div class="section-eyebrow">Our 8 AI-Powered Systems</div>
+  <h2 class="section-title">Everything your marketing needs,<br>in one platform</h2>
+  <p class="section-sub">Click on any system below to get started — sign up or log in and you'll be taken directly to that system.</p>
+
+  <div class="systems-grid">
+
+    <!-- 1. M-EasyContent AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=tools&cat=blog" class="sys-card sys-content">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">✍️</div>
+        <div class="sys-module-tag">Content Creation Module</div>
+        <div class="sys-name">M-EasyContent <em>AI+</em> Tools</div>
+        <div class="sys-desc">Generate blog posts, landing pages, articles and long-form content in seconds with AI.</div>
       </div>
-      <div class="mockup-url">app.msm-ai.com/dashboard</div>
-    </div>
-    <div class="mockup-inner">
-      <div class="mockup-sidebar">
-        <div class="ms-logo">M-SM <em>AI</em></div>
-        <div class="ms-item a">◈ Dashboard</div>
-        <div class="ms-item">✦ AI Tools</div>
-        <div class="ms-item">◎ AI Chat</div>
-        <div class="ms-item">◻ Documents</div>
-        <div class="ms-item">⊙ SEO Suite</div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Blog Writer</span><span class="sys-feat-desc">— SEO-optimized articles with H2/H3 structure</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Landing Page Copy</span><span class="sys-feat-desc">— Conversion-focused page copy with CTAs</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Article Outline</span><span class="sys-feat-desc">— Detailed outlines with H2/H3 structure</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Content Rewriter</span><span class="sys-feat-desc">— Rewrite and improve existing content</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">AI Humanizer</span><span class="sys-feat-desc">— Remove AI detection patterns</span></div></div>
       </div>
-      <div class="mockup-main">
-        <div class="mm-title">Dashboard Overview</div>
-        <div class="mm-cards">
-          <div class="mm-card"><div class="mm-card-val">148K</div><div class="mm-card-label">Words Generated</div><div class="mm-card-delta">↑ 23%</div></div>
-          <div class="mm-card"><div class="mm-card-val">312</div><div class="mm-card-label">Documents</div><div class="mm-card-delta">↑ 18 this week</div></div>
-          <div class="mm-card"><div class="mm-card-val">4.8K</div><div class="mm-card-label">Credits Left</div><div class="mm-card-delta">Resets in 14d</div></div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+    <!-- 2. M-EasySocial AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=tools&cat=social" class="sys-card sys-social">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">📱</div>
+        <div class="sys-module-tag">Social Media Module</div>
+        <div class="sys-name">M-EasySocial <em>AI+</em> Tools</div>
+        <div class="sys-desc">Create scroll-stopping social media content for Instagram, LinkedIn, TikTok and more.</div>
+      </div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Social Media Posts</span><span class="sys-feat-desc">— Posts for all major platforms with hashtags</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Instagram Bio</span><span class="sys-feat-desc">— Punchy bios with clear value propositions</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">LinkedIn Post</span><span class="sys-feat-desc">— Thought leadership and company updates</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">YouTube Script</span><span class="sys-feat-desc">— Full video scripts with hook and CTA</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Content Summarizer</span><span class="sys-feat-desc">— Condense long content into social snippets</span></div></div>
+      </div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+    <!-- 3. M-EasyMail AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=tools&cat=email" class="sys-card sys-mail">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">📧</div>
+        <div class="sys-module-tag">Email Marketing Module</div>
+        <div class="sys-name">M-EasyMail <em>AI+</em> Tools</div>
+        <div class="sys-desc">Write high-converting email campaigns, sequences and subject lines that get opened and clicked.</div>
+      </div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Email Campaign</span><span class="sys-feat-desc">— Subject lines, body copy and CTAs</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Email Sequence</span><span class="sys-feat-desc">— 3-7 email drip sequences for nurturing</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Subject Line Generator</span><span class="sys-feat-desc">— A/B-testable subject lines</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Welcome Email</span><span class="sys-feat-desc">— Onboarding and first-impression emails</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Re-engagement Email</span><span class="sys-feat-desc">— Win back inactive subscribers</span></div></div>
+      </div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+    <!-- 4. M-EasyAds AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=tools&cat=ads" class="sys-card sys-ads">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">🎯</div>
+        <div class="sys-module-tag">Advertising Module</div>
+        <div class="sys-name">M-EasyAds <em>AI+</em> Tools</div>
+        <div class="sys-desc">Write high-converting ads for Facebook, Instagram, Google and LinkedIn that drive real results.</div>
+      </div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Facebook & Instagram Ads</span><span class="sys-feat-desc">— 3 ad variants with headlines and copy</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Google Search Ads</span><span class="sys-feat-desc">— Headlines (30 chars) and descriptions (90 chars)</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">LinkedIn Ads</span><span class="sys-feat-desc">— B2B-focused ad copy that converts</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Push Notifications</span><span class="sys-feat-desc">— Short urgent copy that drives clicks</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">TikTok Ads</span><span class="sys-feat-desc">— Video ad scripts optimized for TikTok</span></div></div>
+      </div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+    <!-- 5. M-EasySEO AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=seo" class="sys-card sys-seo">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">🔍</div>
+        <div class="sys-module-tag">SEO Suite Module</div>
+        <div class="sys-name">M-EasySEO <em>AI+</em> Tools</div>
+        <div class="sys-desc">Rank higher on Google with AI-powered SEO tools for keywords, meta tags and content optimization.</div>
+      </div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">SEO Meta Generator</span><span class="sys-feat-desc">— Title tags and meta descriptions for Google</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Keyword Cluster Builder</span><span class="sys-feat-desc">— Long-tail keywords with intent mapping</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">FAQ Generator</span><span class="sys-feat-desc">— SEO-rich FAQ sections for any topic</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Content Scorer</span><span class="sys-feat-desc">— SEO score, readability and keyword density</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">SEO Article Writer</span><span class="sys-feat-desc">— Long-form articles structured for ranking</span></div></div>
+      </div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+    <!-- 6. M-EasyCommerce AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=tools&cat=ecom" class="sys-card sys-commerce">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">🛍️</div>
+        <div class="sys-module-tag">eCommerce Module</div>
+        <div class="sys-name">M-EasyCommerce <em>AI+</em> Tools</div>
+        <div class="sys-desc">Write product descriptions, listings and review replies that turn browsers into buyers on Shopify and Amazon.</div>
+      </div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Product Description</span><span class="sys-feat-desc">— Persuasive copy for Shopify and Amazon</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Product Title Generator</span><span class="sys-feat-desc">— SEO-friendly titles for listings</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Review Responder</span><span class="sys-feat-desc">— Professional replies to customer reviews</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Shopify Integration</span><span class="sys-feat-desc">— Push content directly to your store</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">WordPress Integration</span><span class="sys-feat-desc">— Publish blog content directly to WordPress</span></div></div>
+      </div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+    <!-- 7. M-EasySales AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=tools&cat=sales" class="sys-card sys-sales">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">💼</div>
+        <div class="sys-module-tag">Sales Module</div>
+        <div class="sys-name">M-EasySales <em>AI+</em> Tools</div>
+        <div class="sys-desc">Close more deals with AI-written sales emails, cold outreach, pitch scripts and follow-up sequences.</div>
+      </div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Sales Outreach Email</span><span class="sys-feat-desc">— 3-touch cold email sequences</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Cold DM Templates</span><span class="sys-feat-desc">— LinkedIn and Instagram outreach scripts</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Sales Pitch Script</span><span class="sys-feat-desc">— Elevator pitches and call scripts</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Follow-up Email</span><span class="sys-feat-desc">— Breakup emails and re-engagement</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Bulk Generate</span><span class="sys-feat-desc">— Generate 20 sales emails at once</span></div></div>
+      </div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+    <!-- 8. M-EasyTools AI+ -->
+    <a href="https://msm-ai-production.up.railway.app/app.html?goto=chat" class="sys-card sys-tools">
+      <div class="sys-card-top">
+        <div class="sys-icon-wrap">⚡</div>
+        <div class="sys-module-tag">Productivity System</div>
+        <div class="sys-name">M-EasyTools <em>AI+</em> System</div>
+        <div class="sys-desc">Your complete AI productivity hub — chat assistant, bulk generation, document management and developer API.</div>
+      </div>
+      <div class="sys-card-features">
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">AI Chat Assistant</span><span class="sys-feat-desc">— Expert marketing AI available 24/7</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Bulk Generate</span><span class="sys-feat-desc">— Create up to 20 pieces of content at once</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Document Manager</span><span class="sys-feat-desc">— Save, organize and manage all generated content</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Developer API</span><span class="sys-feat-desc">— Use AI tools inside your own apps</span></div></div>
+        <div class="sys-feat"><div class="sys-feat-dot"></div><div><span class="sys-feat-name">Team Workspace</span><span class="sys-feat-desc">— Collaborate with your team in one place</span></div></div>
+      </div>
+      <div class="sys-card-footer">
+        <span class="sys-cta-text">Get Started →</span>
+        <div class="sys-arrow">↗</div>
+      </div>
+    </a>
+
+  </div>
+  <p style="text-align:center;font-size:13px;color:var(--text3);margin-top:32px">All 8 systems are included in one platform. Sign up once, access everything.</p>
+</section>
+
+<!-- WHY SECTION -->
+<section class="why-section" id="why">
+  <div class="why-inner">
+    <div class="why-text">
+      <div class="why-tag">Why M-EasyMarketing AI+</div>
+      <h2 class="why-title">Built for results,<br>not complexity</h2>
+      <p class="why-desc">Unlike generic AI tools, M-EasyMarketing AI+ is purpose-built for marketing — every tool is trained to produce conversion-focused content that actually works.</p>
+      <div class="why-points">
+        <div class="why-point">
+          <div class="why-point-icon">🆓</div>
+          <div class="why-point-text">
+            <div class="why-point-title">100% Free AI — Powered by Groq</div>
+            <div class="why-point-desc">No OpenAI costs. Our platform uses Groq's LLaMA model — enterprise-grade AI at zero API cost.</div>
+          </div>
         </div>
-        <div class="mm-tools">
-          <div class="mm-tool"><div class="mm-tool-icon">✍️</div>Blog Writer</div>
-          <div class="mm-tool"><div class="mm-tool-icon">📧</div>Email Copy</div>
-          <div class="mm-tool"><div class="mm-tool-icon">📱</div>Social Posts</div>
-          <div class="mm-tool"><div class="mm-tool-icon">🎯</div>Ad Copy</div>
+        <div class="why-point">
+          <div class="why-point-icon">⚡</div>
+          <div class="why-point-text">
+            <div class="why-point-title">Generate in 10 Seconds</div>
+            <div class="why-point-desc">What takes a copywriter hours takes M-EasyMarketing AI+ seconds. 40+ specialized tools, one platform.</div>
+          </div>
+        </div>
+        <div class="why-point">
+          <div class="why-point-icon">🇲🇾</div>
+          <div class="why-point-text">
+            <div class="why-point-title">Built for Malaysia</div>
+            <div class="why-point-desc">Full Bahasa Malaysia interface. Priced for Malaysian SMEs. Powered by Modus AI Associates.</div>
+          </div>
+        </div>
+        <div class="why-point">
+          <div class="why-point-icon">🔌</div>
+          <div class="why-point-text">
+            <div class="why-point-title">Publish Directly to WordPress & Shopify</div>
+            <div class="why-point-desc">Generate content and publish it to your website or store in one click. No copy-pasting needed.</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section id="features">
-  <div style="text-align:center;max-width:640px;margin:0 auto">
-    <div class="section-eyebrow">Why M-SM AI</div>
-    <div class="section-title">Everything You Need to<br>Dominate Marketing</div>
-    <div class="section-sub" style="margin:0 auto">One platform for all your AI-powered content. No switching tools, no wasted time.</div>
-  </div>
-  <div class="features-grid">
-    <div class="feat-card">
-      <div class="feat-icon" style="background:rgba(255,107,53,.12)">✦</div>
-      <div class="feat-name">25+ AI Writing Tools</div>
-      <div class="feat-desc">Blog posts, emails, social media, ad copy, product descriptions, SEO content, sales emails — all generated in seconds with AI fine-tuned for marketing.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon" style="background:rgba(0,212,170,.1)">◎</div>
-      <div class="feat-name">AI Chat Assistant</div>
-      <div class="feat-desc">Powered by Groq's ultra-fast LLaMA model. Ask anything, brainstorm campaigns, refine copy, get marketing advice — 24/7 AI marketing expert in your pocket.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon" style="background:rgba(139,92,246,.1)">⊙</div>
-      <div class="feat-name">Full SEO Suite</div>
-      <div class="feat-desc">Meta tag generator, keyword cluster builder, SEO article writer, and content optimizer. Rank on Google and get cited by AI platforms.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon" style="background:rgba(255,185,55,.1)">◈</div>
-      <div class="feat-name">Brand Voice Training</div>
-      <div class="feat-desc">Train the AI on your brand's unique voice. Every piece of content sounds like you — consistent, on-brand, and authentic across all channels.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon" style="background:rgba(239,68,68,.1)">◻</div>
-      <div class="feat-name">Document Management</div>
-      <div class="feat-desc">Save, organize, and manage all your generated content. Search, filter, edit, and export documents. Your content library, always organized.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-icon" style="background:rgba(16,185,129,.1)">◬</div>
-      <div class="feat-name">Team Collaboration</div>
-      <div class="feat-desc">Invite team members, share brand voices, assign roles, and collaborate in real-time. Built for agencies managing multiple clients at once.</div>
+    <div class="why-visual">
+      <div style="font-size:12px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">System Coverage</div>
+      <div class="wv-row"><div class="wv-icon">✍️</div><div class="wv-name">Content AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:92%;background:#E8622A"></div></div><div class="wv-pct" style="color:#E8622A">92%</div></div>
+      <div class="wv-row"><div class="wv-icon">📱</div><div class="wv-name">Social AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:88%;background:#A855F7"></div></div><div class="wv-pct" style="color:#A855F7">88%</div></div>
+      <div class="wv-row"><div class="wv-icon">📧</div><div class="wv-name">Mail AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:95%;background:#06B6D4"></div></div><div class="wv-pct" style="color:#06B6D4">95%</div></div>
+      <div class="wv-row"><div class="wv-icon">🎯</div><div class="wv-name">Ads AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:85%;background:#F59E0B"></div></div><div class="wv-pct" style="color:#F59E0B">85%</div></div>
+      <div class="wv-row"><div class="wv-icon">🔍</div><div class="wv-name">SEO AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:78%;background:#10B981"></div></div><div class="wv-pct" style="color:#10B981">78%</div></div>
+      <div class="wv-row"><div class="wv-icon">🛍️</div><div class="wv-name">Commerce AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:90%;background:#F43F5E"></div></div><div class="wv-pct" style="color:#F43F5E">90%</div></div>
+      <div class="wv-row"><div class="wv-icon">💼</div><div class="wv-name">Sales AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:83%;background:#3B82F6"></div></div><div class="wv-pct" style="color:#3B82F6">83%</div></div>
+      <div class="wv-row"><div class="wv-icon">⚡</div><div class="wv-name">Tools AI+</div><div class="wv-bar-track"><div class="wv-bar-fill" style="width:97%;background:#8B5CF6"></div></div><div class="wv-pct" style="color:#8B5CF6">97%</div></div>
     </div>
   </div>
 </section>
 
-<!-- TOOLS TICKER -->
-<section id="tools" class="tools-showcase">
-  <div style="text-align:center;max-width:640px;margin:0 auto">
-    <div class="section-eyebrow">40+ AI Tools</div>
-    <div class="section-title">A Tool for Every<br>Marketing Need</div>
-  </div>
-  <div class="tools-ticker" style="margin-top:48px">
-    <div class="tools-ticker-track">
-      ${['✍️ Blog Writer','📧 Email Campaign','📱 Social Media Posts','🎯 Ad Copy','🛍️ Product Description','💼 Sales Outreach','🔍 SEO Meta Tags','💡 Keyword Clusters','🚀 Landing Page Copy','🎬 YouTube Script','👔 LinkedIn Post','🔄 Content Rewriter','🤖 AI Humanizer','⭐ Review Responder','📋 Article Outline','📬 Email Sequence','📮 Subject Lines','🔎 Google Ads','🔔 Push Notifications','❓ FAQ Generator'].map(t=>`<div class="ticker-pill">${t}</div>`).join('')}
-      ${['✍️ Blog Writer','📧 Email Campaign','📱 Social Media Posts','🎯 Ad Copy','🛍️ Product Description','💼 Sales Outreach','🔍 SEO Meta Tags','💡 Keyword Clusters','🚀 Landing Page Copy','🎬 YouTube Script','👔 LinkedIn Post','🔄 Content Rewriter','🤖 AI Humanizer','⭐ Review Responder','📋 Article Outline','📬 Email Sequence','📮 Subject Lines','🔎 Google Ads','🔔 Push Notifications','❓ FAQ Generator'].map(t=>`<div class="ticker-pill">${t}</div>`).join('')}
-    </div>
-  </div>
-  <div class="tools-ticker" style="margin-top:10px">
-    <div class="tools-ticker-track tools-ticker-track2">
-      ${['🎤 Sales Pitch Script','📤 Cold DM Templates','📉 Content Summarizer','🏷️ Product Title','📣 Marketing Copy','📊 Analytics Reports','🌐 Website Copy','📰 Press Release','💬 Chat Scripts','🎪 Event Promotion','🔥 Hook Generator','📸 Image Captions','📆 Content Calendar','🎁 Offer Copy','💌 Newsletter Content','🌟 Brand Story','🔗 Link-in-Bio Copy','📽️ Video Description','🎵 Podcast Intro','🏪 Store Description'].map(t=>`<div class="ticker-pill">${t}</div>`).join('')}
-      ${['🎤 Sales Pitch Script','📤 Cold DM Templates','📉 Content Summarizer','🏷️ Product Title','📣 Marketing Copy','📊 Analytics Reports','🌐 Website Copy','📰 Press Release','💬 Chat Scripts','🎪 Event Promotion','🔥 Hook Generator','📸 Image Captions','📆 Content Calendar','🎁 Offer Copy','💌 Newsletter Content','🌟 Brand Story','🔗 Link-in-Bio Copy','📽️ Video Description','🎵 Podcast Intro','🏪 Store Description'].map(t=>`<div class="ticker-pill">${t}</div>`).join('')}
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section id="pricing" style="text-align:center">
-  <div class="section-eyebrow">Simple Pricing</div>
-  <div class="section-title">Start Free, Scale Fast</div>
-  <div class="section-sub" style="margin:0 auto 0">No hidden fees. Cancel anytime. All plans include a 14-day free trial.</div>
-  <div class="pricing-grid">
-    <div class="price-card">
-      <div class="price-plan">Free</div>
-      <div class="price-name">Starter</div>
-      <div class="price-desc">Perfect for trying out M-SM AI</div>
-      <div class="price-amount">
-        <span class="price-curr">$</span>
-        <span class="price-num">0</span>
-        <span class="price-period">/month</span>
-      </div>
-      <ul class="price-features">
-        <li>2,500 credits / month</li>
-        <li>20 AI writing tools</li>
-        <li>AI Chat (Groq-powered)</li>
-        <li>Basic document storage</li>
-        <li class="dim">SEO Suite</li>
-        <li class="dim">Brand Voice</li>
-        <li class="dim">Team seats</li>
-      </ul>
-      <a href="signup.html" class="btn btn-outline-orange" style="width:100%;justify-content:center">Get Started Free</a>
-    </div>
-    <div class="price-card featured">
-      <div class="price-plan">Pro</div>
-      <div class="price-name">Professional</div>
-      <div class="price-desc">For solo marketers and freelancers</div>
-      <div class="price-amount">
-        <span class="price-curr">$</span>
-        <span class="price-num">49</span>
-        <span class="price-period">/month</span>
-      </div>
-      <ul class="price-features">
-        <li>10,000 credits / month</li>
-        <li>All 40+ AI tools</li>
-        <li>AI Chat (Groq-powered)</li>
-        <li>Full SEO Suite</li>
-        <li>Brand Voice training</li>
-        <li>Custom templates</li>
-        <li class="dim">Team seats</li>
-      </ul>
-      <a href="signup.html" class="btn btn-orange" style="width:100%;justify-content:center">Start Free Trial →</a>
-    </div>
-    <div class="price-card">
-      <div class="price-plan">Agency</div>
-      <div class="price-name">Agency</div>
-      <div class="price-desc">For teams and marketing agencies</div>
-      <div class="price-amount">
-        <span class="price-curr">$</span>
-        <span class="price-num">99</span>
-        <span class="price-period">/month</span>
-      </div>
-      <ul class="price-features">
-        <li>Unlimited credits</li>
-        <li>All 40+ AI tools</li>
-        <li>AI Chat (Groq-powered)</li>
-        <li>Full SEO Suite</li>
-        <li>Brand Voice training</li>
-        <li>5 team seats</li>
-        <li>White-label exports</li>
-      </ul>
-      <a href="signup.html" class="btn btn-outline-orange" style="width:100%;justify-content:center">Start Free Trial →</a>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section style="background:var(--dark2)">
-  <div style="text-align:center;max-width:640px;margin:0 auto">
-    <div class="section-eyebrow">Testimonials</div>
-    <div class="section-title">Loved by Marketers Worldwide</div>
-  </div>
-  <div class="testi-grid">
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-text">"M-SM AI cut our content production time from 3 days to 3 hours. Our blog output tripled in 2 months and organic traffic is up 68%."</div>
-      <div class="testi-author">
-        <div class="testi-av" style="background:linear-gradient(135deg,#FF6B35,#C44414)">SR</div>
-        <div><div class="testi-name">Sarah Rahman</div><div class="testi-role">Head of Content, TechFlow</div></div>
-      </div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-text">"The AI chat is insane. I use it as my marketing strategist. It helped me plan a whole Q3 campaign in one afternoon. Worth every cent."</div>
-      <div class="testi-author">
-        <div class="testi-av" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">MK</div>
-        <div><div class="testi-name">Marcus Kim</div><div class="testi-role">Digital Marketing Manager</div></div>
-      </div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <div class="testi-text">"We manage 12 client accounts. M-SM AI's brand voice feature is a game changer — every client gets content that actually sounds like them."</div>
-      <div class="testi-author">
-        <div class="testi-av" style="background:linear-gradient(135deg,#00D4AA,#0094AA)">AL</div>
-        <div><div class="testi-name">Aisha Lim</div><div class="testi-role">Agency Founder, CreateBold</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq" style="text-align:center">
-  <div class="section-eyebrow">FAQ</div>
-  <div class="section-title">Got Questions?</div>
-  <div class="faq-list">
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Do I need a credit card to sign up? <div class="faq-chevron">▼</div></div>
-      <div class="faq-a">No credit card required for the free plan. You get 2,500 credits every month free, forever. Upgrade only when you need more.</div>
-    </div>
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">What is a credit? <div class="faq-chevron">▼</div></div>
-      <div class="faq-a">Credits are consumed when you generate content. Roughly 1 credit = 1 word of output. A typical blog post uses 800–1,200 credits. The AI Chat uses credits too.</div>
-    </div>
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Which AI model powers the platform? <div class="faq-chevron">▼</div></div>
-      <div class="faq-a">M-SM AI uses Groq's ultra-fast LLaMA models for the AI Chat — delivering responses in under a second. Content generation uses Anthropic Claude or OpenAI depending on the task.</div>
-    </div>
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Can I use M-SM AI for my clients? <div class="faq-chevron">▼</div></div>
-      <div class="faq-a">Absolutely. The Agency plan is designed for this. You can manage multiple brand voices, create client workspaces, and export white-labeled content. Many agencies resell M-SM AI as their own service.</div>
-    </div>
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">Can I cancel anytime? <div class="faq-chevron">▼</div></div>
-      <div class="faq-a">Yes, you can cancel your subscription at any time from your account settings. You'll keep access until the end of your billing period with no questions asked.</div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
+<!-- CTA SECTION -->
 <section class="cta-section">
-  <div class="section-eyebrow" style="text-align:center">Get Started Today</div>
-  <div class="section-title" style="text-align:center;margin:0 auto 16px">Ready to 10× Your<br>Marketing Output?</div>
-  <div class="section-sub" style="text-align:center;margin:0 auto 36px">Join 2,400+ marketers who use M-SM AI to create better content, faster. Start free — no credit card needed.</div>
-  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-    <a href="signup.html" class="btn btn-orange btn-lg">Create Free Account →</a>
-    <a href="login.html" class="btn btn-ghost btn-lg">Sign In</a>
+  <h2 class="cta-title">Start generating content<br><span style="color:var(--orange)">in 60 seconds</span></h2>
+  <p class="cta-desc">Join hundreds of Malaysian businesses using M-EasyMarketing AI+ to create better content, faster.</p>
+  <div class="cta-btns">
+    <a href="https://msm-ai-production.up.railway.app/signup.html" class="btn btn-primary btn-lg">Create Free Account →</a>
+    <a href="https://msm-ai-production.up.railway.app/login.html" class="btn-outline-lg btn">Sign In</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-brand">
-    <a href="index.html" class="nav-logo">
-      <div class="nav-logo-badge">M</div>
-      M-SM <em>AI</em>
-    </a>
-    <div class="footer-desc">The AI marketing platform built for agencies, freelancers, and marketers who demand results.</div>
-    <div style="font-size:12px;color:var(--text3)">© 2025 M-SM AI. All rights reserved.</div>
-  </div>
-  <div>
-    <div class="footer-heading">Product</div>
-    <ul class="footer-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#tools">AI Tools</a></li>
-      <li><a href="#pricing">Pricing</a></li>
-      <li><a href="signup.html">Get Started</a></li>
-    </ul>
-  </div>
-  <div>
-    <div class="footer-heading">Company</div>
-    <ul class="footer-links">
-      <li><a href="#">About Us</a></li>
-      <li><a href="#">Blog</a></li>
-      <li><a href="#">Careers</a></li>
-      <li><a href="#">Contact</a></li>
-    </ul>
-  </div>
-  <div>
-    <div class="footer-heading">Legal</div>
-    <ul class="footer-links">
-      <li><a href="#">Privacy Policy</a></li>
-      <li><a href="#">Terms of Service</a></li>
-      <li><a href="#">Cookie Policy</a></li>
-      <li><a href="#">Refund Policy</a></li>
-    </ul>
+  <div class="footer-copy">© 2025 M-EasyMarketing AI+ · Powered by Modus AI Associates</div>
+  <div class="footer-links">
+    <a href="https://msm-ai-production.up.railway.app/login.html">Sign In</a>
+    <a href="https://msm-ai-production.up.railway.app/signup.html">Sign Up</a>
+    <a href="https://msm-ai-production.up.railway.app/app.html">Dashboard</a>
+    <a href="mailto:admin@modusaiassociates.com">Contact</a>
   </div>
 </footer>
 
 <script>
-function toggleFaq(el){
-  const isOpen=el.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-  if(!isOpen)el.classList.add('open');
-}
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-  a.addEventListener('click',e=>{
-    e.preventDefault();
-    document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+// Handle ?goto= parameter after login
+// When user clicks a system card, they go to login/signup
+// After auth, app.html reads the ?goto= param and navigates to the right section
+window.addEventListener('DOMContentLoaded', () => {
+  // Add click handler to all system cards
+  document.querySelectorAll('.sys-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      const dest = card.getAttribute('href');
+      const token = localStorage.getItem('msm_token');
+      if (token) {
+        // Already logged in — go directly
+        window.location.href = dest;
+      } else {
+        // Not logged in — go to login with redirect
+        const encoded = encodeURIComponent(dest);
+        window.location.href = `https://msm-ai-production.up.railway.app/login.html?redirect=${encoded}`;
+      }
+    });
   });
 });
 </script>
