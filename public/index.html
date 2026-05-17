@@ -609,26 +609,380 @@ footer{
 
 <script>
 // Handle ?goto= parameter after login
-// When user clicks a system card, they go to login/signup
-// After auth, app.html reads the ?goto= param and navigates to the right section
 window.addEventListener('DOMContentLoaded', () => {
-  // Add click handler to all system cards
   document.querySelectorAll('.sys-card').forEach(card => {
     card.addEventListener('click', (e) => {
       e.preventDefault();
       const dest = card.getAttribute('href');
       const token = localStorage.getItem('msm_token');
       if (token) {
-        // Already logged in — go directly
         window.location.href = dest;
       } else {
-        // Not logged in — go to login with redirect
         const encoded = encodeURIComponent(dest);
         window.location.href = `https://msm-ai-production.up.railway.app/login.html?redirect=${encoded}`;
       }
     });
   });
 });
+</script>
+
+<!-- ══ FLOATING AI CHAT WIDGET ══ -->
+<style>
+/* Chat bubble button */
+.chat-fab {
+  position:fixed;bottom:28px;right:28px;z-index:1000;
+  display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+}
+.chat-tooltip {
+  display:flex;align-items:center;gap:10px;
+  background:white;border-radius:12px;
+  padding:10px 16px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.18);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;font-weight:600;color:#1A1A2E;
+  white-space:nowrap;
+  animation:tooltipIn .3s cubic-bezier(.34,1.56,.64,1);
+  cursor:pointer;
+}
+.chat-tooltip-icon{font-size:18px}
+.chat-tooltip-close{
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(0,0,0,0.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;cursor:pointer;flex-shrink:0;
+  color:#666;font-weight:700;
+}
+@keyframes tooltipIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+.chat-btn {
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#E8622A,#FF8C5A);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 28px rgba(232,98,42,0.45);
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.chat-btn:hover{transform:scale(1.1);box-shadow:0 12px 36px rgba(232,98,42,0.55)}
+.chat-btn:active{transform:scale(0.96)}
+.chat-btn-ring {
+  position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid rgba(232,98,42,0.3);
+  animation:ring 2.5s ease-in-out infinite;
+}
+@keyframes ring{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:0}}
+.chat-btn svg{width:28px;height:28px}
+
+/* Chat window */
+.chat-window {
+  position:fixed;bottom:104px;right:28px;z-index:1000;
+  width:360px;height:500px;
+  background:#0D1018;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,0.6);
+  display:flex;flex-direction:column;
+  transform:scale(0.85) translateY(20px);
+  opacity:0;pointer-events:none;
+  transform-origin:bottom right;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.chat-window.open {
+  transform:scale(1) translateY(0);
+  opacity:1;pointer-events:all;
+}
+
+/* Chat header */
+.cw-header {
+  padding:16px 18px;
+  background:linear-gradient(135deg,#E8622A,#FF7A45);
+  display:flex;align-items:center;gap:12px;
+}
+.cw-avatar {
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.cw-info{flex:1}
+.cw-name{font-size:14px;font-weight:700;color:white;line-height:1.2}
+.cw-status{font-size:11px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:5px;margin-top:2px}
+.cw-status-dot{width:6px;height:6px;border-radius:50%;background:#4ADE80}
+.cw-close{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,0.15);border:none;
+  color:white;font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.cw-close:hover{background:rgba(255,255,255,0.25)}
+
+/* Chat messages */
+.cw-messages {
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+  scroll-behavior:smooth;
+}
+.cw-messages::-webkit-scrollbar{width:3px}
+.cw-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+.cw-msg{display:flex;gap:8px;align-items:flex-end}
+.cw-msg.user{flex-direction:row-reverse}
+.cw-msg-av{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#E8622A,#FF7A45);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:white;
+  font-family:'Libre Baskerville',serif;
+}
+.cw-msg-av.user-av{background:rgba(255,255,255,0.1);font-size:10px}
+.cw-bubble{
+  max-width:78%;padding:10px 14px;
+  border-radius:16px 16px 16px 4px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.06);
+  font-size:13px;line-height:1.6;color:#E8EDF2;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.cw-msg.user .cw-bubble{
+  border-radius:16px 16px 4px 16px;
+  background:linear-gradient(135deg,rgba(232,98,42,0.25),rgba(255,122,74,0.2));
+  border-color:rgba(232,98,42,0.3);
+}
+.cw-typing{display:flex;gap:4px;align-items:center;padding:4px 0}
+.cw-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.3);animation:bounce .9s infinite}
+.cw-dot:nth-child(2){animation-delay:.15s}
+.cw-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* Chat input */
+.cw-input-bar{
+  padding:12px 14px;
+  background:rgba(255,255,255,0.03);
+  border-top:1px solid rgba(255,255,255,0.06);
+  display:flex;gap:8px;align-items:flex-end;
+}
+.cw-input{
+  flex:1;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;padding:10px 14px;
+  font-size:13px;color:#E8EDF2;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  outline:none;resize:none;max-height:90px;
+  min-height:40px;line-height:1.5;
+}
+.cw-input::placeholder{color:rgba(255,255,255,0.25)}
+.cw-input:focus{border-color:rgba(232,98,42,0.4);background:rgba(255,255,255,0.08)}
+.cw-send{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#E8622A,#FF7A45);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:all .15s;
+}
+.cw-send:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(232,98,42,0.4)}
+.cw-send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Quick replies */
+.cw-quick{
+  padding:0 14px 12px;
+  display:flex;flex-wrap:wrap;gap:6px;
+}
+.cw-quick-btn{
+  padding:5px 12px;border-radius:20px;
+  background:rgba(232,98,42,0.1);
+  border:1px solid rgba(232,98,42,0.25);
+  color:#FF7A45;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.cw-quick-btn:hover{background:rgba(232,98,42,0.2);border-color:rgba(232,98,42,0.4)}
+
+/* Powered by */
+.cw-powered{
+  text-align:center;padding:6px;
+  font-size:10px;color:rgba(255,255,255,0.2);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  border-top:1px solid rgba(255,255,255,0.04);
+}
+.cw-powered a{color:rgba(232,98,42,0.5);text-decoration:none}
+</style>
+
+<!-- Floating Button -->
+<div class="chat-fab" id="chat-fab">
+  <!-- Tooltip -->
+  <div class="chat-tooltip" id="chat-tooltip" onclick="openChat()">
+    <span class="chat-tooltip-icon">🤖</span>
+    <span>AI Assistant — Click to ask me anything!</span>
+    <span class="chat-tooltip-close" onclick="dismissTooltip(event)">✕</span>
+  </div>
+  <!-- FAB Button -->
+  <button class="chat-btn" onclick="toggleChat()" id="chat-fab-btn" aria-label="Open AI Chat">
+    <div class="chat-btn-ring"></div>
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 20V8L10.5 16L14 10L17.5 16L23 8V20" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="23.5" cy="4.5" r="1.5" fill="#FFD580"/>
+      <circle cx="26" cy="7.5" r="1" fill="#FFD580" opacity="0.7"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Chat Window -->
+<div class="chat-window" id="chat-window-widget">
+  <div class="cw-header">
+    <div class="cw-avatar">🤖</div>
+    <div class="cw-info">
+      <div class="cw-name">M-EasyMarketing AI+</div>
+      <div class="cw-status"><span class="cw-status-dot"></span>Online — Powered by Groq AI</div>
+    </div>
+    <button class="cw-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="cw-messages" id="cw-msgs">
+    <div class="cw-msg">
+      <div class="cw-msg-av">M</div>
+      <div class="cw-bubble">👋 Hi! I'm M-EasyMarketing AI+, your intelligent marketing assistant.<br><br>I can help you with content creation, SEO, email marketing, ads, and more. What would you like to know?</div>
+    </div>
+  </div>
+  <div class="cw-quick" id="cw-quick">
+    <button class="cw-quick-btn" onclick="quickSend('What can M-EasyMarketing AI+ do?')">What can you do?</button>
+    <button class="cw-quick-btn" onclick="quickSend('How much does it cost?')">Pricing?</button>
+    <button class="cw-quick-btn" onclick="quickSend('How do I get started?')">Get started</button>
+    <button class="cw-quick-btn" onclick="quickSend('What AI tools are available?')">AI Tools</button>
+  </div>
+  <div class="cw-input-bar">
+    <textarea class="cw-input" id="cw-input" placeholder="Ask me anything about marketing…" rows="1" onkeydown="cwKeyDown(event)" oninput="cwResize(this)"></textarea>
+    <button class="cw-send" id="cw-send-btn" onclick="cwSend()">➤</button>
+  </div>
+  <div class="cw-powered">Powered by <a href="https://msm-ai-production.up.railway.app" target="_blank">M-EasyMarketing AI+</a></div>
+</div>
+
+<script>
+// ── Chat Widget Logic ──────────────────────────────────
+const CHAT_API = 'https://msm-ai-production.up.railway.app/api/chat';
+let cwHistory = [];
+let cwOpen = false;
+let tooltipDismissed = false;
+
+// Auto show tooltip after 3s
+setTimeout(() => {
+  if (!tooltipDismissed) document.getElementById('chat-tooltip').style.display = 'flex';
+}, 3000);
+
+function dismissTooltip(e) {
+  e.stopPropagation();
+  tooltipDismissed = true;
+  document.getElementById('chat-tooltip').style.display = 'none';
+}
+
+function openChat() {
+  dismissTooltip({stopPropagation:()=>{}});
+  if (!cwOpen) toggleChat();
+}
+
+function toggleChat() {
+  cwOpen = !cwOpen;
+  const win = document.getElementById('chat-window-widget');
+  const tooltip = document.getElementById('chat-tooltip');
+  win.classList.toggle('open', cwOpen);
+  if (cwOpen) {
+    tooltip.style.display = 'none';
+    document.getElementById('cw-input').focus();
+  }
+}
+
+function cwKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cwSend(); }
+}
+
+function cwResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 90) + 'px';
+}
+
+function quickSend(msg) {
+  document.getElementById('cw-input').value = msg;
+  document.getElementById('cw-quick').style.display = 'none';
+  cwSend();
+}
+
+function cwAppend(type, html) {
+  const msgs = document.getElementById('cw-msgs');
+  const el = document.createElement('div');
+  el.className = 'cw-msg ' + type;
+  const isAI = type === 'ai';
+  el.innerHTML = `
+    <div class="cw-msg-av ${isAI ? '' : 'user-av'}">${isAI ? 'M' : '👤'}</div>
+    <div class="cw-bubble">${html}</div>`;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+
+async function cwSend() {
+  const input = document.getElementById('cw-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('cw-send-btn').disabled = true;
+  document.getElementById('cw-quick').style.display = 'none';
+
+  // Show user message
+  cwAppend('user', msg.replace(/\n/g, '<br>'));
+  cwHistory.push({ role: 'user', content: msg });
+
+  // Show typing indicator
+  const typingEl = cwAppend('ai', '<div class="cw-typing"><div class="cw-dot"></div><div class="cw-dot"></div><div class="cw-dot"></div></div>');
+
+  try {
+    // Get token if logged in
+    const token = localStorage.getItem('msm_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    const systemMsg = `You are M-EasyMarketing AI+, a friendly and knowledgeable marketing assistant for the M-EasyMarketing AI+ platform. You help visitors understand what the platform does, its 8 AI systems (M-EasyContent, M-EasySocial, M-EasyMail, M-EasyAds, M-EasySEO, M-EasyCommerce, M-EasySales, M-EasyTools), pricing plans (Free, Pro RM49/month, Agency RM199/month), and how to get started. Be concise, helpful, and encourage users to sign up. Platform URL: https://msm-ai-production.up.railway.app`;
+
+    let responseText = '';
+
+    if (token) {
+      // Use real API if logged in
+      const res = await fetch(CHAT_API, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ messages: cwHistory.slice(-10) })
+      });
+      const data = await res.json();
+      if (data.message) responseText = data.message;
+      else throw new Error(data.error || 'API error');
+    } else {
+      // Use Anthropic API for non-logged-in visitors
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemMsg,
+          messages: cwHistory.slice(-10)
+        })
+      });
+      const data = await res.json();
+      if (data.content?.[0]?.text) responseText = data.content[0].text;
+      else throw new Error('Could not get response');
+    }
+
+    cwHistory.push({ role: 'assistant', content: responseText });
+    typingEl.querySelector('.cw-bubble').innerHTML = responseText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  } catch (err) {
+    typingEl.querySelector('.cw-bubble').innerHTML = "I'm having trouble connecting right now. Please <a href='https://msm-ai-production.up.railway.app/login.html' style='color:#FF7A45'>sign in</a> to chat with the full AI assistant! 🚀";
+  }
+
+  document.getElementById('cw-send-btn').disabled = false;
+  document.getElementById('cw-msgs').scrollTop = document.getElementById('cw-msgs').scrollHeight;
+}
 </script>
 </body>
 </html>
