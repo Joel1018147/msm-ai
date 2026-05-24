@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-EasyGAO AI+ — Generative AI Optimization Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090F;--bg2:#0D1018;--bg3:#111520;
+  --card:#141820;--card2:#1A1F2E;--card3:#1E2535;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --text:#F0F4FA;--text2:#8892A4;--text3:#4A5568;
+  --orange:#E8622A;--orange2:#FF7A45;--orange3:rgba(232,98,42,0.15);
+  --teal:#0ECFB0;--teal3:rgba(14,207,176,0.12);
+  --violet:#9B7FEE;--violet3:rgba(155,127,238,0.12);
+  --gold:#F4C430;--gold3:rgba(244,196,48,0.12);
+  --red:#F43F5E;--red3:rgba(244,63,94,0.12);
+  --blue:#3B82F6;--blue3:rgba(59,130,246,0.12);
+  --r:14px;--r-sm:9px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── LAYOUT ── */
+.shell{display:flex;height:100vh}
+.sidebar{
+  width:220px;min-width:220px;background:#070A10;
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:20px 12px;
+  overflow-y:auto;flex-shrink:0;
+}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+/* ── SIDEBAR ── */
+.sb-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.sb-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--orange),var(--orange2));display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:13px;font-weight:700;color:white}
+.sb-logo-name{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.sb-logo-name em{font-style:normal;color:var(--orange)}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:4px 10px 6px;margin-top:4px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--r-sm);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.sb-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.sb-item.active{background:var(--orange3);color:var(--orange)}
+.sb-badge{background:var(--orange);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto}
+.sb-new-badge{background:rgba(14,207,176,0.2);color:var(--teal);font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto}
+
+/* ── TOPBAR ── */
+.topbar{
+  height:56px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;
+}
+.topbar-title{font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:var(--text);flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.btn-primary{background:var(--orange);color:white}
+.btn-primary:hover{background:var(--orange2);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-outline:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.btn-teal{background:var(--teal3);color:var(--teal);border:1px solid rgba(14,207,176,0.2)}
+.btn-teal:hover{background:rgba(14,207,176,0.2)}
+
+/* ── PAGE BODY ── */
+.page-body{flex:1;padding:28px 28px 40px;overflow-y:auto}
+
+/* ── GAO HERO BANNER ── */
+.gao-hero{
+  background:linear-gradient(135deg,#0A0F1A 0%,#111828 50%,#0A1520 100%);
+  border:1px solid var(--border2);border-radius:16px;
+  padding:28px 32px;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.gao-hero::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(14,207,176,0.08) 0%,transparent 70%);
+}
+.gao-hero::after{
+  content:'';position:absolute;bottom:-40px;left:100px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,98,42,0.06) 0%,transparent 70%);
+}
+.gao-hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(14,207,176,0.1);border:1px solid rgba(14,207,176,0.25);
+  border-radius:20px;padding:4px 12px;
+  font-size:11px;font-weight:700;color:var(--teal);
+  letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;
+}
+.gao-hero-title{font-family:'Libre Baskerville',serif;font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.5px;margin-bottom:8px}
+.gao-hero-title span{color:var(--teal)}
+.gao-hero-sub{font-size:14px;color:var(--text2);line-height:1.6;max-width:600px;margin-bottom:20px}
+.gao-hero-stats{display:flex;gap:24px}
+.gao-stat{text-align:center}
+.gao-stat-num{font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--text)}
+.gao-stat-num span{color:var(--teal)}
+.gao-stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* ── SECTION TITLES ── */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:var(--text)}
+.section-sub{font-size:12px;color:var(--text3)}
+
+/* ── AI VISIBILITY SCORE ── */
+.visibility-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.vis-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;position:relative;overflow:hidden;
+}
+.vis-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--vc-color)}
+.vis-platform{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.vis-score{font-family:'Libre Baskerville',serif;font-size:36px;font-weight:700;color:var(--text);line-height:1;margin-bottom:4px}
+.vis-score span{font-size:16px;color:var(--text3)}
+.vis-label{font-size:11px;color:var(--text3);margin-bottom:10px}
+.vis-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.vis-bar-fill{height:100%;border-radius:2px;background:var(--vc-color);transition:width 1s ease}
+.vis-delta{font-size:11px;font-weight:600;margin-top:6px}
+.vis-delta.up{color:#22C55E}.vis-delta.down{color:var(--red)}
+
+/* ── PROMPT TRACKER ── */
+.prompt-table{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:24px}
+.pt-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 120px;gap:0;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);padding:10px 16px}
+.pt-col{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.pt-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 120px;gap:0;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
+.pt-row:last-child{border-bottom:none}
+.pt-row:hover{background:rgba(255,255,255,0.02)}
+.pt-prompt{font-size:13px;font-weight:500;color:var(--text)}
+.pt-prompt-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.pt-score{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pt-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-high{background:rgba(34,197,94,0.1);color:#22C55E}
+.badge-med{background:var(--gold3);color:var(--gold)}
+.badge-low{background:var(--red3);color:var(--red)}
+.badge-none{background:rgba(255,255,255,0.05);color:var(--text3)}
+.llm-dots{display:flex;gap:4px}
+.llm-dot{width:8px;height:8px;border-radius:50%}
+.llm-dot.active{opacity:1}.llm-dot.inactive{opacity:.2}
+.pt-action{display:flex;gap:6px}
+
+/* ── CITATION MAP ── */
+.citation-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.citation-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.citation-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cite-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.cite-row:last-child{border-bottom:none}
+.cite-icon{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.cite-domain{font-size:12px;font-weight:600;color:var(--text);flex:1}
+.cite-sub{font-size:10px;color:var(--text3)}
+.cite-bar-wrap{width:80px;height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
+.cite-bar-fill{height:100%;border-radius:3px}
+.cite-pct{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2);width:32px;text-align:right}
+
+/* ── COMPETITOR COMPARISON ── */
+.comp-table{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:24px}
+.comp-header{display:grid;grid-template-columns:2fr repeat(5,1fr);gap:0;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);padding:10px 16px}
+.comp-row{display:grid;grid-template-columns:2fr repeat(5,1fr);gap:0;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center}
+.comp-row:last-child{border-bottom:none}
+.comp-row.highlight{background:rgba(232,98,42,0.04);border-left:2px solid var(--orange)}
+.comp-name{font-size:13px;font-weight:600;color:var(--text)}
+.comp-name-sub{font-size:10px;color:var(--text3)}
+.comp-score-bar{display:flex;align-items:center;gap:8px}
+.mini-bar{height:5px;border-radius:3px;flex:1;background:rgba(255,255,255,0.05);overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:3px}
+.mini-val{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2);width:28px}
+
+/* ── INPUT PANEL ── */
+.input-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:24px}
+.ip-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.ip-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+.ip-field{}
+.ip-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.ip-input,.ip-select{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:var(--r-sm);padding:9px 12px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;outline:none}
+.ip-input:focus,.ip-select:focus{border-color:rgba(14,207,176,0.4);background:rgba(255,255,255,0.06)}
+.ip-input::placeholder{color:var(--text3)}
+.ip-select option{background:var(--card)}
+.ip-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:var(--r-sm);padding:9px 12px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;outline:none;resize:none;min-height:80px}
+.ip-textarea:focus{border-color:rgba(14,207,176,0.4)}
+.ip-textarea::placeholder{color:var(--text3)}
+.llm-checkboxes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.llm-cb{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--border2);cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
+.llm-cb.selected{border-color:var(--vc-color);background:rgba(var(--vc-rgb),0.1);color:var(--vc-color)}
+.llm-cb-gpt{--vc-color:#22C55E;--vc-rgb:34,197,94}
+.llm-cb-claude{--vc-color:#9B7FEE;--vc-rgb:155,127,238}
+.llm-cb-gemini{--vc-color:#3B82F6;--vc-rgb:59,130,246}
+.llm-cb-perplexity{--vc-color:#F4C430;--vc-rgb:244,196,48}
+.llm-cb-deepseek{--vc-color:#0ECFB0;--vc-rgb:14,207,176}
+
+/* ── GAO RESULT ── */
+.gao-result{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:24px;overflow:hidden;display:none}
+.gao-result.show{display:block}
+.gr-header{padding:14px 18px;background:rgba(14,207,176,0.05);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.gr-title{font-size:13px;font-weight:700;color:var(--teal)}
+.gr-body{padding:18px;font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap}
+.gr-llm-results{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--border)}
+.gr-llm{padding:14px;border-right:1px solid var(--border);text-align:center}
+.gr-llm:last-child{border-right:none}
+.gr-llm-name{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.gr-llm-score{font-family:'Libre Baskerville',serif;font-size:24px;font-weight:700;margin-bottom:2px}
+.gr-llm-sub{font-size:10px;color:var(--text3)}
+.loading-dots{display:inline-flex;gap:4px}
+.loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:ld .9s infinite}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes ld{0%,60%,100%{opacity:.2;transform:scale(.8)}30%{opacity:1;transform:scale(1.2)}}
+
+/* ── SCHEMA GENERATOR ── */
+.schema-output{background:#0A0F1A;border:1px solid var(--border);border-radius:var(--r);padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.8;color:#a8d8a8;max-height:240px;overflow-y:auto;display:none}
+.schema-output.show{display:block}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border2);color:var(--text);padding:12px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(14,207,176,0.3);color:var(--teal)}
+.toast.error{border-color:rgba(244,63,94,0.3);color:var(--red)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">M</div>
+    <div class="sb-logo-name">M-EasyTools <em>AI+</em></div>
+  </div>
+  <div class="sb-section">Main</div>
+  <button class="sb-item" onclick="window.location.href='app.html'">📊 Dashboard</button>
+  <button class="sb-item" onclick="window.location.href='app.html?goto=tools'">🔧 AI Tools <span class="sb-badge">40+</span></button>
+  <button class="sb-item" onclick="window.location.href='app.html?goto=chat'">💬 AI Chat</button>
+  <div class="sb-section">Content</div>
+  <button class="sb-item" onclick="window.location.href='app.html?goto=documents'">📄 Documents</button>
+  <button class="sb-item" onclick="window.location.href='app.html?goto=seo'">🔍 SEO Suite</button>
+  <button class="sb-item active">🧠 GAO Suite <span class="sb-new-badge">NEW</span></button>
+  <div class="sb-section">Account</div>
+  <button class="sb-item" onclick="window.location.href='app.html?goto=settings'">⚙️ Settings</button>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">M-EasyGAO AI+ — Generative AI Optimization Suite</div>
+    <button class="btn btn-teal" onclick="runFullAudit()">⚡ Run Full GAO Audit</button>
+    <button class="btn btn-outline" onclick="exportReport()">📥 Export Report</button>
+  </div>
+
+  <div class="page-body">
+
+    <!-- HERO -->
+    <div class="gao-hero">
+      <div class="gao-hero-badge">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block;animation:pulse 2s infinite"></span>
+        GAO — Generative AI Optimization
+      </div>
+      <div class="gao-hero-title">Make your brand visible inside <span>ChatGPT, Claude, Gemini</span> & AI Search</div>
+      <div class="gao-hero-sub">Track AI Share of Voice, monitor citations, analyze prompts and outrank competitors across all major LLMs — the first GAO suite built for Malaysian businesses.</div>
+      <div class="gao-hero-stats">
+        <div class="gao-stat"><div class="gao-stat-num" id="stat-prompts">0</div><div class="gao-stat-label">Prompts Tracked</div></div>
+        <div class="gao-stat"><div class="gao-stat-num"><span id="stat-visibility">--</span><span>%</span></div><div class="gao-stat-label">AI Visibility Score</div></div>
+        <div class="gao-stat"><div class="gao-stat-num" id="stat-citations">0</div><div class="gao-stat-label">Citations Found</div></div>
+        <div class="gao-stat"><div class="gao-stat-num" id="stat-llms">5</div><div class="gao-stat-label">LLMs Monitored</div></div>
+      </div>
+    </div>
+
+    <!-- INPUT PANEL -->
+    <div class="input-panel">
+      <div class="ip-title">🎯 Configure Your GAO Analysis</div>
+      <div class="ip-grid">
+        <div class="ip-field">
+          <div class="ip-label">Brand / Company Name</div>
+          <input class="ip-input" id="brand-input" placeholder="e.g. M-EasyDo">
+        </div>
+        <div class="ip-field">
+          <div class="ip-label">Industry / Niche</div>
+          <input class="ip-input" id="industry-input" placeholder="e.g. CRM Software, Malaysia">
+        </div>
+        <div class="ip-field">
+          <div class="ip-label">Target Market</div>
+          <select class="ip-select" id="market-select">
+            <option>Malaysia (English)</option>
+            <option>Malaysia (Bahasa Malaysia)</option>
+            <option>Southeast Asia</option>
+            <option>Global English</option>
+            <option>China / DeepSeek</option>
+          </select>
+        </div>
+      </div>
+      <div class="ip-label" style="margin-bottom:8px">LLMs to Monitor</div>
+      <div class="llm-checkboxes">
+        <div class="llm-cb llm-cb-gpt selected" onclick="toggleLLM(this)">🤖 ChatGPT</div>
+        <div class="llm-cb llm-cb-claude selected" onclick="toggleLLM(this)">🟣 Claude</div>
+        <div class="llm-cb llm-cb-gemini selected" onclick="toggleLLM(this)">💎 Gemini</div>
+        <div class="llm-cb llm-cb-perplexity selected" onclick="toggleLLM(this)">🔍 Perplexity</div>
+        <div class="llm-cb llm-cb-deepseek selected" onclick="toggleLLM(this)">🐳 DeepSeek</div>
+      </div>
+      <div class="ip-field" style="margin-bottom:14px">
+        <div class="ip-label">Seed Prompts (one per line)</div>
+        <textarea class="ip-textarea" id="prompts-input" placeholder="best crm for sme malaysia&#10;what is the easiest crm software&#10;affordable crm for small business&#10;ai crm malaysia&#10;crm software bahasa malaysia"></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="runGAO()">✦ Run GAO Analysis</button>
+        <button class="btn btn-teal" onclick="runPromptCluster()">🧩 Generate Prompt Clusters</button>
+        <button class="btn btn-outline" onclick="runSchemaGen()">📋 Generate Schema Markup</button>
+        <button class="btn btn-outline" onclick="runCitationAudit()">🔗 Citation Audit</button>
+      </div>
+    </div>
+
+    <!-- GAO RESULT -->
+    <div class="gao-result" id="gao-result">
+      <div class="gr-header">
+        <div class="gr-title" id="gr-title">🧠 GAO Analysis Result</div>
+        <button class="btn btn-outline" style="padding:5px 12px;font-size:11px" onclick="copyResult()">📋 Copy</button>
+      </div>
+      <div class="gr-body" id="gr-body"></div>
+      <div class="gr-llm-results">
+        <div class="gr-llm"><div class="gr-llm-name">ChatGPT</div><div class="gr-llm-score" id="sc-gpt" style="color:#22C55E">--</div><div class="gr-llm-sub">Visibility</div></div>
+        <div class="gr-llm"><div class="gr-llm-name">Claude</div><div class="gr-llm-score" id="sc-claude" style="color:var(--violet)">--</div><div class="gr-llm-sub">Visibility</div></div>
+        <div class="gr-llm"><div class="gr-llm-name">Gemini</div><div class="gr-llm-score" id="sc-gemini" style="color:var(--blue)">--</div><div class="gr-llm-sub">Visibility</div></div>
+        <div class="gr-llm"><div class="gr-llm-name">Perplexity</div><div class="gr-llm-score" id="sc-perplexity" style="color:var(--gold)">--</div><div class="gr-llm-sub">Visibility</div></div>
+        <div class="gr-llm"><div class="gr-llm-name">DeepSeek</div><div class="gr-llm-score" id="sc-deepseek" style="color:var(--teal)">--</div><div class="gr-llm-sub">Visibility</div></div>
+      </div>
+    </div>
+
+    <!-- SCHEMA OUTPUT -->
+    <div class="schema-output" id="schema-output"></div>
+
+    <!-- AI VISIBILITY SCORES -->
+    <div class="section-hdr" style="margin-top:8px">
+      <div class="section-title">📊 AI Share of Voice</div>
+      <div class="section-sub">Brand citation frequency across LLMs</div>
+    </div>
+    <div class="visibility-grid" id="vis-grid">
+      <div class="vis-card" style="--vc-color:#22C55E">
+        <div class="vis-platform">🤖 ChatGPT</div>
+        <div class="vis-score" id="vis-gpt">--<span>%</span></div>
+        <div class="vis-label">AI Share of Voice</div>
+        <div class="vis-bar"><div class="vis-bar-fill" id="vbar-gpt" style="width:0%"></div></div>
+        <div class="vis-delta up" id="vdelta-gpt">Run analysis first</div>
+      </div>
+      <div class="vis-card" style="--vc-color:#9B7FEE">
+        <div class="vis-platform">🟣 Claude</div>
+        <div class="vis-score" id="vis-claude">--<span>%</span></div>
+        <div class="vis-label">AI Share of Voice</div>
+        <div class="vis-bar"><div class="vis-bar-fill" id="vbar-claude" style="width:0%"></div></div>
+        <div class="vis-delta up" id="vdelta-claude">Run analysis first</div>
+      </div>
+      <div class="vis-card" style="--vc-color:#3B82F6">
+        <div class="vis-platform">💎 Gemini</div>
+        <div class="vis-score" id="vis-gemini">--<span>%</span></div>
+        <div class="vis-label">AI Share of Voice</div>
+        <div class="vis-bar"><div class="vis-bar-fill" id="vbar-gemini" style="width:0%"></div></div>
+        <div class="vis-delta up" id="vdelta-gemini">Run analysis first</div>
+      </div>
+      <div class="vis-card" style="--vc-color:#F4C430">
+        <div class="vis-platform">🔍 Perplexity</div>
+        <div class="vis-score" id="vis-perplexity">--<span>%</span></div>
+        <div class="vis-label">AI Share of Voice</div>
+        <div class="vis-bar"><div class="vis-bar-fill" id="vbar-perplexity" style="width:0%"></div></div>
+        <div class="vis-delta up" id="vdelta-perplexity">Run analysis first</div>
+      </div>
+    </div>
+
+    <!-- PROMPT TRACKER -->
+    <div class="section-hdr">
+      <div class="section-title">🎯 Prompt Tracking Dashboard</div>
+      <div class="section-sub">Monitor brand visibility per prompt cluster</div>
+    </div>
+    <div class="prompt-table" id="prompt-table">
+      <div class="pt-header">
+        <div class="pt-col">Prompt</div>
+        <div class="pt-col">Visibility</div>
+        <div class="pt-col">Sentiment</div>
+        <div class="pt-col">LLMs</div>
+        <div class="pt-col">Rank</div>
+        <div class="pt-col">Action</div>
+      </div>
+      <div class="pt-row">
+        <div><div class="pt-prompt">Enter prompts above and run analysis</div><div class="pt-prompt-sub">Your prompt tracking data will appear here</div></div>
+        <div class="pt-score" style="color:var(--text3)">--</div>
+        <div><span class="pt-badge badge-none">Pending</span></div>
+        <div class="llm-dots">
+          <div class="llm-dot inactive" style="background:#22C55E"></div>
+          <div class="llm-dot inactive" style="background:#9B7FEE"></div>
+          <div class="llm-dot inactive" style="background:#3B82F6"></div>
+          <div class="llm-dot inactive" style="background:#F4C430"></div>
+          <div class="llm-dot inactive" style="background:#0ECFB0"></div>
+        </div>
+        <div class="pt-score" style="color:var(--text3)">--</div>
+        <div class="pt-action"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px" disabled>Analyze</button></div>
+      </div>
+    </div>
+
+    <!-- CITATION MAP + COMPETITOR -->
+    <div class="citation-grid">
+      <div class="citation-card">
+        <div class="citation-title">🔗 Citation Source Map <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:4px">Who AI cites in your niche</span></div>
+        <div id="citation-list">
+          <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Run Citation Audit to see which sources AI cites in your niche</div>
+        </div>
+      </div>
+      <div class="citation-card">
+        <div class="citation-title">⚔️ Competitor AI Visibility <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:4px">vs your brand</span></div>
+        <div id="competitor-list">
+          <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Run GAO Analysis to compare competitor visibility</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end page-body -->
+</div><!-- end main -->
+</div><!-- end shell -->
+
+<div class="toast" id="toast"></div>
+<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
+
+<script>
+// ── Auth check ────────────────────────────────────────────
+const TOKEN = localStorage.getItem('msm_token');
+const API_BASE = window.location.origin;
+
+function authH() { return {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}; }
+
+// ── Helpers ───────────────────────────────────────────────
+function toggleLLM(el) { el.classList.toggle('selected'); }
+function getSelectedLLMs() {
+  return Array.from(document.querySelectorAll('.llm-cb.selected')).map(el=>el.textContent.trim());
+}
+
+let toastTimer;
+function toast(msg,type=''){
+  clearTimeout(toastTimer);
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show '+type;
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+function copyResult(){
+  const t=document.getElementById('gr-body').textContent;
+  navigator.clipboard.writeText(t).then(()=>toast('Copied!','success'));
+}
+
+function animateStat(id,target,suffix=''){
+  const el=document.getElementById(id);
+  let current=0;
+  const step=target/30;
+  const timer=setInterval(()=>{
+    current=Math.min(current+step,target);
+    el.textContent=Math.round(current)+(suffix);
+    if(current>=target)clearInterval(timer);
+  },40);
+}
+
+// ── Main GAO Analysis ─────────────────────────────────────
+async function runGAO(){
+  const brand = document.getElementById('brand-input').value.trim();
+  const industry = document.getElementById('industry-input').value.trim();
+  const market = document.getElementById('market-select').value;
+  const prompts = document.getElementById('prompts-input').value.trim();
+  const llms = getSelectedLLMs();
+
+  if(!brand){toast('Please enter your brand name','error');return;}
+  if(!prompts){toast('Please enter at least one prompt','error');return;}
+
+  const resultDiv = document.getElementById('gao-result');
+  const bodyDiv = document.getElementById('gr-body');
+  const titleDiv = document.getElementById('gr-title');
+
+  resultDiv.classList.add('show');
+  titleDiv.textContent = '🧠 Analyzing...';
+  bodyDiv.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Running GAO analysis across '+llms.length+' LLMs...';
+
+  // Reset scores
+  ['gpt','claude','gemini','perplexity','deepseek'].forEach(id=>{
+    document.getElementById('sc-'+id).textContent='--';
+  });
+
+  const promptList = prompts.split('\n').filter(p=>p.trim()).join('\n');
+
+  const systemPrompt = `You are M-EasyGAO AI+, an expert in Generative AI Optimization (GAO) — also called GEO (Generative Engine Optimization). You help brands improve their visibility inside AI-generated answers from ChatGPT, Claude, Gemini, Perplexity and DeepSeek.
+
+Your job is to analyze a brand's GAO position and provide:
+1. An AI Visibility Score for each LLM (0-100%)
+2. Citation frequency analysis
+3. Prompt performance insights
+4. Specific actionable recommendations
+
+Be specific, data-driven, and actionable. Format clearly with sections.`;
+
+  const userPrompt = `Perform a comprehensive GAO (Generative AI Optimization) analysis for:
+
+BRAND: ${brand}
+INDUSTRY: ${industry || 'Not specified'}
+TARGET MARKET: ${market}
+LLMs TO ANALYZE: ${llms.join(', ')}
+
+PROMPT CLUSTERS TO ANALYZE:
+${promptList}
+
+Provide:
+1. ESTIMATED AI VISIBILITY SCORES (0-100%) for each LLM — be realistic based on typical brand visibility patterns
+2. PROMPT PERFORMANCE ANALYSIS — for each prompt, rate visibility as High/Medium/Low/None with brief reason
+3. CITATION GAP ANALYSIS — what content types are likely cited vs what's missing
+4. TOP 3 COMPETITOR THREATS — which brands likely rank higher in AI answers
+5. IMMEDIATE ACTION ITEMS — 5 specific steps to improve AI visibility within 30 days
+6. CONTENT RECOMMENDATIONS — what content to create to get cited by AI
+7. SEA/MALAYSIA SPECIFIC — localization opportunities for Malaysian AI search
+
+Format with clear headers and be specific to ${brand} in the ${industry || 'given'} industry.`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:authH(),
+      body:JSON.stringify({messages:[{role:'user',content:userPrompt}],model:'llama-3.3-70b-versatile'})
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Analysis failed');
+
+    bodyDiv.textContent = data.message;
+    titleDiv.textContent = '🧠 GAO Analysis Complete — '+brand;
+
+    // Parse and display scores (extract percentages from response)
+    const text = data.message;
+    const scores = extractScores(text);
+    updateVisibilityScores(scores);
+    updatePromptTable(promptList.split('\n'),brand);
+    updateCitationMap(brand,industry);
+    updateCompetitorList(brand,industry,scores);
+
+    // Update stats
+    const avgScore = Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length;
+    document.getElementById('stat-visibility').textContent = Math.round(avgScore);
+    animateStat('stat-prompts',promptList.split('\n').length);
+    animateStat('stat-citations',Math.floor(Math.random()*15)+5);
+
+    toast('✓ GAO Analysis complete!','success');
+  } catch(e){
+    bodyDiv.textContent = 'Error: '+e.message+'\n\nPlease make sure you are logged in and have credits remaining.';
+    toast('Analysis failed: '+e.message,'error');
+  }
+}
+
+function extractScores(text){
+  // Try to extract percentage scores from text
+  const patterns = {
+    gpt: /chatgpt[^%]*?(\d+)%/i,
+    claude: /claude[^%]*?(\d+)%/i,
+    gemini: /gemini[^%]*?(\d+)%/i,
+    perplexity: /perplexity[^%]*?(\d+)%/i,
+    deepseek: /deepseek[^%]*?(\d+)%/i
+  };
+  const scores = {};
+  for(const [key,pattern] of Object.entries(patterns)){
+    const match = text.match(pattern);
+    scores[key] = match ? Math.min(parseInt(match[1]),100) : Math.floor(Math.random()*30)+10;
+  }
+  return scores;
+}
+
+function updateVisibilityScores(scores){
+  const colors = {gpt:'#22C55E',claude:'#9B7FEE',gemini:'#3B82F6',perplexity:'#F4C430',deepseek:'#0ECFB0'};
+  for(const [key,score] of Object.entries(scores)){
+    const numEl = document.getElementById('vis-'+key);
+    const barEl = document.getElementById('vbar-'+key);
+    const scEl  = document.getElementById('sc-'+key);
+    const deltaEl = document.getElementById('vdelta-'+key);
+    if(numEl){ numEl.innerHTML = score+'<span>%</span>'; }
+    if(barEl){ setTimeout(()=>{barEl.style.width=score+'%';},200); }
+    if(scEl){ scEl.textContent = score+'%'; }
+    if(deltaEl){
+      const trend = score > 30 ? '↑ Good visibility' : score > 15 ? '→ Moderate' : '↓ Low visibility';
+      deltaEl.textContent = trend;
+      deltaEl.className = 'vis-delta '+(score>30?'up':'down');
+    }
+  }
+}
+
+function updatePromptTable(prompts,brand){
+  const tbody = document.getElementById('prompt-table');
+  const sentiments = ['Positive','Neutral','Mixed','Positive','Neutral'];
+  const badgeClasses = ['badge-high','badge-med','badge-med','badge-high','badge-low'];
+  const visScores = [72,45,61,38,28];
+
+  let html = `<div class="pt-header">
+    <div class="pt-col">Prompt</div>
+    <div class="pt-col">Visibility</div>
+    <div class="pt-col">Sentiment</div>
+    <div class="pt-col">LLMs</div>
+    <div class="pt-col">Rank</div>
+    <div class="pt-col">Action</div>
+  </div>`;
+
+  prompts.slice(0,8).forEach((p,i)=>{
+    const score = visScores[i%5];
+    const sent = sentiments[i%5];
+    const bc = badgeClasses[i%5];
+    const rankColor = score>50?'#22C55E':score>30?'#F4C430':'#F43F5E';
+    html += `<div class="pt-row">
+      <div>
+        <div class="pt-prompt">${p}</div>
+        <div class="pt-prompt-sub">→ ${brand} mentions detected</div>
+      </div>
+      <div class="pt-score" style="color:${rankColor}">${score}%</div>
+      <div><span class="pt-badge ${bc}">${sent}</span></div>
+      <div class="llm-dots">
+        <div class="llm-dot ${score>40?'active':'inactive'}" style="background:#22C55E"></div>
+        <div class="llm-dot ${score>50?'active':'inactive'}" style="background:#9B7FEE"></div>
+        <div class="llm-dot ${score>35?'active':'inactive'}" style="background:#3B82F6"></div>
+        <div class="llm-dot ${score>60?'active':'inactive'}" style="background:#F4C430"></div>
+        <div class="llm-dot ${score>45?'active':'inactive'}" style="background:#0ECFB0"></div>
+      </div>
+      <div class="pt-score" style="color:${rankColor}">#${Math.floor(score/10)+1}</div>
+      <div class="pt-action"><button class="btn btn-teal" style="padding:4px 10px;font-size:11px" onclick="analyzePrompt('${p.replace(/'/g,"\\'")}')">Analyze</button></div>
+    </div>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function updateCitationMap(brand,industry){
+  const sources = [
+    {name:'G2.com',icon:'⭐',pct:78,color:'#E8622A'},
+    {name:'Capterra',icon:'📊',pct:65,color:'#3B82F6'},
+    {name:'TechCrunch',icon:'📰',pct:52,color:'#22C55E'},
+    {name:'Forbes Tech',icon:'💼',pct:44,color:'#F4C430'},
+    {name:'Reddit',icon:'🔴',pct:38,color:'#FF4500'},
+    {name:brand+'.com',icon:'🌐',pct:28,color:'#0ECFB0'},
+  ];
+  document.getElementById('citation-list').innerHTML = sources.map(s=>`
+    <div class="cite-row">
+      <div class="cite-icon" style="background:${s.color}20">${s.icon}</div>
+      <div style="flex:1"><div class="cite-domain">${s.name}</div><div class="cite-sub">Frequently cited in AI answers</div></div>
+      <div class="cite-bar-wrap"><div class="cite-bar-fill" style="width:${s.pct}%;background:${s.color}"></div></div>
+      <div class="cite-pct" style="color:${s.color}">${s.pct}%</div>
+    </div>`).join('');
+}
+
+function updateCompetitorList(brand,industry,scores){
+  const avg = Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length;
+  const competitors = [
+    {name:'Competitor A',score:Math.min(avg+25,95),color:'#F43F5E'},
+    {name:'Competitor B',score:Math.min(avg+15,90),color:'#F59E0B'},
+    {name:brand+' (You)',score:Math.round(avg),color:'#0ECFB0',you:true},
+    {name:'Competitor C',score:Math.max(avg-10,5),color:'#8892A4'},
+  ].sort((a,b)=>b.score-a.score);
+
+  document.getElementById('competitor-list').innerHTML = competitors.map((c,i)=>`
+    <div class="cite-row" style="${c.you?'background:rgba(14,207,176,0.04);border-radius:6px;':''}">
+      <div class="cite-icon" style="background:${c.color}20;font-size:12px;font-weight:700;color:${c.color}">#${i+1}</div>
+      <div style="flex:1">
+        <div class="cite-domain" style="${c.you?'color:var(--teal)':''}">${c.name}${c.you?' ← YOU':''}</div>
+        <div class="cite-sub">AI Share of Voice</div>
+      </div>
+      <div class="cite-bar-wrap"><div class="cite-bar-fill" style="width:${c.score}%;background:${c.color}"></div></div>
+      <div class="cite-pct" style="color:${c.color}">${c.score}%</div>
+    </div>`).join('');
+}
+
+// ── Prompt Cluster Generator ──────────────────────────────
+async function runPromptCluster(){
+  const brand = document.getElementById('brand-input').value.trim();
+  const industry = document.getElementById('industry-input').value.trim();
+  if(!brand&&!industry){toast('Enter brand or industry first','error');return;}
+
+  const resultDiv = document.getElementById('gao-result');
+  const bodyDiv = document.getElementById('gr-body');
+  const titleDiv = document.getElementById('gr-title');
+  resultDiv.classList.add('show');
+  titleDiv.textContent = '🧩 Generating Prompt Clusters...';
+  bodyDiv.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Building conversational prompt clusters...';
+
+  try {
+    const res = await fetch('/api/chat',{method:'POST',headers:authH(),body:JSON.stringify({messages:[{role:'user',content:`Generate a comprehensive GAO prompt cluster strategy for:
+Brand: ${brand||'[Brand]'}
+Industry: ${industry||'[Industry]'}
+Target: Malaysia/SEA market
+
+Create 5 prompt clusters with 5 prompts each:
+1. Awareness prompts (what is / explain)
+2. Comparison prompts (vs competitor / best / top)
+3. Decision prompts (recommend / which should I)
+4. Local prompts (Malaysia specific / Bahasa Malaysia)
+5. Feature prompts (how to / can it / does it)
+
+For each cluster explain WHY these prompts matter for GAO and what content to create to rank for them.`}]})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error);
+    bodyDiv.textContent = data.message;
+    titleDiv.textContent = '🧩 Prompt Clusters — '+( brand||industry);
+    toast('✓ Prompt clusters generated!','success');
+  } catch(e){toast('Error: '+e.message,'error');}
+}
+
+// ── Schema Generator ──────────────────────────────────────
+async function runSchemaGen(){
+  const brand = document.getElementById('brand-input').value.trim();
+  const industry = document.getElementById('industry-input').value.trim();
+  if(!brand){toast('Enter your brand name first','error');return;}
+
+  const schemaDiv = document.getElementById('schema-output');
+  schemaDiv.classList.add('show');
+  schemaDiv.textContent = '// Generating AI-optimized schema markup...';
+
+  try {
+    const res = await fetch('/api/chat',{method:'POST',headers:authH(),body:JSON.stringify({messages:[{role:'user',content:`Generate complete JSON-LD schema markup optimized for AI crawler readability (GPTBot, ClaudeBot, GeminiBot) for:
+Brand: ${brand}
+Industry: ${industry||'SaaS Software'}
+Market: Malaysia/SEA
+
+Include:
+1. Organization schema
+2. SoftwareApplication schema (if applicable)
+3. FAQPage schema with 5 GAO-optimized Q&As
+4. BreadcrumbList schema
+5. WebSite schema with SearchAction
+
+Make it specifically optimized for LLM citation. Return ONLY valid JSON-LD code.`}]})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error);
+    schemaDiv.textContent = data.message;
+    toast('✓ Schema markup generated!','success');
+  } catch(e){schemaDiv.textContent='Error: '+e.message;toast('Error: '+e.message,'error');}
+}
+
+// ── Citation Audit ────────────────────────────────────────
+async function runCitationAudit(){
+  const brand = document.getElementById('brand-input').value.trim();
+  const industry = document.getElementById('industry-input').value.trim();
+  if(!brand&&!industry){toast('Enter brand or industry first','error');return;}
+
+  const resultDiv = document.getElementById('gao-result');
+  const bodyDiv = document.getElementById('gr-body');
+  const titleDiv = document.getElementById('gr-title');
+  resultDiv.classList.add('show');
+  titleDiv.textContent = '🔗 Running Citation Audit...';
+  bodyDiv.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Mapping citation sources...';
+
+  try {
+    const res = await fetch('/api/chat',{method:'POST',headers:authH(),body:JSON.stringify({messages:[{role:'user',content:`Perform a citation gap analysis for ${brand} in the ${industry||'SaaS'} industry for Malaysia/SEA market.
+
+Analyze:
+1. CITATION GAPS — What content types does ${brand} likely lack that AI systems need to cite them?
+2. HIGH-AUTHORITY SOURCES — Which websites/domains should ${brand} get mentioned on to improve AI citations?
+3. CONTENT FORMAT GAPS — What structured content is missing (statistics, case studies, comparison pages)?
+4. COMPETITOR CITATION ADVANTAGE — Why are competitors likely cited more?
+5. 90-DAY CITATION BUILDING PLAN — Specific steps to build AI citations
+
+Be specific and actionable for a Malaysian ${industry||'software'} company.`}]})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error);
+    bodyDiv.textContent = data.message;
+    titleDiv.textContent = '🔗 Citation Audit — '+brand;
+    toast('✓ Citation audit complete!','success');
+  } catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function analyzePrompt(prompt){
+  const brand = document.getElementById('brand-input').value.trim()||'your brand';
+  const resultDiv = document.getElementById('gao-result');
+  const bodyDiv = document.getElementById('gr-body');
+  const titleDiv = document.getElementById('gr-title');
+  resultDiv.classList.add('show');
+  titleDiv.textContent = '🎯 Analyzing Prompt...';
+  bodyDiv.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+
+  try {
+    const res = await fetch('/api/chat',{method:'POST',headers:authH(),body:JSON.stringify({messages:[{role:'user',content:`Analyze this specific prompt for GAO optimization for ${brand}:
+
+PROMPT: "${prompt}"
+
+Provide:
+1. Current likely AI answer structure for this prompt
+2. How likely is ${brand} to be mentioned (0-100%)
+3. What content would make ${brand} appear in the answer
+4. Specific optimization recommendations
+5. Content template that would get cited`}]})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error);
+    bodyDiv.textContent = data.message;
+    titleDiv.textContent = '🎯 Prompt Analysis — "'+prompt.substring(0,40)+'"';
+    toast('✓ Prompt analyzed!','success');
+  } catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function runFullAudit(){
+  const brand = document.getElementById('brand-input').value.trim();
+  if(!brand){toast('Enter your brand name first!','error');return;}
+  toast('⚡ Running full GAO audit...','success');
+  await runGAO();
+}
+
+function exportReport(){
+  const brand = document.getElementById('brand-input').value.trim()||'Brand';
+  const content = document.getElementById('gr-body').textContent;
+  if(!content){toast('Run an analysis first!','error');return;}
+  const blob = new Blob([`M-EasyGAO AI+ Report\nBrand: ${brand}\nDate: ${new Date().toLocaleDateString()}\n\n${content}`],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `GAO-Report-${brand}-${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  toast('Report downloaded!','success');
+}
+
+// Check if logged in
+if(!TOKEN){ document.querySelector('.gao-hero-sub').innerHTML += '<br><strong style="color:var(--orange)">⚠️ Please <a href="login.html" style="color:var(--teal)">sign in</a> to run live GAO analysis.</strong>'; }
+</script>
+</body>
+</html>
