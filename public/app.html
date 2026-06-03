@@ -1538,8 +1538,8 @@ function applyUser(u) {
   if (n) n.textContent = u.name;
   // Use translated plan text
   const planName = (u.plan||'free').charAt(0).toUpperCase()+(u.plan||'free').slice(1);
-  const planLabel = currentLang === 'bm' ? 'Pelan' : 'Plan';
-  const creditsLabel = currentLang === 'bm' ? 'kredit' : 'credits';
+  const planLabel = currentLang === 'bm' ? 'Pelan' : (currentLang === 'zh' ? '套餐' : 'Plan');
+  const creditsLabel = currentLang === 'bm' ? 'kredit' : (currentLang === 'zh' ? '积分' : 'credits');
   if (p) p.textContent = `${planName} ${planLabel} · ${(u.credits||0).toLocaleString()} ${creditsLabel}`;
   if (a) {
     if (u.avatar) a.innerHTML = `<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
@@ -1579,22 +1579,27 @@ function closeProfileMenu() {
 
 function updateProfileMenuLabels() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const isBM = currentLang === 'bm';
 
   const themeIcon = document.getElementById('pm-theme-icon');
   const themeLabel = document.getElementById('pm-theme-label');
   const themeStatus = document.getElementById('pm-theme-status');
   if (themeIcon) themeIcon.textContent = isDark ? '☀️' : '🌙';
-  if (themeLabel) themeLabel.textContent = isDark ? (isBM ? 'Mod Cerah' : 'Light Mode') : (isBM ? 'Mod Gelap' : 'Dark Mode');
-  if (themeStatus) themeStatus.textContent = isDark ? (isBM ? 'GELAP' : 'DARK') : (isBM ? 'CERAH' : 'LIGHT');
+  const themeLabelMap = { bm: [' Mod Cerah', 'Mod Gelap'], en: ['Light Mode', 'Dark Mode'], zh: ['浅色模式', '深色模式'] };
+  const themeStatusMap = { bm: ['GELAP', 'CERAH'], en: ['DARK', 'LIGHT'], zh: ['浅色', '深色'] };
+  const tl = themeLabelMap[currentLang] || themeLabelMap.en;
+  const ts = themeStatusMap[currentLang] || themeStatusMap.en;
+  if (themeLabel) themeLabel.textContent = isDark ? tl[0] : tl[1];
+  if (themeStatus) themeStatus.textContent = isDark ? ts[0] : ts[1];
 
   const langFlag = document.getElementById('pm-lang-flag');
   const langLabel = document.getElementById('pm-lang-label');
   const langBadge = document.getElementById('pm-lang-badge');
-  // Show the OTHER language (what you'll switch TO)
-  if (langFlag) langFlag.textContent = isBM ? '🇬🇧' : '🇲🇾';
-  if (langLabel) langLabel.textContent = isBM ? 'English' : 'Bahasa Malaysia';
-  if (langBadge) langBadge.textContent = isBM ? 'EN' : 'BM';
+  // Show the NEXT language in the cycle (bm→en→zh→bm)
+  const nextLangMap = { bm: ['🇬🇧', 'English', 'EN'], en: ['🇨🇳', '简体中文', 'ZH'], zh: ['🇲🇾', 'Bahasa Malaysia', 'BM'] };
+  const nl = nextLangMap[currentLang] || nextLangMap.bm;
+  if (langFlag) langFlag.textContent = nl[0];
+  if (langLabel) langLabel.textContent = nl[1];
+  if (langBadge) langBadge.textContent = nl[2];
 }
 
 // Close menu when clicking outside
@@ -1630,7 +1635,8 @@ async function loadStats() {
     const note = document.getElementById('credit-note');
     if (fill) fill.style.width=pct+'%';
     if (pctEl) pctEl.textContent=pct+'%';
-    if (note) note.textContent=`${(s.creditsUsed||0).toLocaleString()} ${currentLang==='bm'?'digunakan':'used'} · ${(s.creditsRemaining||0).toLocaleString()} ${t('dash_remaining')}`;
+    const _usedWordMap = { bm: 'digunakan', zh: '已用' };
+    if (note) note.textContent=`${(s.creditsUsed||0).toLocaleString()} ${_usedWordMap[currentLang]||'used'} · ${(s.creditsRemaining||0).toLocaleString()} ${t('dash_remaining')}`;
 
     // Recent documents panel
     const panel = document.getElementById('recent-docs-panel');
@@ -1652,7 +1658,7 @@ function renderRecentDocsTo(panel, docs) {
     const bg=bgs[d.tool_name]||'var(--cream2)';
     const tc=tcs[d.tool_name]||'var(--slate)';
     const date=new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-    const wordsLbl = currentLang==='bm' ? 'patah perkataan' : 'words'; return `<div class="recent-row"><div class="rr-ico" style="background:${bg}">${icon}</div><div class="rr-info"><div class="rr-name">${d.title}</div><div class="rr-meta">${d.tool_name||'Content'} · ${date} · ${(d.word_count||0).toLocaleString()} ${wordsLbl}</div></div><span class="rr-badge" style="background:${bg};color:${tc}">${(d.tool_name||'Doc').split(' ')[0]}</span></div>`;
+    const wordsLbl = currentLang==='bm' ? 'patah perkataan' : (currentLang==='zh' ? '字' : 'words'); return `<div class="recent-row"><div class="rr-ico" style="background:${bg}">${icon}</div><div class="rr-info"><div class="rr-name">${d.title}</div><div class="rr-meta">${d.tool_name||'Content'} · ${date} · ${(d.word_count||0).toLocaleString()} ${wordsLbl}</div></div><span class="rr-badge" style="background:${bg};color:${tc}">${(d.tool_name||'Doc').split(' ')[0]}</span></div>`;
   }).join('');
 }
 
@@ -1790,7 +1796,7 @@ async function generateContent() {
     if(!res.ok){const err=await res.json();throw new Error(err.error||'Generation failed');}
     const data=await res.json();
     credits=Math.max(0,credits-(data.creditsUsed||10));
-    const credLabel=currentLang==='bm'?'kredit':'credits';
+    const credLabel=currentLang==='bm'?'kredit':(currentLang==='zh'?'积分':'credits');
     document.getElementById('cred-count').textContent=credits.toLocaleString()+' '+credLabel;
     renderOutput(data.text,varCount);
     toast('✓ Content generated successfully','success');
@@ -2747,6 +2753,229 @@ const TRANSLATIONS = {
     feat_priority: 'Sokongan keutamaan',
     feat_team: '5 tempat duduk pasukan',
     feat_whitelabel: 'Eksport white-label',
+  },
+
+  zh: {
+    // Nav
+    nav_main: '主页', nav_dashboard: '仪表板', nav_tools: 'AI工具',
+    nav_chat: 'AI聊天', nav_content: '内容', nav_documents: '文档',
+    nav_seo: 'SEO套件',
+    nav_gao: 'GAO套件', nav_bulk: '批量生成', nav_templates: '模板',
+    nav_account: '账户', nav_settings: '设置',
+    signout_label: '退出登录',
+
+    // Topbar
+    btn_new_content: '＋ 新内容',
+
+    // Dashboard
+    dash_hello: '你好 ☀',
+    dash_welcome: '欢迎回来',
+    dash_sub: "您的AI营销引擎已就绪。本月您已创建了 {n} 条内容——继续保持！",
+    metric_words: '已生成字数',
+    metric_docs: '文档数量',
+    metric_credits: '已用积分',
+    metric_toptool: '最常用工具',
+    dash_recent: '最近文档',
+    dash_viewall: '查看全部 →',
+    dash_quickcreate: '快速创建',
+    dash_credits_label: '每月积分',
+    // Dashboard extras
+    dash_this_month: '本月',
+    dash_this_week: '本周',
+    dash_remaining: '剩余',
+    dash_uses: '次使用',
+    dash_credit_usage: '积分使用情况',
+    qt_blog: '博客文章',
+    qt_social: '社交帖子',
+    qt_email: '邮件文案',
+    qt_ad: '广告文案',
+
+    // Tools page
+    tools_title: 'AI工具',
+    tools_sub: '40多种工具，几秒内创建任意营销内容',
+    tools_search: '搜索工具...',
+    cat_all: '全部工具', cat_blog: '✍️ 博客与长文', cat_social: '📱 社交媒体',
+    cat_email: '📧 邮件', cat_ads: '🎯 广告与PPC', cat_ecom: '🛍️ 电商',
+    cat_sales: '💼 销售', cat_rewrite: '🔄 改写', cat_seo: '🔍 SEO',
+
+    // Editor
+    back_tools: '← 返回',
+    btn_generate: '✦ 生成内容',
+    out_output: '输出', out_edit: '编辑',
+    btn_copy_all: '📋 全部复制', btn_save_doc: '💾 保存文档',
+    out_empty_text: '填写左侧详细信息，然后点击生成以创建您的内容',
+    generating: '正在生成您的内容…',
+    lbl_tone: '语气风格', lbl_variants: '变体数量',
+    var1: '1个变体', var2: '2个变体', var3: '3个变体',
+    variant_label: '变体',
+    btn_copy: '📋', btn_save: '💾', btn_regen: '🔄', btn_wp: '🌐',
+
+    // Chat
+    chat_title: 'AI聊天',
+    chat_sub: '您的专业营销AI——随时为您服务',
+    chat_clear: '🗑 清空聊天',
+    chat_placeholder: '询问任何关于营销、内容、SEO的问题…',
+    chat_send: '发送 →',
+    chat_greeting: "你好！我是M-EasyTools AI，您的智能营销助手。我可以帮助您：\n\n• 撰写和编辑各类营销内容\n• 博客文章、邮件序列、广告活动\n• SEO策略和关键词研究\n• 品牌声音和信息策略\n• 社交媒体内容和标题\n• 销售文案和产品描述\n\n您今天在做什么？",
+    chat_cleared: '聊天已清空！您今天想创建什么？',
+
+    // Documents
+    docs_title: '文档',
+    docs_sub: '所有AI生成的内容集中在一处',
+    btn_new_doc: '＋ 新文档',
+    col_title: '标题', col_type: '类型', col_words: '字数',
+    col_created: '创建时间', col_actions: '操作',
+    no_docs: '暂无文档。使用AI工具开始创建内容！',
+    filter_all: '全部', filter_blog: '博客文章', filter_email: '邮件',
+    filter_social: '社交', filter_ads: '广告', filter_product: '产品',
+
+    // SEO
+    seo_title: 'SEO套件',
+    seo_sub: '在Google和AI搜索结果中获得更高排名',
+    seo_intro_title: 'SEO套件',
+    seo_intro_sub: '利用AI驱动的SEO工具主导搜索结果。',
+    seo_meta_title: 'SEO元标签生成器',
+    seo_meta_desc: '生成吸引点击的标题标签和元描述。',
+    seo_keyword_title: '关键词集群构建器',
+    seo_keyword_desc: '构建完整的关键词策略，包含集群和意图映射。',
+    seo_article_title: 'SEO文章写手',
+    seo_article_desc: '撰写具有完整结构的长篇文章。',
+    seo_optimizer_title: '内容优化器',
+    seo_optimizer_desc: '重写并优化现有内容以获得更好的排名。',
+
+    // Bulk
+    bulk_title: '批量生成',
+    bulk_sub: '一次最多生成20条内容',
+    bulk_tool_label: '选择工具',
+    bulk_tone_label: '语气',
+    bulk_inputs_label: '要生成的项目（每行一个，最多20个）',
+    bulk_inputs_ph: '例：为蓝色跑鞋写产品描述\n为红色运动鞋写产品描述\n为白色训练鞋写产品描述',
+    bulk_count: '已输入0个项目',
+    btn_bulk_generate: '⚡ 全部生成',
+    bulk_processing: '正在处理第 {n} / {t} 个...',
+    bulk_done: '✓ 批量生成完成！{s}/{t} 成功',
+    btn_export_csv: '📥 导出CSV',
+    bulk_empty_text: '在上方输入项目并点击全部生成',
+
+    // Templates
+    tpl_title: '自定义模板',
+    tpl_sub: '保存您最好的提示词，供任何客户或活动重复使用',
+    btn_new_tpl: '＋ 新模板',
+    tpl_use: '使用模板 →',
+
+    // Settings
+    settings_title: '设置',
+    sn_general: '⚙️ 通用', sn_api: '🔑 API密钥', sn_password: '🔒 密码',
+    sn_brand: '🎨 品牌声音', sn_team: '👥 团队', sn_wordpress: '🔌 WordPress',
+    sn_shopify: '🛍️ Shopify', sn_developer: '👨‍💻 开发者API', sn_notif: '🔔 通知',
+    sc_general_title: '通用设置',
+    lbl_fullname: '全名', lbl_fullname_desc: '在平台上显示',
+    lbl_email: '电子邮件地址', lbl_email_desc: '用于登录和账单',
+    lbl_lang: '默认语言', lbl_lang_desc: '生成内容的语言',
+    lbl_tone_def: '默认语气', lbl_tone_desc: '适用于所有新内容',
+    btn_save_changes: '保存更改',
+    sc_api_title: 'API配置',
+    lbl_groq: '您的Groq API密钥（可选）',
+    lbl_groq_desc: '从console.groq.com添加您的免费Groq密钥',
+    btn_save_key: '保存密钥',
+    api_info: '✅ 该平台已内置Groq AI密钥——所有工具均可免费开箱即用。',
+    sc_password_title: '修改密码',
+    lbl_current_pw: '当前密码',
+    lbl_new_pw: '新密码',
+    lbl_confirm_pw: '确认新密码',
+    btn_change_pw: '修改密码',
+    sc_brand_title: '品牌声音',
+    lbl_brand_name: '品牌/公司名称',
+    lbl_brand_desc_field: '品牌描述',
+    lbl_tone_voice: '语气风格',
+    lbl_target_audience: '目标受众',
+    btn_save_brand: '保存品牌声音',
+    sc_team_title: '团队工作区',
+    sc_wp_title: 'WordPress集成',
+    lbl_wp_url: 'WordPress网站URL',
+    lbl_wp_user: 'WordPress用户名',
+    lbl_wp_pass: '应用程序密码',
+    btn_connect_wp: '连接WordPress',
+    btn_disconnect: '断开连接',
+    wp_info: '💡 使用WordPress管理后台 → 用户 → 个人资料中的应用程序密码',
+    sc_shopify_title: 'Shopify集成',
+    lbl_shopify_domain: 'Shopify商店域名',
+    lbl_shopify_token: '管理员API访问令牌',
+    btn_connect_shopify: '连接Shopify',
+    shopify_info: '💡 从Shopify管理后台 → 应用 → 开发应用获取令牌',
+    sc_dev_title: '开发者API',
+    dev_desc: '通过我们的REST API在您自己的应用中使用M-EasyTools AI的AI工具。',
+    btn_show_key: '显示我的API密钥',
+    btn_regen_key: '🔄 重新生成密钥',
+    dev_base_url: '基础URL',
+    dev_auth: '认证',
+    dev_auth_desc: '添加请求头：X-API-Key: 您的API密钥',
+    dev_rate: '速率限制：120次请求/分钟',
+    sc_notif_title: '通知',
+    notif_weekly: '每周使用报告',
+    notif_weekly_desc: '每周一获取您的内容创建摘要',
+    notif_credits: '积分不足提醒',
+    notif_credits_desc: '当积分低于1,000时通知您',
+    notif_features: '新功能公告',
+    notif_features_desc: '第一时间了解新AI工具',
+    notif_tips: '营销技巧',
+    notif_tips_desc: '每周接收营销最佳实践',
+    btn_save_notif: '保存偏好设置',
+
+    // Billing
+    billing_title: '账单与套餐',
+    billing_sub: '选择驱动您营销的套餐',
+    current_plan: '当前套餐',
+    credits_this_month: '本月积分',
+    plan_tag_free: '免费', plan_tag_pro: '当前套餐 ✓', plan_tag_agency: '功能最强',
+    plan_name_starter: '入门版', plan_name_pro: '专业版', plan_name_agency: '企业版',
+    plan_price_mo: '/月',
+    btn_downgrade: '降级', btn_active: '当前套餐', btn_upgrade: '升级到企业版 →',
+
+    // Toasts / messages
+    toast_saved: '设置已保存！',
+    toast_brand_saved: '品牌声音已保存！',
+    toast_copied: '已复制到剪贴板！',
+    toast_all_copied: '全部已复制！',
+    toast_doc_saved: '已保存到文档 ✓',
+    toast_deleted: '已删除',
+    toast_generated: '✓ 内容生成成功',
+    toast_regen: '已重新生成 ✓',
+    toast_key_saved: '✓ Groq API密钥已保存！',
+    toast_pw_changed: '✓ 密码已更新！',
+    toast_wp_disconnected: 'WordPress已断开连接',
+    toast_shopify_disconnected: 'Shopify已断开连接',
+    toast_team_created: '团队已创建！',
+    toast_member_removed: '成员已移除',
+    toast_new_key: '✓ 新API密钥已生成！',
+    toast_pw_mismatch: '两次输入的新密码不匹配',
+    toast_pw_short: '密码至少需要8个字符',
+    toast_field_required: '请填写第一个字段',
+    toast_bulk_started: '⚡ 批量生成已开始！',
+    toast_csv_downloaded: 'CSV已下载！',
+    confirm_delete: '删除此文档？',
+    confirm_regen_key: '重新生成API密钥？旧密钥将立即失效。',
+    confirm_remove_member: '从团队中移除此成员？',
+    confirm_wp_disconnect: '断开WordPress连接？',
+    confirm_shopify_disconnect: '断开Shopify连接？',
+    publish_as: '发布方式（草稿或发布）：',
+    publish_default: '草稿',
+
+    // Plan features
+    feat_credits_free: '每月2,500积分',
+    feat_credits_pro: '每月10,000积分',
+    feat_credits_agency: '无限积分',
+    feat_tools_basic: '20个核心AI工具',
+    feat_tools_all: '全部40+个AI工具',
+    feat_chat: 'AI聊天（Groq驱动）',
+    feat_storage: '基础文档存储',
+    feat_seo: '完整SEO套件',
+    feat_brand: '品牌声音训练',
+    feat_templates: '自定义模板',
+    feat_api: 'API访问',
+    feat_priority: '优先支持',
+    feat_team: '5个团队席位',
+    feat_whitelabel: '白标导出',
   }
 };
 
@@ -2776,15 +3005,18 @@ function applyTranslations() {
   const signoutEl = document.getElementById('signout-label');
   if (signoutEl) signoutEl.textContent = t('signout_label');
 
-  // Update language button
+  // Update language button (shows next language in cycle bm→en→zh→bm)
   const langBtn = document.getElementById('lang-btn');
   const langFlag = document.getElementById('lang-flag');
   const langLabel = document.getElementById('lang-label');
-  if (langFlag) langFlag.textContent = currentLang === 'bm' ? '🇬🇧' : '🇲🇾';
-  if (langLabel) langLabel.textContent = currentLang === 'bm' ? 'EN' : 'BM';
+  const nextBtnMap = { bm: ['🇬🇧', 'EN'], en: ['🇨🇳', 'ZH'], zh: ['🇲🇾', 'BM'] };
+  const nb = nextBtnMap[currentLang] || nextBtnMap.bm;
+  if (langFlag) langFlag.textContent = nb[0];
+  if (langLabel) langLabel.textContent = nb[1];
 
   // Update html lang attribute
-  document.documentElement.lang = currentLang === 'bm' ? 'ms' : 'en';
+  const htmlLangMap = { bm: 'ms', en: 'en', zh: 'zh-Hans' };
+  document.documentElement.lang = htmlLangMap[currentLang] || 'en';
 
   // Update topbar title
   const topbarTitle = document.getElementById('topbar-title');
@@ -2850,7 +3082,8 @@ function updatePageTexts() {
   // Credit note
   const creditNote = document.getElementById('credit-note');
   if (creditNote && currentUser) {
-    const usedLabel = currentLang === 'bm' ? 'digunakan' : 'used';
+    const _usedMap2 = { bm: 'digunakan', zh: '已用' };
+    const usedLabel = _usedMap2[currentLang] || 'used';
     const credUsed = (currentUser.credits_max || 0) - (currentUser.credits || 0);
     creditNote.textContent = `${Math.max(0,credUsed).toLocaleString()} ${usedLabel} · ${(currentUser.credits||0).toLocaleString()} ${t('dash_remaining')}`;
   }
@@ -2908,7 +3141,8 @@ function updateBulkPageTexts() {
 }
 
 function toggleLang() {
-  currentLang = currentLang === 'bm' ? 'en' : 'bm';
+  const cycle = { bm: 'en', en: 'zh', zh: 'bm' };
+  currentLang = cycle[currentLang] || 'en';
   localStorage.setItem('msm_lang', currentLang);
   applyTranslations();
   renderTools(TOOLS);
@@ -2920,7 +3154,8 @@ function toggleLang() {
     const g = document.querySelector('.banner-title');
     if (g) g.textContent = t('dash_welcome') + ', ' + currentUser.name.split(' ')[0];
   }
-  toast(currentLang === 'bm' ? '🇲🇾 Bahasa Malaysia diaktifkan' : '🇬🇧 English activated', 'success');
+  const toastMsgMap = { bm: '🇲🇾 Bahasa Malaysia diaktifkan', en: '🇬🇧 English activated', zh: '🇨🇳 简体中文已启用' };
+  toast(toastMsgMap[currentLang] || '🇬🇧 English activated', 'success');
 }
 
 function initLang() {
