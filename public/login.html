@@ -338,5 +338,117 @@ function socialLogin(provider) {
   }
 })();
 </script>
+
+<script>
+(function(){
+  const saved = localStorage.getItem('msm_lang') || 'en';
+  const lang = saved === 'ms' || saved === 'bm' ? 'bm' : saved;
+  if (lang === 'en') return;
+
+  const TX = {
+    bm: {
+      page_title: 'Log Masuk — M-EasyTools AI',
+      left_headline: 'Enjin Pemasaran AI Anda <span class="hl">Menanti</span>',
+      left_desc: 'Log masuk untuk mengakses 40+ alat penulisan AI, perpustakaan dokumen, Sembang AI dikuasakan Groq, dan suite SEO anda.',
+      stat_tools: 'Alat AI', stat_faster: 'Lebih Pantas', stat_users: 'Pengguna',
+      testi_quote: '"Daftar hari Isnin, 5 siaran blog siap pada hari Rabu. M-EasyTools AI adalah pelaburan pemasaran terbaik yang pernah saya buat tahun ini."',
+      testi_name: 'James Wong', testi_role: 'Pengasas, GrowthLab Agency',
+      footer_copy: '© 2025 M-EasyTools AI',
+      auth_title: 'Selamat kembali',
+      auth_sub: 'Tiada akaun? <a href="signup.html">Daftar percuma →</a>',
+      error_default: 'E-mel atau kata laluan tidak sah. Sila cuba lagi.',
+      success_default: 'Berjaya log masuk! Mengalihkan…',
+      lbl_email: 'Alamat E-mel', ph_email: 'anda@syarikat.com',
+      lbl_password: 'Kata Laluan', ph_password: 'Kata laluan anda',
+      remember_me: 'Kekalkan saya log masuk',
+      forgot: 'Lupa kata laluan?',
+      btn_signin: 'Log Masuk →',
+      or_continue: 'atau teruskan dengan',
+      footer_link: 'Baru di M-EasyTools AI? <a href="signup.html">Buat akaun percuma</a>',
+      signing_in: 'Sedang log masuk…',
+    },
+    zh: {
+      page_title: '登录 — M-EasyTools AI',
+      left_headline: '您的AI营销引擎<span class="hl">正在等候</span>',
+      left_desc: '登录以访问40+个AI写作工具、文档库、Groq驱动的AI聊天和SEO套件。',
+      stat_tools: 'AI工具', stat_faster: '更快速', stat_users: '用户',
+      testi_quote: '"周一注册，周三就完成了5篇博客文章。M-EasyTools AI是我今年做过的最好的营销投资。"',
+      testi_name: 'James Wong', testi_role: 'GrowthLab Agency 创始人',
+      footer_copy: '© 2025 M-EasyTools AI',
+      auth_title: '欢迎回来',
+      auth_sub: '还没有账户？<a href="signup.html">免费注册 →</a>',
+      error_default: '邮箱或密码无效，请重试。',
+      success_default: '登录成功！正在跳转…',
+      lbl_email: '电子邮件地址', ph_email: 'you@company.com',
+      lbl_password: '密码', ph_password: '您的密码',
+      remember_me: '保持登录状态',
+      forgot: '忘记密码？',
+      btn_signin: '登录 →',
+      or_continue: '或继续使用',
+      footer_link: '新用户？<a href="signup.html">创建免费账户</a>',
+      signing_in: '正在登录…',
+    }
+  };
+
+  const tx = TX[lang]; if (!tx) return;
+
+  function setText(sel, val) { const el = document.querySelector(sel); if (el) el.textContent = val; }
+  function setHTML(sel, val) { const el = document.querySelector(sel); if (el) el.innerHTML = val; }
+  function setPlaceholder(id, val) { const el = document.getElementById(id); if (el) el.placeholder = val; }
+  function setAttr(id, attr, val) { const el = document.getElementById(id); if (el) el.setAttribute(attr, val); }
+
+  document.title = tx.page_title;
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : 'ms';
+
+  setHTML('.left-headline', tx.left_headline);
+  setText('.left-desc', tx.left_desc);
+
+  const statLabels = document.querySelectorAll('.stat-label');
+  if (statLabels[0]) statLabels[0].textContent = tx.stat_tools;
+  if (statLabels[1]) statLabels[1].textContent = tx.stat_faster;
+  if (statLabels[2]) statLabels[2].textContent = tx.stat_users;
+
+  setText('.testi-quote', tx.testi_quote);
+  setText('.testi-name', tx.testi_name);
+  setText('.testi-role', tx.testi_role);
+
+  setText('.auth-title', tx.auth_title);
+  setHTML('.auth-sub', tx.auth_sub);
+
+  const errorMsgEl = document.getElementById('error-msg');
+  if (errorMsgEl && !errorMsgEl.style.display.includes('block')) errorMsgEl.textContent = tx.error_default;
+
+  const formLabels = document.querySelectorAll('.form-label');
+  if (formLabels[0]) formLabels[0].textContent = tx.lbl_email;
+  if (formLabels[1]) formLabels[1].textContent = tx.lbl_password;
+
+  setPlaceholder('login-email', tx.ph_email);
+  setPlaceholder('login-password', tx.ph_password);
+
+  const checkLabel = document.querySelector('.checkbox-label');
+  if (checkLabel) checkLabel.textContent = tx.remember_me;
+
+  const forgotLink = document.querySelector('.forgot-link');
+  if (forgotLink) forgotLink.textContent = tx.forgot;
+
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn && loginBtn.textContent.includes('Sign In')) loginBtn.textContent = tx.btn_signin;
+
+  const divider = document.querySelector('.divider-row');
+  if (divider) { const lines = divider.querySelectorAll('.divider-line'); divider.textContent = ''; lines.forEach((l,i) => { divider.appendChild(l); if (i===0) divider.appendChild(document.createTextNode(` ${tx.or_continue} `)); }); }
+
+  setHTML('.auth-footer', tx.footer_link);
+
+  // Override login button JS text
+  const origHandleLogin = window.handleLogin;
+  if (origHandleLogin) {
+    window.handleLogin = async function(e) {
+      const btn = document.getElementById('login-btn');
+      if (btn) { btn.textContent = tx.signing_in; }
+      return origHandleLogin.call(this, e);
+    };
+  }
+})();
+</script>
 </body>
 </html>

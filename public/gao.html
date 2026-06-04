@@ -1552,5 +1552,341 @@ renderHistory();
 // Check if logged in
 if(!TOKEN){ document.querySelector('.gao-hero-sub').innerHTML += '<br><strong style="color:var(--orange)">⚠️ Please <a href="login.html" style="color:var(--teal)">sign in</a> to run live GAO analysis.</strong>'; }
 </script>
+
+<!-- ══ GAO i18n ══ -->
+<script>
+(function(){
+  const saved = localStorage.getItem('msm_lang') || 'en';
+  const lang = saved === 'ms' || saved === 'bm' ? 'bm' : saved;
+
+  const GAO_T = {
+    en: {
+      topbar_title: 'M-EasyGAO AI+ — Generative AI Optimization Suite',
+      btn_audit: '⚡ Run Full GAO Audit', btn_export: '📥 Export Report',
+      tab_overview: '📊 GAO Overview', tab_entity: '🏷️ Entity Extractor',
+      tab_links: '🔗 Internal Link Suggester', tab_schema: '📋 Schema Builder',
+      tab_enrich: '✨ Content Enricher', tab_history: '📈 Visibility History',
+      hero_badge: 'GAO — Generative AI Optimization',
+      hero_title: 'Make your brand visible inside <span>ChatGPT, Claude, Gemini</span> & AI Search',
+      hero_sub: 'Track AI Share of Voice, monitor citations, analyze prompts and outrank competitors across all major LLMs — the first GAO suite built for Malaysian businesses.',
+      stat_prompts: 'Prompts Tracked', stat_visibility: 'AI Visibility Score',
+      stat_citations: 'Citations Found', stat_llms: 'LLMs Monitored',
+      ip_title: '🎯 Configure Your GAO Analysis',
+      lbl_brand: 'Brand / Company Name', lbl_industry: 'Industry / Niche',
+      lbl_market: 'Target Market', lbl_llms: 'LLMs to Monitor',
+      lbl_prompts: 'Seed Prompts (one per line)',
+      ph_brand: 'e.g. M-EasyDo', ph_industry: 'e.g. CRM Software, Malaysia',
+      ph_prompts: 'best crm for sme malaysia\nwhat is the easiest crm software',
+      mkt_en: 'Malaysia (English)', mkt_bm: 'Malaysia (Bahasa Malaysia)',
+      mkt_sea: 'Southeast Asia', mkt_global: 'Global English', mkt_cn: 'China / DeepSeek',
+      btn_run: '✦ Run GAO Analysis', btn_clusters: '🧩 Generate Prompt Clusters',
+      btn_schema: '📋 Generate Schema Markup', btn_citation: '🔗 Citation Audit',
+      gr_title: '🧠 GAO Analysis Result', btn_copy: '📋 Copy',
+      vis_label: 'AI Share of Voice', run_first: 'Run analysis first',
+      sov_title: '📊 AI Share of Voice', sov_sub: 'Brand citation frequency across LLMs',
+      pt_title: '🎯 Prompt Tracking Dashboard', pt_sub: 'Monitor brand visibility per prompt cluster',
+      col_prompt: 'Prompt', col_visibility: 'Visibility', col_sentiment: 'Sentiment',
+      col_llms: 'LLMs', col_rank: 'Rank', col_action: 'Action',
+      pt_empty: 'Enter prompts above and run analysis',
+      pt_empty2: 'Your prompt tracking data will appear here',
+      cite_title: '🔗 Citation Source Map', cite_sub: 'Who AI cites in your niche',
+      cite_empty: 'Run Citation Audit to see which sources AI cites in your niche',
+      comp_title: '⚔️ Competitor AI Visibility', comp_sub: 'vs your brand',
+      comp_empty: 'Run GAO Analysis to compare competitor visibility',
+      entity_title: '🏷️ Entity Extractor',
+      entity_desc: 'Identify key entities in your content — people, brands, places, topics, products',
+      entity_ph: 'Paste any content here — blog post, product description, landing page copy, article...',
+      entity_hint: 'The AI will extract all key entities and classify them by type.',
+      btn_extract: '🏷️ Extract Entities', btn_analyze_gao: '🧠 Analyze for GAO',
+      btn_copy_entities: '📋 Copy All Entities',
+      extracted_title: 'Extracted Entities', extracted_hint: 'Click any entity to analyze its AI visibility',
+      entity_empty: 'Paste content above and click Extract Entities',
+      analysis_title: 'Entity Analysis', analysis_empty: 'Select an entity to see its GAO analysis',
+      btn_full_report: '🏷️ Full Entity Report',
+      links_title: '🔗 Internal Link Suggester',
+      links_desc: 'AI recommends which pages to link to — improve SEO, reduce bounce rate and help AI crawlers map your site',
+      lbl_content: '📝 Content to Analyze for Internal Links',
+      lbl_page_url: 'Current Page URL', lbl_domain: 'Website Domain',
+      btn_suggest_links: '🔗 Suggest Internal Links', btn_link_strategy: '🗺️ Build Link Strategy',
+      links_result_title: '🔗 Internal Link Suggestions',
+      schema_title: '📋 Schema Markup Builder',
+      schema_desc: 'Generate JSON-LD schema optimized for GPTBot, ClaudeBot, GeminiBot and Google rich snippets',
+      schema_config: '⚙️ Configure Schema',
+      lbl_schema_url: 'Website URL', lbl_schema_industry: 'Industry', lbl_schema_type: 'Schema Type',
+      schema_org: '🏢 Organization', schema_soft: '💻 Software App', schema_faq: '❓ FAQ Page',
+      schema_product: '🛍️ Product', schema_article: '📝 Article', schema_local: '📍 Local Business',
+      schema_complete: '✨ Complete Suite',
+      schema_ph: 'Optional: paste your page content or describe what you want in the schema...',
+      btn_gen_schema: '📋 Generate Schema', btn_validate: '✅ Validate Schema', btn_copy_json: '📋 Copy JSON-LD',
+      enrich_title: '✨ Content Enricher',
+      enrich_desc: 'Make your content more AI-readable — add semantic context, entities, structured data signals and citation-worthy facts',
+      lbl_target_llm: 'Target LLM', lbl_enrich_goal: 'Enrichment Goal',
+      llm_all: 'All LLMs (general)', llm_gpt: 'ChatGPT / OpenAI', llm_claude: 'Claude / Anthropic',
+      llm_gemini: 'Gemini / Google', llm_perplexity: 'Perplexity', llm_deepseek: 'DeepSeek',
+      goal_cite: 'Get cited in AI answers', goal_vis: 'Improve AI visibility score',
+      goal_entities: 'Add semantic entities', goal_stats: 'Add citation-worthy statistics',
+      goal_read: 'Improve readability for AI',
+      btn_enrich: '✨ Enrich Content', btn_gao_score: '📊 GAO Content Score', btn_copy_enriched: '📋 Copy Enriched',
+      panel_original: '📄 Original Content', panel_enriched: '✨ AI-Enriched Version',
+      history_title: '📈 Visibility History',
+      history_desc: 'Track your AI visibility score over time — see trends, improvements and what\'s working',
+      history_chart_title: 'AI Visibility Trend — Last 7 Analyses',
+      history_empty: 'Run GAO analyses regularly to build your history',
+      hist_best: '📈 Best Score Ever', hist_latest: '📊 Latest Score',
+      hist_total: '🔢 Total Analyses', hist_total_sub: 'GAO analyses run',
+      col_brand: 'Brand', col_date: 'Date', col_avg: 'Avg Score', col_best: 'Best LLM', col_prompts_col: 'Prompts',
+      hist_empty: 'No GAO analyses saved yet. Run a GAO Analysis in the Overview tab to start building your history.',
+      sb_main: 'Main', sb_content: 'Content', sb_account: 'Account',
+      sb_dashboard: '📊 Dashboard', sb_tools: '🔧 AI Tools',
+      sb_chat: '💬 AI Chat', sb_docs: '📄 Documents',
+      sb_seo: '🔍 SEO Suite', sb_gao: '🧠 GAO Suite', sb_settings: '⚙️ Settings',
+    },
+    bm: {
+      topbar_title: 'M-EasyGAO AI+ — Suite Pengoptimuman AI Generatif',
+      btn_audit: '⚡ Jalankan Audit GAO Penuh', btn_export: '📥 Eksport Laporan',
+      tab_overview: '📊 Gambaran Keseluruhan GAO', tab_entity: '🏷️ Pengekstrak Entiti',
+      tab_links: '🔗 Pencadang Pautan Dalaman', tab_schema: '📋 Pembina Skema',
+      tab_enrich: '✨ Pengaya Kandungan', tab_history: '📈 Sejarah Keterlihatan',
+      hero_badge: 'GAO — Pengoptimuman AI Generatif',
+      hero_title: 'Jadikan jenama anda kelihatan di dalam <span>ChatGPT, Claude, Gemini</span> & Carian AI',
+      hero_sub: 'Jejak Bahagian Suara AI, pantau petikan, analisa gesaan dan kalahkan pesaing merentasi semua LLM utama — suite GAO pertama dibina untuk perniagaan Malaysia.',
+      stat_prompts: 'Gesaan Dijejak', stat_visibility: 'Skor Keterlihatan AI',
+      stat_citations: 'Petikan Ditemui', stat_llms: 'LLM Dipantau',
+      ip_title: '🎯 Konfigurasi Analisis GAO Anda',
+      lbl_brand: 'Nama Jenama / Syarikat', lbl_industry: 'Industri / Niche',
+      lbl_market: 'Pasaran Sasaran', lbl_llms: 'LLM untuk Dipantau',
+      lbl_prompts: 'Gesaan Awal (satu setiap baris)',
+      ph_brand: 'cth. M-EasyDo', ph_industry: 'cth. Perisian CRM, Malaysia',
+      ph_prompts: 'crm terbaik untuk sme malaysia\napakah perisian crm paling mudah',
+      mkt_en: 'Malaysia (Bahasa Inggeris)', mkt_bm: 'Malaysia (Bahasa Malaysia)',
+      mkt_sea: 'Asia Tenggara', mkt_global: 'Bahasa Inggeris Global', mkt_cn: 'China / DeepSeek',
+      btn_run: '✦ Jalankan Analisis GAO', btn_clusters: '🧩 Jana Gugusan Gesaan',
+      btn_schema: '📋 Jana Tandaan Skema', btn_citation: '🔗 Audit Petikan',
+      gr_title: '🧠 Keputusan Analisis GAO', btn_copy: '📋 Salin',
+      vis_label: 'Bahagian Suara AI', run_first: 'Jalankan analisis dahulu',
+      sov_title: '📊 Bahagian Suara AI', sov_sub: 'Kekerapan petikan jenama merentasi LLM',
+      pt_title: '🎯 Papan Pemuka Penjejak Gesaan', pt_sub: 'Pantau keterlihatan jenama setiap gugusan gesaan',
+      col_prompt: 'Gesaan', col_visibility: 'Keterlihatan', col_sentiment: 'Sentimen',
+      col_llms: 'LLM', col_rank: 'Kedudukan', col_action: 'Tindakan',
+      pt_empty: 'Masukkan gesaan di atas dan jalankan analisis',
+      pt_empty2: 'Data penjejakan gesaan anda akan muncul di sini',
+      cite_title: '🔗 Peta Sumber Petikan', cite_sub: 'Sumber yang AI petik dalam niche anda',
+      cite_empty: 'Jalankan Audit Petikan untuk melihat sumber yang dipetik AI dalam niche anda',
+      comp_title: '⚔️ Keterlihatan AI Pesaing', comp_sub: 'berbanding jenama anda',
+      comp_empty: 'Jalankan Analisis GAO untuk membandingkan keterlihatan pesaing',
+      entity_title: '🏷️ Pengekstrak Entiti',
+      entity_desc: 'Kenal pasti entiti utama dalam kandungan anda — orang, jenama, tempat, topik, produk',
+      entity_ph: 'Tampal sebarang kandungan di sini — siaran blog, penerangan produk, salinan halaman pendaratan, artikel...',
+      entity_hint: 'AI akan mengekstrak semua entiti utama dan mengklasifikasikannya mengikut jenis.',
+      btn_extract: '🏷️ Ekstrak Entiti', btn_analyze_gao: '🧠 Analisis untuk GAO',
+      btn_copy_entities: '📋 Salin Semua Entiti',
+      extracted_title: 'Entiti Diekstrak', extracted_hint: 'Klik mana-mana entiti untuk menganalisis keterlihatan AI-nya',
+      entity_empty: 'Tampal kandungan di atas dan klik Ekstrak Entiti',
+      analysis_title: 'Analisis Entiti', analysis_empty: 'Pilih entiti untuk melihat analisis GAO-nya',
+      btn_full_report: '🏷️ Laporan Entiti Penuh',
+      links_title: '🔗 Pencadang Pautan Dalaman',
+      links_desc: 'AI mengesyorkan halaman untuk dipautkan — tingkatkan SEO, kurangkan kadar lantunan dan bantu perayap AI memetakan laman web anda',
+      lbl_content: '📝 Kandungan untuk Dianalisis bagi Pautan Dalaman',
+      lbl_page_url: 'URL Halaman Semasa', lbl_domain: 'Domain Laman Web',
+      btn_suggest_links: '🔗 Cadangkan Pautan Dalaman', btn_link_strategy: '🗺️ Bina Strategi Pautan',
+      links_result_title: '🔗 Cadangan Pautan Dalaman',
+      schema_title: '📋 Pembina Tandaan Skema',
+      schema_desc: 'Jana skema JSON-LD dioptimumkan untuk GPTBot, ClaudeBot, GeminiBot dan petikan kaya Google',
+      schema_config: '⚙️ Konfigurasi Skema',
+      lbl_schema_url: 'URL Laman Web', lbl_schema_industry: 'Industri', lbl_schema_type: 'Jenis Skema',
+      schema_org: '🏢 Organisasi', schema_soft: '💻 Aplikasi Perisian', schema_faq: '❓ Halaman FAQ',
+      schema_product: '🛍️ Produk', schema_article: '📝 Artikel', schema_local: '📍 Perniagaan Tempatan',
+      schema_complete: '✨ Suite Lengkap',
+      schema_ph: 'Pilihan: tampal kandungan halaman anda atau huraikan apa yang anda mahu dalam skema...',
+      btn_gen_schema: '📋 Jana Skema', btn_validate: '✅ Sahkan Skema', btn_copy_json: '📋 Salin JSON-LD',
+      enrich_title: '✨ Pengaya Kandungan',
+      enrich_desc: 'Jadikan kandungan anda lebih boleh dibaca AI — tambah konteks semantik, entiti, isyarat data berstruktur dan fakta layak dipetik',
+      lbl_target_llm: 'LLM Sasaran', lbl_enrich_goal: 'Matlamat Pengayaan',
+      llm_all: 'Semua LLM (umum)', llm_gpt: 'ChatGPT / OpenAI', llm_claude: 'Claude / Anthropic',
+      llm_gemini: 'Gemini / Google', llm_perplexity: 'Perplexity', llm_deepseek: 'DeepSeek',
+      goal_cite: 'Dipetik dalam jawapan AI', goal_vis: 'Tingkatkan skor keterlihatan AI',
+      goal_entities: 'Tambah entiti semantik', goal_stats: 'Tambah statistik layak dipetik',
+      goal_read: 'Tingkatkan kebolehbacaan untuk AI',
+      btn_enrich: '✨ Kayakan Kandungan', btn_gao_score: '📊 Skor Kandungan GAO', btn_copy_enriched: '📋 Salin Yang Dikayakan',
+      panel_original: '📄 Kandungan Asal', panel_enriched: '✨ Versi Dikayakan AI',
+      history_title: '📈 Sejarah Keterlihatan',
+      history_desc: 'Jejak skor keterlihatan AI anda dari masa ke masa — lihat trend, peningkatan dan apa yang berkesan',
+      history_chart_title: 'Trend Keterlihatan AI — 7 Analisis Terakhir',
+      history_empty: 'Jalankan analisis GAO secara berkala untuk membina sejarah anda',
+      hist_best: '📈 Skor Terbaik', hist_latest: '📊 Skor Terkini',
+      hist_total: '🔢 Jumlah Analisis', hist_total_sub: 'Analisis GAO dijalankan',
+      col_brand: 'Jenama', col_date: 'Tarikh', col_avg: 'Purata Skor', col_best: 'LLM Terbaik', col_prompts_col: 'Gesaan',
+      hist_empty: 'Tiada analisis GAO disimpan lagi. Jalankan Analisis GAO dalam tab Gambaran Keseluruhan untuk mula membina sejarah anda.',
+      sb_main: 'Utama', sb_content: 'Kandungan', sb_account: 'Akaun',
+      sb_dashboard: '📊 Papan Pemuka', sb_tools: '🔧 Alat AI',
+      sb_chat: '💬 Sembang AI', sb_docs: '📄 Dokumen',
+      sb_seo: '🔍 Suite SEO', sb_gao: '🧠 Suite GAO', sb_settings: '⚙️ Tetapan',
+    },
+    zh: {
+      topbar_title: 'M-EasyGAO AI+ — 生成式AI优化套件',
+      btn_audit: '⚡ 运行完整GAO审计', btn_export: '📥 导出报告',
+      tab_overview: '📊 GAO概览', tab_entity: '🏷️ 实体提取器',
+      tab_links: '🔗 内链建议器', tab_schema: '📋 结构化数据生成器',
+      tab_enrich: '✨ 内容增强器', tab_history: '📈 曝光历史',
+      hero_badge: 'GAO — 生成式AI优化',
+      hero_title: '让您的品牌出现在<span>ChatGPT、Claude、Gemini</span>和AI搜索中',
+      hero_sub: '追踪AI声量份额、监控引用、分析提示词并在所有主要LLM中超越竞争对手 — 首个专为马来西亚企业打造的GAO套件。',
+      stat_prompts: '追踪提示词', stat_visibility: 'AI曝光度评分',
+      stat_citations: '发现引用', stat_llms: '监控LLM数',
+      ip_title: '🎯 配置您的GAO分析',
+      lbl_brand: '品牌/公司名称', lbl_industry: '行业/细分市场',
+      lbl_market: '目标市场', lbl_llms: '要监控的LLM',
+      lbl_prompts: '种子提示词（每行一条）',
+      ph_brand: '例如：M-EasyDo', ph_industry: '例如：CRM软件，马来西亚',
+      ph_prompts: '马来西亚最佳中小企业CRM\n最简单的CRM软件是什么',
+      mkt_en: '马来西亚（英文）', mkt_bm: '马来西亚（马来文）',
+      mkt_sea: '东南亚', mkt_global: '全球英文', mkt_cn: '中国/DeepSeek',
+      btn_run: '✦ 运行GAO分析', btn_clusters: '🧩 生成提示词集群',
+      btn_schema: '📋 生成结构化数据', btn_citation: '🔗 引用审计',
+      gr_title: '🧠 GAO分析结果', btn_copy: '📋 复制',
+      vis_label: 'AI声量份额', run_first: '请先运行分析',
+      sov_title: '📊 AI声量份额', sov_sub: '品牌引用频率（跨LLM）',
+      pt_title: '🎯 提示词追踪仪表板', pt_sub: '监控每个提示词集群的品牌曝光度',
+      col_prompt: '提示词', col_visibility: '曝光度', col_sentiment: '情感',
+      col_llms: 'LLM', col_rank: '排名', col_action: '操作',
+      pt_empty: '在上方输入提示词并运行分析',
+      pt_empty2: '您的提示词追踪数据将在此显示',
+      cite_title: '🔗 引用来源地图', cite_sub: 'AI在您的细分市场中引用的来源',
+      cite_empty: '运行引用审计，查看AI在您细分市场中引用的来源',
+      comp_title: '⚔️ 竞争对手AI曝光度', comp_sub: '与您的品牌对比',
+      comp_empty: '运行GAO分析以比较竞争对手曝光度',
+      entity_title: '🏷️ 实体提取器',
+      entity_desc: '识别内容中的关键实体 — 人物、品牌、地点、话题、产品',
+      entity_ph: '在此粘贴任何内容 — 博客文章、产品描述、落地页文案、文章...',
+      entity_hint: 'AI将提取所有关键实体并按类型分类。',
+      btn_extract: '🏷️ 提取实体', btn_analyze_gao: '🧠 GAO分析',
+      btn_copy_entities: '📋 复制所有实体',
+      extracted_title: '已提取实体', extracted_hint: '点击任意实体查看其AI曝光度分析',
+      entity_empty: '在上方粘贴内容并点击提取实体',
+      analysis_title: '实体分析', analysis_empty: '选择实体查看其GAO分析',
+      btn_full_report: '🏷️ 完整实体报告',
+      links_title: '🔗 内链建议器',
+      links_desc: 'AI推荐链接到哪些页面 — 改善SEO、降低跳出率，帮助AI爬虫绘制网站地图',
+      lbl_content: '📝 用于分析内链的内容',
+      lbl_page_url: '当前页面URL', lbl_domain: '网站域名',
+      btn_suggest_links: '🔗 建议内部链接', btn_link_strategy: '🗺️ 构建链接策略',
+      links_result_title: '🔗 内部链接建议',
+      schema_title: '📋 结构化数据生成器',
+      schema_desc: '生成针对GPTBot、ClaudeBot、GeminiBot和Google富摘要优化的JSON-LD结构化数据',
+      schema_config: '⚙️ 配置结构化数据',
+      lbl_schema_url: '网站URL', lbl_schema_industry: '行业', lbl_schema_type: '结构化数据类型',
+      schema_org: '🏢 组织', schema_soft: '💻 软件应用', schema_faq: '❓ FAQ页面',
+      schema_product: '🛍️ 产品', schema_article: '📝 文章', schema_local: '📍 本地商家',
+      schema_complete: '✨ 完整套件',
+      schema_ph: '可选：粘贴页面内容或描述您想要的结构化数据内容...',
+      btn_gen_schema: '📋 生成结构化数据', btn_validate: '✅ 验证结构化数据', btn_copy_json: '📋 复制JSON-LD',
+      enrich_title: '✨ 内容增强器',
+      enrich_desc: '让内容更易被AI读取 — 添加语义上下文、实体、结构化数据信号和值得引用的事实',
+      lbl_target_llm: '目标LLM', lbl_enrich_goal: '增强目标',
+      llm_all: '所有LLM（通用）', llm_gpt: 'ChatGPT / OpenAI', llm_claude: 'Claude / Anthropic',
+      llm_gemini: 'Gemini / Google', llm_perplexity: 'Perplexity', llm_deepseek: 'DeepSeek',
+      goal_cite: '被AI回答引用', goal_vis: '提升AI曝光度评分',
+      goal_entities: '添加语义实体', goal_stats: '添加值得引用的统计数据',
+      goal_read: '提升AI可读性',
+      btn_enrich: '✨ 增强内容', btn_gao_score: '📊 GAO内容评分', btn_copy_enriched: '📋 复制增强版本',
+      panel_original: '📄 原始内容', panel_enriched: '✨ AI增强版本',
+      history_title: '📈 曝光历史',
+      history_desc: '追踪AI曝光度评分的变化趋势 — 查看趋势、改进情况及有效策略',
+      history_chart_title: 'AI曝光度趋势 — 最近7次分析',
+      history_empty: '定期运行GAO分析以积累历史数据',
+      hist_best: '📈 历史最高分', hist_latest: '📊 最新评分',
+      hist_total: '🔢 总分析次数', hist_total_sub: '次GAO分析',
+      col_brand: '品牌', col_date: '日期', col_avg: '平均分', col_best: '最佳LLM', col_prompts_col: '提示词',
+      hist_empty: '尚无GAO分析记录。在概览标签页运行GAO分析开始积累历史数据。',
+      sb_main: '主页', sb_content: '内容', sb_account: '账户',
+      sb_dashboard: '📊 仪表板', sb_tools: '🔧 AI工具',
+      sb_chat: '💬 AI聊天', sb_docs: '📄 文档',
+      sb_seo: '🔍 SEO套件', sb_gao: '🧠 GAO套件', sb_settings: '⚙️ 设置',
+    }
+  };
+
+  const tx = GAO_T[lang] || GAO_T.en;
+  if (!tx || lang === 'en') return;
+
+  function setText(sel, val) { const el = document.querySelector(sel); if (el) el.textContent = val; }
+  function setHTML(sel, val) { const el = document.querySelector(sel); if (el) el.innerHTML = val; }
+  function setPlaceholder(id, val) { const el = document.getElementById(id); if (el) el.placeholder = val; }
+  function setOption(selId, idx, val) { const sel = document.getElementById(selId); if (sel && sel.options[idx]) sel.options[idx].text = val; }
+  function setAllText(sel, val) { document.querySelectorAll(sel).forEach(el => el.textContent = val); }
+
+  // Topbar
+  setText('.topbar-title', tx.topbar_title);
+  document.querySelector('[onclick="runFullAudit()"]') && (document.querySelector('[onclick="runFullAudit()"]').textContent = tx.btn_audit);
+  document.querySelector('[onclick="exportReport()"]') && (document.querySelector('[onclick="exportReport()"]').textContent = tx.btn_export);
+
+  // Tabs
+  setText('#tab-overview', tx.tab_overview);
+  setText('#tab-entity', tx.tab_entity);
+  setText('#tab-links', tx.tab_links);
+  setText('#tab-schema', tx.tab_schema);
+  setText('#tab-enrich', tx.tab_enrich);
+  setText('#tab-history', tx.tab_history);
+
+  // Hero
+  const badge = document.querySelector('.gao-hero-badge');
+  if (badge) { const dot = badge.querySelector('span'); badge.textContent = tx.hero_badge; if (dot) badge.prepend(dot); }
+  setHTML('.gao-hero-title', tx.hero_title);
+  setText('.gao-hero-sub', tx.hero_sub);
+  document.querySelectorAll('.gao-stat-label').forEach((el,i) => {
+    const keys = [tx.stat_prompts, tx.stat_visibility, tx.stat_citations, tx.stat_llms];
+    if (keys[i]) el.textContent = keys[i];
+  });
+
+  // Input panel
+  setText('.ip-title', tx.ip_title);
+  const ipLabels = document.querySelectorAll('.ip-label');
+  if (ipLabels[0]) ipLabels[0].textContent = tx.lbl_brand;
+  if (ipLabels[1]) ipLabels[1].textContent = tx.lbl_industry;
+  if (ipLabels[2]) ipLabels[2].textContent = tx.lbl_market;
+  const llmLabel = document.querySelector('.ip-label[style*="margin-bottom:8px"]');
+  if (llmLabel) llmLabel.textContent = tx.lbl_llms;
+  const promptLabel = document.querySelectorAll('.ip-label');
+  if (promptLabel[promptLabel.length-1]) promptLabel[promptLabel.length-1].textContent = tx.lbl_prompts;
+  setPlaceholder('brand-input', tx.ph_brand);
+  setPlaceholder('industry-input', tx.ph_industry);
+  setPlaceholder('prompts-input', tx.ph_prompts);
+  setOption('market-select', 0, tx.mkt_en);
+  setOption('market-select', 1, tx.mkt_bm);
+  setOption('market-select', 2, tx.mkt_sea);
+  setOption('market-select', 3, tx.mkt_global);
+  setOption('market-select', 4, tx.mkt_cn);
+
+  // Buttons
+  document.querySelector('[onclick="runGAO()"]') && (document.querySelector('[onclick="runGAO()"]').textContent = tx.btn_run);
+  document.querySelector('[onclick="runPromptCluster()"]') && (document.querySelector('[onclick="runPromptCluster()"]').textContent = tx.btn_clusters);
+  document.querySelector('[onclick="runSchemaGen()"]') && (document.querySelector('[onclick="runSchemaGen()"]').textContent = tx.btn_schema);
+  document.querySelector('[onclick="runCitationAudit()"]') && (document.querySelector('[onclick="runCitationAudit()"]').textContent = tx.btn_citation);
+
+  // GAO result
+  setText('#gr-title', tx.gr_title);
+  document.querySelector('[onclick="copyResult()"]') && (document.querySelector('[onclick="copyResult()"]').textContent = tx.btn_copy);
+  document.querySelectorAll('.gr-llm-sub').forEach(el => el.textContent = tx.vis_label);
+  document.querySelectorAll('.vis-delta').forEach(el => { if(el.textContent.trim()==='Run analysis first') el.textContent = tx.run_first; });
+
+  // AI Share of Voice section
+  const secTitles = document.querySelectorAll('.section-title');
+  const secSubs = document.querySelectorAll('.section-sub');
+  if (secTitles[0]) secTitles[0].textContent = tx.sov_title;
+  if (secSubs[0]) secSubs[0].textContent = tx.sov_sub;
+
+  // Sidebar
+  const sbSections = document.querySelectorAll('.sb-section');
+  if (sbSections[0]) sbSections[0].textContent = tx.sb_main;
+  if (sbSections[1]) sbSections[1].textContent = tx.sb_content;
+  if (sbSections[2]) sbSections[2].textContent = tx.sb_account;
+  const sbItems = document.querySelectorAll('.sb-item');
+  const sbTextMap = [tx.sb_dashboard, null /* tools w/ badge */, tx.sb_chat, tx.sb_docs, tx.sb_seo, tx.sb_gao, tx.sb_settings];
+  // Sidebar items translation handled inline per page
+
+  // html lang attribute
+  const htmlLangMap = { bm: 'ms', en: 'en', zh: 'zh-Hans' };
+  document.documentElement.lang = htmlLangMap[lang] || 'en';
+})();
+</script>
 </body>
 </html>

@@ -1731,14 +1731,21 @@ const FORMS={
 
 // ── Tools Rendering ──────────────────────────────────────
 function renderTools(list) {
-  document.getElementById('tools-grid').innerHTML=list.map(tool=>`
+  const toolNames = (TRANSLATIONS[currentLang]||TRANSLATIONS.en).tool_names || [];
+  const toolDescs = (TRANSLATIONS[currentLang]||TRANSLATIONS.en).tool_descs || [];
+  document.getElementById('tools-grid').innerHTML=list.map(tool=>{
+    const idx = TOOLS.indexOf(tool);
+    const name = (toolNames[idx] && toolNames[idx]) || tool.name;
+    const desc = (toolDescs[idx] && toolDescs[idx]) || tool.desc;
+    return `
     <div class="tool-card" onclick="openTool('${tool.id}')" style="--tc-color:${tool.color}">
       <div class="tc-stripe"></div>
       ${tool.badge?`<span class="tc-badge" style="background:${tool.color}15;color:${tool.color}">${tool.badge}</span>`:''}
       <div class="tc-icon" style="background:${tool.bg}">${tool.icon}</div>
-      <div class="tc-name">${tool.name}</div>
-      <div class="tc-desc">${tool.desc}</div>
-    </div>`).join('');
+      <div class="tc-name">${name}</div>
+      <div class="tc-desc">${desc}</div>
+    </div>`;
+  }).join('');
 }
 
 function filterTools(q) { renderTools(TOOLS.filter(tool=>tool.name.toLowerCase().includes(q.toLowerCase())||tool.desc.toLowerCase().includes(q.toLowerCase()))); }
@@ -2530,6 +2537,61 @@ const TRANSLATIONS = {
     feat_priority: 'Priority support',
     feat_team: '5 team seats',
     feat_whitelabel: 'White-label exports',
+
+    // Settings section headers
+    settings_sec_account: 'Account', settings_sec_content: 'Content',
+    settings_sec_integrations: 'Integrations', settings_sec_preferences: 'Preferences',
+
+    // Documents filter / table
+    no_docs_table: 'No documents yet. Start creating content with AI Tools!',
+
+    // Bulk config
+    bulk_config: 'Configuration',
+
+    // Toasts for settings
+    toast_all_wp_fields: 'All WordPress fields required',
+    toast_all_shopify_fields: 'Store domain and token required',
+
+    // Templates
+    tpl_names: ['SaaS Blog Post Framework','7-Day Welcome Sequence','Facebook Ad — AIDA Framework','Amazon Product Listing','B2B Cold Outreach Series','SaaS Landing Page'],
+    tpl_descs: [
+      'Pre-configured prompts for B2B SaaS companies. Includes intro, problem-solution, and CTA sections.',
+      'Complete 7-email welcome series for new subscribers with optimal send timing suggestions.',
+      'Attention-Interest-Desire-Action ad copy template proven for e-commerce campaigns.',
+      'Full Amazon-optimized listing with bullet points, A+ content sections, and backend keywords.',
+      '3-touch cold email sequence for B2B sales teams. Proven framework with 28%+ reply rates.',
+      'Complete landing page copy for SaaS products — hero, features, social proof, pricing, FAQ, CTA.'
+    ],
+
+    // Tool names/descs (24 tools)
+    tool_names: ['Blog Writer','Landing Page Copy','Article Outline','Social Media Posts','Instagram Bio','YouTube Script','LinkedIn Post','Email Campaign','Email Sequence','Email Subject Lines','Ad Copy','Google Ads','Push Notification','Product Description','Product Title','Review Responder','Sales Outreach','Cold Outreach DM','Sales Pitch Script','Content Rewriter','AI Humanizer','Content Summarizer','SEO Meta Tags','Keyword Clusters','FAQ Generator'],
+    tool_descs: [
+      'Write full SEO-optimized blog posts from a title, keywords, and audience.',
+      'Conversion-focused landing page copy: headlines, body, social proof, and CTAs.',
+      'Detailed blog post or article outlines with H2/H3 structure.',
+      'Posts for Instagram, LinkedIn, X (Twitter), Facebook, and TikTok.',
+      'Punchy, click-worthy Instagram bios with clear value props.',
+      'Full video scripts: hook, story, value, and CTA.',
+      'Thought leadership posts and company updates for LinkedIn.',
+      'Subject lines, body copy, and CTAs for any email type.',
+      'Complete 3-7 email drip sequences for onboarding or nurturing.',
+      'A/B-testable subject lines that boost open rates.',
+      'Facebook, Instagram, Google, and LinkedIn ads that convert.',
+      'Search ads with headlines (30 chars) and descriptions (90 chars).',
+      'Short, urgent copy that drives clicks and app opens.',
+      'Persuasive product copy for Shopify, Amazon, and marketplaces.',
+      'SEO-friendly product titles for Amazon and Shopify listings.',
+      'Professional responses to positive and negative customer reviews.',
+      'Cold email sequences with 3-touch follow-up series.',
+      'LinkedIn and Instagram DM templates for B2B prospecting.',
+      'Concise elevator pitches and sales call scripts.',
+      'Rewrite any content with a fresh perspective and unique voice.',
+      'Remove AI-detection patterns and add authentic human voice.',
+      'Condense long articles into clear, concise summaries.',
+      'Title tags and meta descriptions for maximum search CTR.',
+      'Long-tail keywords, clusters, and intent mapping for any niche.',
+      'SEO-rich FAQ sections for any product, service, or article.'
+    ],
   },
 
   bm: {
@@ -2753,6 +2815,61 @@ const TRANSLATIONS = {
     feat_priority: 'Sokongan keutamaan',
     feat_team: '5 tempat duduk pasukan',
     feat_whitelabel: 'Eksport white-label',
+
+    // Settings section headers
+    settings_sec_account: 'Akaun', settings_sec_content: 'Kandungan',
+    settings_sec_integrations: 'Integrasi', settings_sec_preferences: 'Keutamaan',
+
+    // Documents
+    no_docs_table: 'Tiada dokumen lagi. Mula mencipta kandungan dengan Alat AI!',
+
+    // Bulk config
+    bulk_config: 'Konfigurasi',
+
+    // Toasts
+    toast_all_wp_fields: 'Semua medan WordPress diperlukan',
+    toast_all_shopify_fields: 'Domain kedai dan token diperlukan',
+
+    // Templates
+    tpl_names: ['Rangka Blog SaaS','Urutan Alu-aluan 7 Hari','Iklan Facebook — Rangka AIDA','Penyenaraian Produk Amazon','Siri Jangkauan Sejuk B2B','Halaman Pendaratan SaaS'],
+    tpl_descs: [
+      'Gesaan pra-konfigurasi untuk syarikat SaaS B2B. Merangkumi intro, masalah-penyelesaian, dan bahagian CTA.',
+      '7 e-mel alu-aluan lengkap untuk pelanggan baru dengan cadangan masa penghantaran optimum.',
+      'Templat salinan iklan Attention-Interest-Desire-Action yang terbukti untuk kempen e-dagang.',
+      'Penyenaraian dioptimumkan Amazon penuh dengan poin bullet, bahagian konten A+, dan kata kunci backend.',
+      'Urutan e-mel sejuk 3 sentuhan untuk pasukan jualan B2B. Rangka kerja terbukti dengan kadar balasan 28%+.',
+      'Salinan halaman pendaratan lengkap untuk produk SaaS — hero, ciri, bukti sosial, harga, FAQ, CTA.'
+    ],
+
+    // Tool names/descs
+    tool_names: ['Penulis Blog','Salinan Halaman Pendaratan','Rangka Artikel','Siaran Media Sosial','Bio Instagram','Skrip YouTube','Catatan LinkedIn','Kempen E-mel','Urutan E-mel','Baris Subjek E-mel','Salinan Iklan','Iklan Google','Pemberitahuan Tolak','Penerangan Produk','Tajuk Produk','Pembalas Ulasan','Jangkauan Jualan','DM Jangkauan Sejuk','Skrip Pitching Jualan','Penulisan Semula Kandungan','Penghuman AI','Ringkasan Kandungan','Meta Tag SEO','Gugusan Kata Kunci','Penjana FAQ'],
+    tool_descs: [
+      'Tulis siaran blog dioptimumkan SEO sepenuhnya dari tajuk, kata kunci, dan audiens.',
+      'Salinan halaman pendaratan berfokus penukaran: tajuk, badan, bukti sosial, dan CTA.',
+      'Rangka siaran blog atau artikel terperinci dengan struktur H2/H3.',
+      'Siaran untuk Instagram, LinkedIn, X (Twitter), Facebook, dan TikTok.',
+      'Bio Instagram ringkas dan menarik klik dengan cadangan nilai yang jelas.',
+      'Skrip video penuh: pembukaan, cerita, nilai, dan CTA.',
+      'Siaran kepimpinan pemikiran dan kemas kini syarikat untuk LinkedIn.',
+      'Baris subjek, salinan badan, dan CTA untuk mana-mana jenis e-mel.',
+      'Urutan titisan e-mel 3-7 lengkap untuk orientasi atau pemupukan.',
+      'Baris subjek boleh diuji A/B yang meningkatkan kadar buka.',
+      'Iklan Facebook, Instagram, Google, dan LinkedIn yang menukar.',
+      'Iklan carian dengan tajuk (30 aksara) dan penerangan (90 aksara).',
+      'Salinan ringkas dan mendesak yang memacu klik dan buka aplikasi.',
+      'Salinan produk persuasif untuk Shopify, Amazon, dan pasaran.',
+      'Tajuk produk mesra SEO untuk penyenaraian Amazon dan Shopify.',
+      'Balasan profesional kepada ulasan pelanggan positif dan negatif.',
+      'Urutan e-mel sejuk dengan siri susulan 3 sentuhan.',
+      'Templat DM LinkedIn dan Instagram untuk prospek B2B.',
+      'Pitching ringkas dan skrip panggilan jualan.',
+      'Tulis semula sebarang kandungan dengan perspektif segar dan suara unik.',
+      'Hapuskan corak pengesanan AI dan tambah suara manusia yang autentik.',
+      'Padatkan artikel panjang menjadi ringkasan yang jelas dan ringkas.',
+      'Tag tajuk dan penerangan meta untuk CTR carian maksimum.',
+      'Kata kunci ekor panjang, gugusan, dan pemetaan niat untuk mana-mana niche.',
+      'Bahagian FAQ kaya SEO untuk mana-mana produk, perkhidmatan, atau artikel.'
+    ],
   },
 
   zh: {
@@ -2976,12 +3093,71 @@ const TRANSLATIONS = {
     feat_priority: '优先支持',
     feat_team: '5个团队席位',
     feat_whitelabel: '白标导出',
+
+    // Settings section headers
+    settings_sec_account: '账户', settings_sec_content: '内容',
+    settings_sec_integrations: '集成', settings_sec_preferences: '偏好',
+
+    // Documents
+    no_docs_table: '暂无文档。使用AI工具开始创建内容！',
+
+    // Bulk config
+    bulk_config: '配置',
+
+    // Toasts
+    toast_all_wp_fields: '所有WordPress字段为必填项',
+    toast_all_shopify_fields: '需要店铺域名和令牌',
+
+    // Templates
+    tpl_names: ['SaaS博客框架','7天欢迎邮件序列','Facebook广告 — AIDA框架','亚马逊产品列表','B2B冷开发邮件系列','SaaS落地页'],
+    tpl_descs: [
+      '针对B2B SaaS公司的预配置提示词，包含介绍、问题解决方案和CTA部分。',
+      '为新订阅者准备的完整7封欢迎邮件系列，附最佳发送时间建议。',
+      '注意力-兴趣-欲望-行动广告文案模板，专为电商活动验证有效。',
+      '包含项目符号、A+内容部分和后端关键词的完整亚马逊优化列表。',
+      'B2B销售团队的3触点冷邮件序列，经过验证的框架，回复率28%+。',
+      'SaaS产品完整落地页文案——主页英雄区、功能、社会证明、定价、FAQ、CTA。'
+    ],
+
+    // Tool names/descs
+    tool_names: ['博客写作','落地页文案','文章大纲','社交媒体帖子','Instagram简介','YouTube脚本','领英文章','邮件营销活动','邮件序列','邮件主题行','广告文案','谷歌广告','推送通知','产品描述','产品标题','评论回复','销售开发邮件','冷开发私信','销售推介脚本','内容改写','AI人工化','内容摘要','SEO元标签','关键词聚类','FAQ生成器'],
+    tool_descs: [
+      '根据标题、关键词和受众撰写完整的SEO优化博客文章。',
+      '以转化为核心的落地页文案：标题、正文、社会证明和行动召唤。',
+      '详细的博客文章或文章大纲，含H2/H3结构。',
+      '适用于Instagram、LinkedIn、X（Twitter）、Facebook和TikTok的帖子。',
+      '简洁有力的Instagram简介，清晰传达品牌价值主张。',
+      '完整视频脚本：吸引开场、故事、价值点和行动召唤。',
+      '适用于领英的思想领袖内容和企业动态更新。',
+      '适用于任何类型邮件的主题行、正文和行动召唤。',
+      '用于入门或培育的完整3-7封滴灌式邮件序列。',
+      '可A/B测试的主题行，有效提升开信率。',
+      '高转化率的Facebook、Instagram、Google和LinkedIn广告。',
+      '搜索广告，含标题（30字符）和描述（90字符）。',
+      '简短紧迫的文案，驱动点击和应用程序打开。',
+      '适用于Shopify、亚马逊和各大平台的说服性产品文案。',
+      '适用于亚马逊和Shopify商品列表的SEO友好产品标题。',
+      '对正面和负面客户评价的专业回复。',
+      '含3触点后续跟进系列的冷邮件序列。',
+      '针对B2B销售的LinkedIn和Instagram私信开发模板。',
+      '简洁的电梯演讲和销售电话脚本。',
+      '以全新视角和独特声音改写任何内容。',
+      '消除AI检测特征，加入真实的人类声音。',
+      '将长文章浓缩为清晰简洁的摘要。',
+      '最大化搜索点击率的标题标签和元描述。',
+      '任意细分市场的长尾关键词、集群和搜索意图映射。',
+      '适用于任何产品、服务或文章的SEO优化FAQ章节。'
+    ],
   }
 };
 
 // Initialize language IMMEDIATELY so applyUser uses correct lang
+// NOTE: landing page uses 'ms' for Malay; app uses 'bm' internally — normalize both
 let currentLang = (function() {
-  try { return localStorage.getItem('msm_lang') || 'bm'; } catch(e) { return 'bm'; }
+  try {
+    const saved = localStorage.getItem('msm_lang') || 'bm';
+    return saved === 'ms' ? 'bm' : saved;
+  } catch(e) { return 'bm'; }
 })();
 // Apply lang to html element right away
 document.documentElement.setAttribute('data-lang', currentLang);
@@ -3047,7 +3223,14 @@ function applyTranslations() {
 }
 
 function updatePageTexts() {
-  // Dashboard banner
+  // ── data-i18n elements (catch-all) ──
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (val && val !== key) el.textContent = val;
+  });
+
+  // ── Dashboard ──
   const bannerHello = document.querySelector('.banner-hello');
   if (bannerHello) bannerHello.textContent = t('dash_hello');
   const bannerSub = document.querySelector('.banner-sub');
@@ -3055,57 +3238,158 @@ function updatePageTexts() {
     const docVal = document.querySelectorAll('.m-card-val')[1]?.textContent?.trim() || '0';
     bannerSub.textContent = t('dash_sub').replace('{n}', docVal);
   }
-
-  // Quick Create tiles
   const qtiles = document.querySelectorAll('.qt-nm');
-  const qtKeys = ['qt_blog','qt_social','qt_email','qt_ad'];
-  qtiles.forEach((el,i) => { if(qtKeys[i]) el.textContent = t(qtKeys[i]); });
-
-  // Panel titles (Recent Docs, Quick Create, Credit Usage)
-  const panelTitles = document.querySelectorAll('.panel-title');
-  panelTitles.forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (key) el.textContent = t(key);
-  });
-
-  // Panel actions
-  const panelActions = document.querySelectorAll('.panel-action');
-  panelActions.forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (key) el.textContent = t(key);
-  });
-
-  // No docs message
-  const noDocsEl = document.querySelector('#recent-docs-panel div[data-i18n="no_docs"]');
-  if (noDocsEl) noDocsEl.textContent = t('no_docs');
-
-  // Credit note
+  ['qt_blog','qt_social','qt_email','qt_ad'].forEach((k,i)=>{ if(qtiles[i]) qtiles[i].textContent=t(k); });
   const creditNote = document.getElementById('credit-note');
   if (creditNote && currentUser) {
-    const _usedMap2 = { bm: 'digunakan', zh: '已用' };
-    const usedLabel = _usedMap2[currentLang] || 'used';
-    const credUsed = (currentUser.credits_max || 0) - (currentUser.credits || 0);
-    creditNote.textContent = `${Math.max(0,credUsed).toLocaleString()} ${usedLabel} · ${(currentUser.credits||0).toLocaleString()} ${t('dash_remaining')}`;
+    const usedMap = { bm:'digunakan', zh:'已用' };
+    const credUsed = Math.max(0,(currentUser.credits_max||0)-(currentUser.credits||0));
+    creditNote.textContent = `${credUsed.toLocaleString()} ${usedMap[currentLang]||'used'} · ${(currentUser.credits||0).toLocaleString()} ${t('dash_remaining')}`;
   }
-
-  // Credit label
   const creditLabel = document.querySelector('.progress-label');
   if (creditLabel) creditLabel.textContent = t('dash_credits_label');
-
-  // Topbar buttons
   const newContentBtn = document.querySelector('[data-i18n="btn_new_content"]');
   if (newContentBtn) newContentBtn.textContent = t('btn_new_content');
 
-  // Settings nav items
-  updateSettingsNav();
-  // Category pills
-  updateCategoryPills();
-  // Bulk texts
-  updateBulkPageTexts();
+  // ── Tools page ──
+  const toolsTitle = document.querySelector('#page-tools .page-title');
+  if (toolsTitle) toolsTitle.textContent = t('tools_title');
+  const toolsSub = document.querySelector('#page-tools .page-subtitle');
+  if (toolsSub) toolsSub.textContent = t('tools_sub');
+  const searchInput = document.getElementById('search-tools');
+  if (searchInput) searchInput.placeholder = t('tools_search');
+
+  // ── Editor page ──
+  const backBtn = document.querySelector('.back-btn');
+  if (backBtn) backBtn.innerHTML = t('back_tools');
+  const genBtn = document.querySelector('.form-footer .btn-primary');
+  if (genBtn) genBtn.innerHTML = t('btn_generate');
+  const outTabs = document.querySelectorAll('.out-tab');
+  if (outTabs[0]) outTabs[0].textContent = t('out_output');
+  if (outTabs[1]) outTabs[1].textContent = t('out_edit');
+  const copyAllBtn = document.querySelector('[onclick="copyAllOutput()"]');
+  if (copyAllBtn) copyAllBtn.textContent = t('btn_copy_all');
+  const saveDocBtn = document.querySelector('[onclick="saveToDocuments()"]');
+  if (saveDocBtn) saveDocBtn.textContent = t('btn_save_doc');
+  const oeLabel = document.querySelector('.oe-label');
+  if (oeLabel) oeLabel.textContent = t('out_empty_text');
+  const loaderText = document.querySelector('.loader-text');
+  if (loaderText) loaderText.textContent = t('generating');
+
+  // ── Chat page ──
+  const chatTitleEl = document.querySelector('#page-chat .chat-header-row > div > div:first-child');
+  if (chatTitleEl && chatTitleEl.tagName !== 'BUTTON') chatTitleEl.textContent = t('chat_title');
+  const chatSubEl = document.querySelector('#page-chat .chat-header-row > div > div:nth-child(2)');
+  if (chatSubEl) chatSubEl.textContent = t('chat_sub');
+  const clearChatBtn = document.querySelector('[onclick="clearChat()"]');
+  if (clearChatBtn) clearChatBtn.textContent = t('chat_clear');
+  const sendBtn = document.querySelector('[onclick="sendMessage()"]');
+  if (sendBtn) sendBtn.textContent = t('chat_send');
+  const chatTA = document.getElementById('chat-ta');
+  if (chatTA) chatTA.placeholder = t('chat_placeholder');
+
+  // ── Documents page ──
+  const docsTitle = document.querySelector('#page-documents .docs-toprow > div > div:first-child');
+  if (docsTitle) docsTitle.textContent = t('docs_title');
+  const docsSub = document.querySelector('#page-documents .docs-toprow > div > div:nth-child(2)');
+  if (docsSub) docsSub.textContent = t('docs_sub');
+  const newDocBtn = document.querySelector('#page-documents .btn-primary');
+  if (newDocBtn) newDocBtn.textContent = t('btn_new_doc');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  ['filter_all','filter_blog','filter_email','filter_social','filter_ads','filter_product'].forEach((k,i)=>{ if(filterBtns[i]) filterBtns[i].textContent=t(k); });
+  const docThs = document.querySelectorAll('.doc-table th');
+  ['col_title','col_type','col_words','col_created','col_actions'].forEach((k,i)=>{ if(docThs[i]) docThs[i].textContent=t(k); });
+
+  // ── SEO page ──
+  const seoIntroTitle = document.querySelector('.seo-intro-title');
+  if (seoIntroTitle) seoIntroTitle.textContent = t('seo_intro_title');
+  const seoIntroSub = document.querySelector('.seo-intro-sub');
+  if (seoIntroSub) seoIntroSub.textContent = t('seo_intro_sub');
+  const seoTileNames = document.querySelectorAll('.st-name');
+  const seoTileDescs = document.querySelectorAll('.st-desc');
+  const seoKeys = [['seo_meta_title','seo_meta_desc'],['seo_keyword_title','seo_keyword_desc'],['seo_article_title','seo_article_desc'],['seo_optimizer_title','seo_optimizer_desc']];
+  seoTileNames.forEach((el,i)=>{ if(seoKeys[i]) el.textContent=t(seoKeys[i][0]); });
+  seoTileDescs.forEach((el,i)=>{ if(seoKeys[i]) el.textContent=t(seoKeys[i][1]); });
+
+  // ── Templates page ──
+  const tplTitleEl = document.querySelector('#page-templates .tpl-shell > div > div:first-child');
+  if (tplTitleEl) tplTitleEl.textContent = t('tpl_title');
+  const tplSubEl = document.querySelector('#page-templates .tpl-shell > div > div:nth-child(2)');
+  if (tplSubEl) tplSubEl.textContent = t('tpl_sub');
+  const newTplBtn = document.querySelector('[onclick*="Template builder"]');
+  if (newTplBtn) newTplBtn.textContent = t('btn_new_tpl');
+  const tplUseLinks = document.querySelectorAll('.tpl-use');
+  tplUseLinks.forEach(el => el.textContent = t('tpl_use'));
+  const tplCards = document.querySelectorAll('.tpl-card');
+  const tplNamesList = (TRANSLATIONS[currentLang]||TRANSLATIONS.en).tpl_names || [];
+  const tplDescsList = (TRANSLATIONS[currentLang]||TRANSLATIONS.en).tpl_descs || [];
+  tplCards.forEach((card,i)=>{
+    const nm=card.querySelector('.tpl-name'); const ds=card.querySelector('.tpl-desc');
+    if(nm&&tplNamesList[i]) nm.textContent=tplNamesList[i];
+    if(ds&&tplDescsList[i]) ds.textContent=tplDescsList[i];
+  });
+
+  // ── Settings section headers ──
+  const snSections = document.querySelectorAll('.sn-section');
+  const secKeys = ['settings_sec_account','settings_sec_content','settings_sec_integrations','settings_sec_preferences'];
+  snSections.forEach((el,i)=>{ if(secKeys[i]) el.textContent=t(secKeys[i]); });
+
+  // ── Settings content labels ──
+  const scGenTitle = document.querySelector('#sc-general .sc-title');
+  if (scGenTitle) scGenTitle.textContent = t('sc_general_title');
+  const generalRows = document.querySelectorAll('#sc-general .s-lbl');
+  const generalDescs = document.querySelectorAll('#sc-general .s-desc');
+  const glbls = ['lbl_fullname','lbl_email','lbl_lang','lbl_tone_def'];
+  const gdscs = ['lbl_fullname_desc','lbl_email_desc','lbl_lang_desc','lbl_tone_desc'];
+  generalRows.forEach((el,i)=>{ if(glbls[i]) el.textContent=t(glbls[i]); });
+  generalDescs.forEach((el,i)=>{ if(gdscs[i]) el.textContent=t(gdscs[i]); });
+  const saveChangesBtn = document.querySelector('[onclick="saveSettings()"]');
+  if (saveChangesBtn) saveChangesBtn.textContent = t('btn_save_changes');
+
+  const scApiTitle = document.querySelector('#sc-api .sc-title');
+  if (scApiTitle) scApiTitle.textContent = t('sc_api_title');
+  const scPwTitle = document.querySelector('#sc-password .sc-title');
+  if (scPwTitle) scPwTitle.textContent = t('sc_password_title');
+  const scBrandTitle = document.querySelector('#sc-brand .sc-title');
+  if (scBrandTitle) scBrandTitle.textContent = t('sc_brand_title');
+  const saveBrandBtn = document.querySelector('[onclick="saveBrandVoice()"]');
+  if (saveBrandBtn) saveBrandBtn.textContent = t('btn_save_brand');
+  const scWpTitle = document.querySelector('#sc-wordpress .sc-title');
+  if (scWpTitle) scWpTitle.textContent = t('sc_wp_title');
+  const connectWpBtn = document.querySelector('[onclick="connectWordPress()"]');
+  if (connectWpBtn) connectWpBtn.textContent = t('btn_connect_wp');
+  const scShopifyTitle = document.querySelector('#sc-shopify .sc-title');
+  if (scShopifyTitle) scShopifyTitle.textContent = t('sc_shopify_title');
+  const connectShopifyBtn = document.querySelector('[onclick="connectShopify()"]');
+  if (connectShopifyBtn) connectShopifyBtn.textContent = t('btn_connect_shopify');
+  const scDevTitle = document.querySelector('#sc-developer .sc-title');
+  if (scDevTitle) scDevTitle.textContent = t('sc_dev_title');
+  const scNotifTitle = document.querySelector('#sc-notif .sc-title');
+  if (scNotifTitle) scNotifTitle.textContent = t('sc_notif_title');
+  const saveNotifBtn = document.querySelector('[onclick*="Notification preferences"]');
+  if (saveNotifBtn) saveNotifBtn.textContent = t('btn_save_notif');
+
+  // Notifications rows
+  const notifRows = document.querySelectorAll('#sc-notif .s-lbl');
+  const notifDescs = document.querySelectorAll('#sc-notif .s-desc');
+  const nKeys = ['notif_weekly','notif_credits','notif_features'];
+  const ndKeys = ['notif_weekly_desc','notif_credits_desc','notif_features_desc'];
+  notifRows.forEach((el,i)=>{ if(nKeys[i]) el.textContent=t(nKeys[i]); });
+  notifDescs.forEach((el,i)=>{ if(ndKeys[i]) el.textContent=t(ndKeys[i]); });
+
+  // ── Bulk page ──
+  const bulkTitleEl = document.querySelector('#page-bulk .page-body > div:first-child > div > div:first-child');
+  if (bulkTitleEl) bulkTitleEl.textContent = t('bulk_title');
+  const bulkSubEl = document.querySelector('#page-bulk .page-body > div:first-child > div > div:nth-child(2)');
+  if (bulkSubEl) bulkSubEl.textContent = t('bulk_sub');
 
   // Sign out label
   const signoutEl = document.getElementById('signout-label');
   if (signoutEl) signoutEl.textContent = t('signout_label');
+
+  updateSettingsNav();
+  updateCategoryPills();
+  updateBulkPageTexts();
 }
 
 function updateSettingsNav() {
@@ -3143,7 +3427,8 @@ function updateBulkPageTexts() {
 function toggleLang() {
   const cycle = { bm: 'en', en: 'zh', zh: 'bm' };
   currentLang = cycle[currentLang] || 'en';
-  localStorage.setItem('msm_lang', currentLang);
+  // Save 'ms' for Malay to stay in sync with landing page selector
+  localStorage.setItem('msm_lang', currentLang === 'bm' ? 'ms' : currentLang);
   applyTranslations();
   renderTools(TOOLS);
   updateProfileMenuLabels();
@@ -3159,7 +3444,8 @@ function toggleLang() {
 }
 
 function initLang() {
-  currentLang = localStorage.getItem('msm_lang') || 'bm';
+  const saved = localStorage.getItem('msm_lang') || 'bm';
+  currentLang = saved === 'ms' ? 'bm' : saved;
   applyTranslations();
 }
 

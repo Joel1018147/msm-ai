@@ -280,5 +280,149 @@ function socialSignup(provider) {
   window.location.href = `/api/auth/${provider.toLowerCase()}` + (remember ? '?remember=true' : '');
 }
 </script>
+
+<script>
+(function(){
+  const saved = localStorage.getItem('msm_lang') || 'en';
+  const lang = saved === 'ms' || saved === 'bm' ? 'bm' : saved;
+  if (lang === 'en') return;
+
+  const TX = {
+    bm: {
+      page_title: 'Buat Akaun — M-EasyTools AI',
+      left_headline: 'Mula Mencipta <span class="hl">10× Lebih Pantas</span> Hari Ini',
+      left_desc: 'Sertai 2,400+ pemasar dan agensi menggunakan M-EasyTools AI untuk mencipta kandungan berkadar penukaran tinggi dalam beberapa saat.',
+      b1_title: 'Tiada kad kredit diperlukan untuk bermula',
+      b1_desc: 'Dapatkan 2,500 kredit setiap bulan, percuma selamanya.',
+      b2_title: 'Sembang AI dikuasakan Groq (ultra-pantas)',
+      b2_desc: 'Respons LLaMA 3 dalam masa kurang dari sesaat.',
+      b3_title: '40+ alat penulisan AI profesional',
+      b3_desc: 'Blog, e-mel, sosial, iklan, SEO dan lagi.',
+      b4_title: 'Batal bila-bila masa, tiada soalan ditanya',
+      b4_desc: 'Kawalan penuh. Tiada kunci masuk. Tiada kejutan.',
+      auth_title: 'Buat akaun anda',
+      auth_sub: 'Sudah ada akaun? <a href="login.html">Log masuk →</a>',
+      lbl_first: 'Nama Pertama', ph_first: 'Ahmad',
+      lbl_last: 'Nama Akhir', ph_last: 'Rahman',
+      lbl_email: 'Alamat E-mel', ph_email: 'anda@syarikat.com',
+      lbl_password: 'Kata Laluan', ph_password: 'Min. 8 aksara',
+      terms_text: 'Saya bersetuju dengan <a href="#">Terma Perkhidmatan</a> dan <a href="#">Dasar Privasi</a>. Saya faham M-EasyTools AI boleh menghantar kemas kini produk ke e-mel saya.',
+      keep_signed: 'Kekalkan saya log masuk di peranti ini',
+      btn_create: 'Buat Akaun Percuma →',
+      or_signup: 'atau daftar dengan',
+      footer_link: 'Sudah ada akaun? <a href="login.html">Log masuk</a>',
+      creating: 'Mencipta akaun…',
+      pw_weak: 'Kata laluan: Lemah', pw_fair: 'Kata laluan: Sederhana',
+      pw_good: 'Kata laluan: Baik', pw_strong: 'Kata laluan: Kukuh',
+      pw_short: 'Kata laluan mestilah sekurang-kurangnya 8 aksara.',
+    },
+    zh: {
+      page_title: '创建账户 — M-EasyTools AI',
+      left_headline: '立即开始<span class="hl">10倍速</span>创作',
+      left_desc: '加入2,400+名营销人员和代理商，使用M-EasyTools AI在几秒内创作高转化率内容。',
+      b1_title: '无需信用卡即可开始',
+      b1_desc: '每月获得2,500积分，永久免费。',
+      b2_title: 'Groq驱动的AI聊天（超快速）',
+      b2_desc: 'LLaMA 3响应不到一秒。',
+      b3_title: '40+专业AI写作工具',
+      b3_desc: '博客、邮件、社交、广告、SEO等。',
+      b4_title: '随时取消，无需理由',
+      b4_desc: '完全掌控。无捆绑。无惊喜。',
+      auth_title: '创建您的账户',
+      auth_sub: '已有账户？<a href="login.html">登录 →</a>',
+      lbl_first: '名字', ph_first: '张',
+      lbl_last: '姓氏', ph_last: '伟',
+      lbl_email: '电子邮件地址', ph_email: 'you@company.com',
+      lbl_password: '密码', ph_password: '至少8位字符',
+      terms_text: '我同意<a href="#">服务条款</a>和<a href="#">隐私政策</a>。我了解M-EasyTools AI可能会向我的邮箱发送产品更新。',
+      keep_signed: '在此设备上保持登录',
+      btn_create: '免费创建账户 →',
+      or_signup: '或使用以下方式注册',
+      footer_link: '已有账户？<a href="login.html">登录</a>',
+      creating: '正在创建账户…',
+      pw_weak: '密码强度：弱', pw_fair: '密码强度：一般',
+      pw_good: '密码强度：良好', pw_strong: '密码强度：强',
+      pw_short: '密码至少需要8个字符。',
+    }
+  };
+
+  const tx = TX[lang]; if (!tx) return;
+
+  function setText(sel, val) { const el = document.querySelector(sel); if (el) el.textContent = val; }
+  function setHTML(sel, val) { const el = document.querySelector(sel); if (el) el.innerHTML = val; }
+  function setPlaceholder(id, val) { const el = document.getElementById(id); if (el) el.placeholder = val; }
+
+  document.title = tx.page_title;
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : 'ms';
+
+  setHTML('.left-headline', tx.left_headline);
+  setText('.left-desc', tx.left_desc);
+
+  const benefitTitles = document.querySelectorAll('.benefit-title');
+  const benefitDescs = document.querySelectorAll('.benefit-desc');
+  const btKeys = [tx.b1_title, tx.b2_title, tx.b3_title, tx.b4_title];
+  const bdKeys = [tx.b1_desc, tx.b2_desc, tx.b3_desc, tx.b4_desc];
+  benefitTitles.forEach((el,i) => { if(btKeys[i]) el.textContent = btKeys[i]; });
+  benefitDescs.forEach((el,i) => { if(bdKeys[i]) el.textContent = bdKeys[i]; });
+
+  setText('.auth-title', tx.auth_title);
+  setHTML('.auth-sub', tx.auth_sub);
+
+  const formLabels = document.querySelectorAll('.form-label');
+  if (formLabels[0]) formLabels[0].textContent = tx.lbl_first;
+  if (formLabels[1]) formLabels[1].textContent = tx.lbl_last;
+  if (formLabels[2]) formLabels[2].textContent = tx.lbl_email;
+  if (formLabels[3]) formLabels[3].textContent = tx.lbl_password;
+
+  setPlaceholder('first-name', tx.ph_first);
+  setPlaceholder('last-name', tx.ph_last);
+  setPlaceholder('signup-email', tx.ph_email);
+  setPlaceholder('signup-password', tx.ph_password);
+
+  setHTML('.terms-text', tx.terms_text);
+
+  const keepSignedLabel = document.querySelectorAll('.terms-text')[1];
+  if (keepSignedLabel) keepSignedLabel.textContent = tx.keep_signed;
+
+  const createBtn = document.getElementById('signup-btn');
+  if (createBtn) createBtn.textContent = tx.btn_create;
+
+  setHTML('.auth-footer', tx.footer_link);
+
+  // Override strength labels
+  const origCheckStrength = window.checkStrength;
+  if (origCheckStrength) {
+    window.checkStrength = function(pw) {
+      origCheckStrength(pw);
+      const hint = document.getElementById('pw-hint');
+      if (hint && pw.length > 0) {
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        const labels = [tx.pw_weak, tx.pw_fair, tx.pw_good, tx.pw_strong];
+        hint.textContent = labels[Math.max(0, score - 1)] || tx.pw_weak;
+      }
+    };
+  }
+
+  // Override error message for short password
+  const origHandleSignup = window.handleSignup;
+  if (origHandleSignup) {
+    window.handleSignup = async function(e) {
+      const pw = document.getElementById('signup-password')?.value || '';
+      if (pw.length < 8) {
+        const errMsg = document.getElementById('error-msg');
+        if (errMsg) { errMsg.textContent = tx.pw_short; errMsg.style.display = 'block'; }
+        e.preventDefault(); return;
+      }
+      const btn = document.getElementById('signup-btn');
+      if (btn) btn.textContent = tx.creating;
+      return origHandleSignup.call(this, e);
+    };
+  }
+})();
+</script>
 </body>
 </html>

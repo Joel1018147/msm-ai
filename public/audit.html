@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Translation Audit — M-EasyTools AI+</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#07090F;color:#F0F4FA;min-height:100vh;padding:32px}
+h1{font-size:22px;font-weight:700;color:#FF7A45;margin-bottom:8px}
+.subtitle{font-size:13px;color:#8892A4;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:32px}
+.card{background:#141820;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px}
+.card-title{font-size:14px;font-weight:700;color:#F0F4FA;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-ok{background:rgba(14,207,176,0.15);color:#0ECFB0}
+.badge-warn{background:rgba(244,196,48,0.15);color:#F4C430}
+.badge-err{background:rgba(244,63,94,0.15);color:#F43F5E}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
+.stat-row:last-child{border-bottom:none}
+.stat-label{color:#8892A4}
+.stat-val{font-weight:700;font-family:monospace}
+.progress-bar{height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;margin-top:12px}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#E8622A,#FF7A45);transition:width .5s}
+.section{margin-bottom:28px}
+.section-title{font-size:16px;font-weight:700;color:#F0F4FA;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.07)}
+table{width:100%;border-collapse:collapse;background:#141820;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.07)}
+th{background:rgba(255,255,255,0.03);padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#4A5568;text-align:left}
+td{padding:10px 14px;font-size:12px;border-top:1px solid rgba(255,255,255,0.04);font-family:monospace}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.ok{color:#0ECFB0}.warn{color:#F4C430}.err{color:#F43F5E}
+.run-btn{padding:10px 20px;background:#E8622A;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:20px}
+.run-btn:hover{background:#FF7A45}
+#report{display:none}
+.summary-box{background:linear-gradient(135deg,#0D1018,#141820);border:1px solid rgba(14,207,176,0.2);border-radius:12px;padding:20px;margin-bottom:24px;display:flex;gap:32px;align-items:center}
+.sum-num{font-size:36px;font-weight:700;font-family:'Libre Baskerville',serif;color:#F0F4FA}
+.sum-label{font-size:11px;color:#4A5568;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.pct-circle{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;border:3px solid #0ECFB0;color:#0ECFB0}
+</style>
+</head>
+<body>
+
+<h1>🔍 Translation Audit — M-EasyTools AI+</h1>
+<p class="subtitle">Scans all locale JSON files and checks translation key coverage across EN, ZH, and MS</p>
+
+<button class="run-btn" onclick="runAudit()">▶ Run Audit Now</button>
+
+<div id="report"></div>
+
+<script>
+async function runAudit() {
+  const btn = document.querySelector('.run-btn');
+  btn.textContent = '⏳ Running…';
+  btn.disabled = true;
+
+  const report = document.getElementById('report');
+  report.style.display = 'none';
+  report.innerHTML = '';
+
+  try {
+    const [en, zh, ms] = await Promise.all([
+      fetch('/locales/en.json').then(r => r.json()),
+      fetch('/locales/zh.json').then(r => r.json()),
+      fetch('/locales/ms.json').then(r => r.json()),
+    ]);
+
+    const enKeys = flattenKeys(en);
+    const zhKeys = flattenKeys(zh);
+    const msKeys = flattenKeys(ms);
+
+    const allKeys = new Set([...Object.keys(enKeys), ...Object.keys(zhKeys), ...Object.keys(msKeys)]);
+    const total = allKeys.size;
+
+    const zhMissing = [...allKeys].filter(k => !(k in zhKeys));
+    const msMissing = [...allKeys].filter(k => !(k in msKeys));
+    const enMissing = [...allKeys].filter(k => !(k in enKeys));
+
+    const zhCoverage = Math.round(((total - zhMissing.length) / total) * 100);
+    const msCoverage = Math.round(((total - msMissing.length) / total) * 100);
+    const enCoverage = Math.round(((total - enMissing.length) / total) * 100);
+    const overallCoverage = Math.round((zhCoverage + msCoverage + enCoverage) / 3);
+
+    const checkHardcoded = await auditHardcoded();
+
+    report.innerHTML = `
+      <div class="summary-box">
+        <div class="pct-circle">${overallCoverage}%</div>
+        <div style="flex:1">
+          <div style="font-size:18px;font-weight:700;margin-bottom:4px">Overall Translation Coverage</div>
+          <div style="font-size:13px;color:#8892A4">Across ${total} unique translation keys · 3 languages</div>
+          <div class="progress-bar" style="margin-top:10px;max-width:300px"><div class="progress-fill" style="width:${overallCoverage}%"></div></div>
+        </div>
+        <div style="display:flex;gap:24px">
+          <div style="text-align:center"><div class="sum-num">${total}</div><div class="sum-label">Total Keys</div></div>
+          <div style="text-align:center"><div class="sum-num" style="color:#0ECFB0">${total - zhMissing.length - msMissing.length}</div><div class="sum-label">Translated</div></div>
+          <div style="text-align:center"><div class="sum-num" style="color:#F43F5E">${zhMissing.length + msMissing.length}</div><div class="sum-label">Missing</div></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        ${langCard('English (EN)', enCoverage, total, enMissing, 'en', enKeys)}
+        ${langCard('Simplified Chinese (ZH)', zhCoverage, total, zhMissing, 'zh', zhKeys)}
+        ${langCard('Bahasa Malaysia (MS)', msCoverage, total, msMissing, 'ms', msKeys)}
+      </div>
+
+      <div class="section">
+        <div class="section-title">📄 Locale File Stats</div>
+        <table>
+          <thead><tr><th>File</th><th>Keys</th><th>Coverage</th><th>Missing</th><th>Status</th></tr></thead>
+          <tbody>
+            ${fileRow('en.json', Object.keys(enKeys).length, total, enMissing.length)}
+            ${fileRow('zh.json', Object.keys(zhKeys).length, total, zhMissing.length)}
+            ${fileRow('ms.json', Object.keys(msKeys).length, total, msMissing.length)}
+          </tbody>
+        </table>
+      </div>
+
+      ${zhMissing.length > 0 ? missingTable('Missing ZH Keys', zhMissing, enKeys) : ''}
+      ${msMissing.length > 0 ? missingTable('Missing MS Keys', msMissing, enKeys) : ''}
+
+      <div class="section">
+        <div class="section-title">🔍 Hardcoded String Scan</div>
+        <div class="card">
+          <div style="font-size:13px;color:#8892A4;line-height:1.8">
+            ${checkHardcoded}
+          </div>
+        </div>
+      </div>
+    `;
+    report.style.display = 'block';
+
+  } catch(e) {
+    report.innerHTML = `<div class="card"><div class="stat-label" style="color:#F43F5E">Error: ${e.message}</div></div>`;
+    report.style.display = 'block';
+  }
+
+  btn.textContent = '▶ Run Audit Now';
+  btn.disabled = false;
+}
+
+function flattenKeys(obj, prefix = '') {
+  const result = {};
+  for (const [k, v] of Object.entries(obj)) {
+    const key = prefix ? `${prefix}.${k}` : k;
+    if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+      Object.assign(result, flattenKeys(v, key));
+    } else {
+      result[key] = v;
+    }
+  }
+  return result;
+}
+
+function langCard(title, pct, total, missing, code, keys) {
+  const status = pct === 100 ? 'ok' : pct >= 80 ? 'warn' : 'err';
+  const badgeClass = `badge-${status}`;
+  const badgeText = pct === 100 ? '✓ Complete' : `${missing.length} missing`;
+  return `
+    <div class="card">
+      <div class="card-title">
+        ${title}
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">Coverage</span><span class="stat-val ${status === 'ok' ? 'ok' : status === 'warn' ? 'warn' : 'err'}">${pct}%</span></div>
+      <div class="stat-row"><span class="stat-label">Translated Keys</span><span class="stat-val">${Object.keys(keys).length} / ${total}</span></div>
+      <div class="stat-row"><span class="stat-label">Missing Keys</span><span class="stat-val ${missing.length > 0 ? 'err' : 'ok'}">${missing.length}</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct===100?'#0ECFB0':pct>=80?'#F4C430':'#F43F5E'}"></div></div>
+    </div>`;
+}
+
+function fileRow(file, keys, total, missing) {
+  const pct = Math.round((keys / total) * 100);
+  const cls = missing === 0 ? 'ok' : missing < 10 ? 'warn' : 'err';
+  return `<tr><td>${file}</td><td>${keys}</td><td class="${cls}">${pct}%</td><td class="${missing>0?'err':'ok'}">${missing}</td><td><span class="badge badge-${cls === 'ok' ? 'ok' : cls === 'warn' ? 'warn' : 'err'}">${missing===0?'✓ Complete':'Incomplete'}</span></td></tr>`;
+}
+
+function missingTable(title, missing, enKeys) {
+  if (!missing.length) return '';
+  return `
+    <div class="section">
+      <div class="section-title">⚠️ ${title} (${missing.length})</div>
+      <table>
+        <thead><tr><th>Key</th><th>English Value</th></tr></thead>
+        <tbody>
+          ${missing.slice(0, 50).map(k => `<tr><td class="warn">${k}</td><td style="color:#8892A4">${String(enKeys[k]||'').substring(0,80)}</td></tr>`).join('')}
+          ${missing.length > 50 ? `<tr><td colspan="2" style="color:#4A5568;text-align:center">… and ${missing.length-50} more</td></tr>` : ''}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function auditHardcoded() {
+  const pages = ['index.html','app.html','gao.html','login.html','signup.html','admin.html'];
+  const results = [];
+  for (const page of pages) {
+    try {
+      const res = await fetch(`/${page}`);
+      const html = await res.text();
+      const dataI18nCount = (html.match(/data-i18n=/g) || []).length;
+      const dataI18nHtmlCount = (html.match(/data-i18n-html=/g) || []).length;
+      const total = dataI18nCount + dataI18nHtmlCount;
+      const status = page === 'admin.html' ? '(admin - optional)' : total > 50 ? '✓ Good coverage' : total > 10 ? '⚠ Partial' : '❌ Needs work';
+      results.push(`<strong>${page}</strong>: ${total} translated nodes — ${status}`);
+    } catch(e) {
+      results.push(`<strong>${page}</strong>: Could not scan (${e.message})`);
+    }
+  }
+  return results.join('<br>');
+}
+</script>
+</body>
+</html>
