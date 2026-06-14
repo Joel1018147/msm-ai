@@ -189,8 +189,8 @@ const FORMS={
   ],prompt:d=>`Write a ${d.length} SEO-optimized article targeting: "${d.keyword}"\nSearch intent: ${d.intent}\nTone: ${activeTone}\n\nRequirements:\n- Include keyword in H1, first paragraph, 2-3 H2s\n- Use ## H2 and ### H3 headings\n- Include internal linking placeholders [LINK: topic]\n- Add author expertise signals (statistics, examples)\n- Include a FAQ section at the end (3 questions)\n- End with a strong CTA`},
 };
 async function init(){
-  if(!token){window.location='/login';return}
-  try{const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login';return}currentUser=(await r.json()).user;document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login'}
+  if(!token){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
+  try{const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}currentUser=(await r.json()).user;document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
   const th=localStorage.getItem('theme')||'light';document.documentElement.dataset.theme=th;document.getElementById('th-btn').textContent=th==='dark'?'🌙':'☀️';
   allTools=TOOLS;renderTools(TOOLS);
 }
@@ -236,4 +236,5 @@ init();
 </script>
 </body>
 </html>
+
 

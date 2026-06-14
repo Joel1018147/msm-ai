@@ -188,13 +188,13 @@ function toast(msg,type='ok'){const el=document.getElementById('toast');el.textC
 function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);document.getElementById('th-btn').textContent=t==='dark'?'🌙':'☀️';}
 
 async function init(){
-  if(!token){window.location='/login';return}
+  if(!token){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
   const th=localStorage.getItem('theme')||'light';
   document.documentElement.dataset.theme=th;
   document.getElementById('th-btn').textContent=th==='dark'?'🌙':'☀️';
   try{
     const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});
-    if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login';return}
+    if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
     currentUser=(await r.json()).user;
     document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();
     document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];
@@ -205,7 +205,7 @@ async function init(){
     }
     document.getElementById('main-content').style.display='block';
     loadModules();
-  }catch{window.location='/login'}
+  }catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
 }
 
 async function loadModules(){
@@ -289,4 +289,5 @@ init();
 </script>
 </body>
 </html>
+
 

@@ -16,8 +16,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#080810;col
   var token  = params.get('token');
   var remember = params.get('remember') === 'true';
   var name   = params.get('name');
-  var redirect = params.get('redirect') || '/app.html';
-  var safeRedirect = (redirect.startsWith('/') && !redirect.startsWith('//')) ? redirect : '/app.html';
+  var redirect = params.get('redirect') || '/app';
+  var safeRedirect = (redirect.startsWith('/') && !redirect.startsWith('//')) ? redirect : '/app';
 
   if (!token) { window.location.href = '/login.html?error=oauth_failed'; return; }
 

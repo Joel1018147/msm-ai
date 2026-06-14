@@ -190,8 +190,8 @@ const FORMS={
   ],prompt:d=>`Write a compelling ${d.channel} upsell/cross-sell message.\nMain product: ${d.main}\nUpsell offer: ${d.upsell}\nTone: ${activeTone}\n\nCreate 3 different versions:\n1. Benefit-focused angle\n2. Bundle value angle (savings emphasis)\n3. Social proof angle ("customers also bought")\n\nEach version should create desire and a clear CTA. Keep each under 100 words.`},
 };
 async function init(){
-  if(!token){window.location='/login';return}
-  try{const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login';return}currentUser=(await r.json()).user;document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login'}
+  if(!token){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
+  try{const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}currentUser=(await r.json()).user;document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
   const th=localStorage.getItem('theme')||'light';document.documentElement.dataset.theme=th;document.getElementById('th-btn').textContent=th==='dark'?'🌙':'☀️';
   allTools=TOOLS;renderTools(TOOLS);
 }
@@ -237,4 +237,5 @@ init();
 </script>
 </body>
 </html>
+
 

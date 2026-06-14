@@ -191,8 +191,8 @@ const FORMS={
   ],prompt:d=>`Write a ${d.duration} TikTok native ad script for: "${d.product}"\nHook angle: ${d.hook}\nTone: ${activeTone}\n\nFormat:\n[0-3s] HOOK: (first words spoken + visual action)\n[3-10s] PROBLEM/CONTEXT:\n[10-20s] SOLUTION/PRODUCT DEMO:\n[20-25s] PROOF/RESULTS:\n[25-30s] CTA:\n\nMake it feel native, not like an ad. Include directions for visuals.`},
 };
 async function init(){
-  if(!token){window.location='/login';return}
-  try{const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login';return}currentUser=(await r.json()).user;document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login'}
+  if(!token){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
+  try{const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}currentUser=(await r.json()).user;document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
   const th=localStorage.getItem('theme')||'light';document.documentElement.dataset.theme=th;document.getElementById('th-btn').textContent=th==='dark'?'🌙':'☀️';
   allTools=TOOLS;renderTools(TOOLS);
 }
@@ -238,4 +238,5 @@ init();
 </script>
 </body>
 </html>
+
 
