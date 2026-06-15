@@ -6,6 +6,7 @@
   },
   "nav": {
     "systems": "系统功能",
+    "how_it_works": "如何使用",
     "why": "为何选择我们",
     "signin": "登录",
     "start": "免费开始 →",
@@ -165,6 +166,19 @@
       "f5n": "Perplexity 和 DeepSeek",
       "f5d": "— 全平台 AI 搜索监控"
     }
+  },
+  "hiw": {
+    "eyebrow": "使用流程",
+    "title_html": "快速上手，<br><span class=\"hiw-accent\">四步搞定</span>",
+    "sub": "从注册到内容发布 — 无需培训，无需信用卡。",
+    "s1_title": "免费注册",
+    "s1_desc": "30 秒创建账户 — 无需信用卡，随时可退出。",
+    "s2_title": "设置品牌信息",
+    "s2_desc": "告诉我们您的业务、风格和目标受众 — 一次设置，AI 永久记住。",
+    "s3_title": "选择 AI 工具",
+    "s3_desc": "从 9 大 AI 系统中的 40+ 工具中选择 — 内容、广告、邮件、SEO 等应有尽有。",
+    "s4_title": "生成并发布",
+    "s4_desc": "秒级生成精品内容，一键发布至 WordPress 或 Shopify。"
   },
   "why": {
     "tag": "为何选择 M-EasyTools AI+",

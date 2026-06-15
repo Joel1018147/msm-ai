@@ -337,6 +337,20 @@ nav{
 .sys-gao      {--card-accent:#00D4AA;--card-icon-bg:rgba(0,212,170,0.1);--card-icon-border:rgba(0,212,170,0.2);--card-bg-from:rgba(0,212,170,0.04)}
 
 /* ── WHY SECTION ── */
+/* ── HOW IT WORKS SECTION ── */
+.hiw-section{padding:100px 48px;background:linear-gradient(180deg,transparent,rgba(232,98,42,0.03),transparent);}
+.hiw-inner{max-width:1100px;margin:0 auto}
+.hiw-eyebrow{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;text-align:center}
+.hiw-title{font-family:'Libre Baskerville',serif;font-size:clamp(28px,3.5vw,44px);font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:12px;text-align:center}
+.hiw-accent{color:var(--orange)}
+.hiw-sub{font-size:15px;color:var(--text2);line-height:1.8;margin:0 auto 64px;max-width:520px;text-align:center}
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative}
+.steps-row::before{content:'';position:absolute;top:36px;left:calc(12.5% + 8px);right:calc(12.5% + 8px);height:1px;background:linear-gradient(90deg,transparent,rgba(232,98,42,0.4),rgba(232,98,42,0.4),transparent);z-index:0}
+.step-item{text-align:center;position:relative;z-index:1}
+.step-circle{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;position:relative;font-size:28px;transition:all 0.2s}
+.step-circle::before{content:attr(data-num);position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;line-height:1}
+.step-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.7}
 .why-section{
   padding:100px 48px;
   background:linear-gradient(180deg,transparent,rgba(232,98,42,0.04) 50%,transparent);
@@ -420,9 +434,11 @@ footer{
   .systems-grid{grid-template-columns:repeat(2,1fr)}
   .why-inner{grid-template-columns:1fr;gap:48px}
   .why-visual{display:none}
+  .steps-row::before{display:none}
 }
 @media(max-width:768px){
   .nav-links{display:none}
+  .steps-row{grid-template-columns:repeat(2,1fr);gap:24px}
 }
 @media(max-width:640px){
   nav{padding:0 20px}
@@ -431,6 +447,7 @@ footer{
   .h-stat{border-right:none;border-bottom:1px solid var(--border)}
   .systems-section{padding:60px 20px}
   .systems-grid{grid-template-columns:1fr}
+  .hiw-section{padding:60px 20px}
   .why-section{padding:60px 20px}
   .cta-section{padding:80px 20px}
   footer{flex-direction:column;gap:16px;text-align:center}
@@ -453,6 +470,7 @@ footer{
   </div>
   <div class="nav-links">
     <a href="#systems" data-i18n="nav.systems">Our Systems</a>
+    <a href="#how-it-works" data-i18n="nav.how_it_works">How it works</a>
     <a href="#why" data-i18n="nav.why">Why Us</a>
   </div>
   <div class="nav-right">
@@ -730,6 +748,37 @@ footer{
 
   </div>
   <p style="text-align:center;font-size:13px;color:var(--text3);margin-top:32px" data-i18n="systems.note">All 9 systems are included in one platform. Sign up once, access everything.</p>
+</section>
+
+<!-- HOW IT WORKS SECTION -->
+<section class="hiw-section" id="how-it-works">
+  <div class="hiw-inner">
+    <div class="hiw-eyebrow" data-i18n="hiw.eyebrow">How It Works</div>
+    <h2 class="hiw-title" data-i18n-html="hiw.title_html">Up and running<br><span class="hiw-accent">in 4 simple steps</span></h2>
+    <p class="hiw-sub" data-i18n="hiw.sub">From sign-up to published content — no training required, no credit card needed.</p>
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-circle" data-num="1" aria-hidden="true">🚀</div>
+        <div class="step-title" data-i18n="hiw.s1_title">Sign Up Free</div>
+        <div class="step-desc" data-i18n="hiw.s1_desc">Create your account in 30 seconds — no credit card, no commitment.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" data-num="2" aria-hidden="true">🏷️</div>
+        <div class="step-title" data-i18n="hiw.s2_title">Set Up Your Brand</div>
+        <div class="step-desc" data-i18n="hiw.s2_desc">Tell us about your business, tone, and audience — once, and AI remembers it.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" data-num="3" aria-hidden="true">🤖</div>
+        <div class="step-title" data-i18n="hiw.s3_title">Choose an AI Tool</div>
+        <div class="step-desc" data-i18n="hiw.s3_desc">Pick from 40+ tools across 9 AI systems — content, ads, email, SEO, and more.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" data-num="4" aria-hidden="true">📤</div>
+        <div class="step-title" data-i18n="hiw.s4_title">Generate &amp; Publish</div>
+        <div class="step-desc" data-i18n="hiw.s4_desc">Get polished, ready-to-use content in seconds. Publish to WordPress or Shopify in one click.</div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- WHY SECTION -->

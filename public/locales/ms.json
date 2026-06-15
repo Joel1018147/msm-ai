@@ -6,6 +6,7 @@
   },
   "nav": {
     "systems": "Sistem Kami",
+    "how_it_works": "Cara Kerja",
     "why": "Mengapa Kami",
     "signin": "Log Masuk",
     "start": "Mulakan Percuma →",
@@ -165,6 +166,19 @@
       "f5n": "Perplexity & DeepSeek",
       "f5d": "— Pemantauan carian AI pelbagai platform penuh"
     }
+  },
+  "hiw": {
+    "eyebrow": "Cara Ia Berfungsi",
+    "title_html": "Sedia beroperasi,<br><span class=\"hiw-accent\">dalam 4 langkah mudah</span>",
+    "sub": "Dari daftar hingga kandungan diterbitkan — tiada latihan diperlukan, tiada kad kredit.",
+    "s1_title": "Daftar Percuma",
+    "s1_desc": "Buat akaun dalam 30 saat — tiada kad kredit, tiada komitmen.",
+    "s2_title": "Tetapkan Jenama Anda",
+    "s2_desc": "Beritahu kami tentang perniagaan, nada dan audiens anda — sekali sahaja, AI ingat selebihnya.",
+    "s3_title": "Pilih Alat AI",
+    "s3_desc": "Pilih dari 40+ alatan merentas 9 sistem AI — kandungan, iklan, e-mel, SEO dan lebih.",
+    "s4_title": "Jana & Terbitkan",
+    "s4_desc": "Dapatkan kandungan siap-guna dalam beberapa saat. Terbitkan ke WordPress atau Shopify dengan satu klik."
   },
   "why": {
     "tag": "Mengapa M-EasyTools AI+",

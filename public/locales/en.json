@@ -6,6 +6,7 @@
   },
   "nav": {
     "systems": "Our Systems",
+    "how_it_works": "How it works",
     "why": "Why Us",
     "signin": "Sign In",
     "start": "Start Free →",
@@ -165,6 +166,19 @@
       "f5n": "Perplexity & DeepSeek",
       "f5d": "— Full multi-platform AI search monitoring"
     }
+  },
+  "hiw": {
+    "eyebrow": "How It Works",
+    "title_html": "Up and running<br><span class=\"hiw-accent\">in 4 simple steps</span>",
+    "sub": "From sign-up to published content — no training required, no credit card needed.",
+    "s1_title": "Sign Up Free",
+    "s1_desc": "Create your account in 30 seconds — no credit card, no commitment.",
+    "s2_title": "Set Up Your Brand",
+    "s2_desc": "Tell us about your business, tone, and audience — once, and AI remembers it.",
+    "s3_title": "Choose an AI Tool",
+    "s3_desc": "Pick from 40+ tools across 9 AI systems — content, ads, email, SEO, and more.",
+    "s4_title": "Generate & Publish",
+    "s4_desc": "Get polished, ready-to-use content in seconds. Publish to WordPress or Shopify in one click."
   },
   "why": {
     "tag": "Why M-EasyTools AI+",
