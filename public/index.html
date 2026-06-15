@@ -813,14 +813,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.sys-card').forEach(card => {
     card.addEventListener('click', (e) => {
       e.preventDefault();
-      const dest = card.getAttribute('href');
-      const token = localStorage.getItem('msm_token');
-      if (token) {
-        window.location.href = dest;
-      } else {
-        const encoded = encodeURIComponent(dest);
-        window.location.href = `https://m-easytools-ai-production.up.railway.app/login.html?redirect=${encoded}`;
-      }
+      window.location.href = card.getAttribute('href');
     });
   });
 });
@@ -1002,21 +995,18 @@ async function cwSend() {
   const typingEl = cwAppend('ai', '<div class="cw-typing"><div class="cw-dot"></div><div class="cw-dot"></div><div class="cw-dot"></div></div>');
 
   try {
-    const token = localStorage.getItem('msm_token');
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-
     const systemMsg = `You are M-EasyTools AI+, a friendly and knowledgeable marketing assistant for the M-EasyTools AI+ platform. You help visitors understand what the platform does, its 9 AI systems (M-EasyContent, M-EasySocial, M-EasyMail, M-EasyAds, M-EasySEO, M-EasyCommerce, M-EasySales, M-EasyTools, M-EasyGAO), and how to get started. Pricing plans are coming soon — encourage users to sign up for free. Be concise, helpful, and encourage users to sign up. Platform URL: https://m-easytools-ai-production.up.railway.app`;
 
     let responseText = '';
 
-    if (token) {
-      const res = await fetch(CHAT_API, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ messages: cwHistory.slice(-10) })
-      });
-      const data = await res.json();
+    const appRes = await fetch(CHAT_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: cwHistory.slice(-10) })
+    });
+
+    if (appRes.ok) {
+      const data = await appRes.json();
       if (data.message) responseText = data.message;
       else throw new Error(data.error || 'API error');
     } else {

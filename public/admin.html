@@ -187,10 +187,9 @@ body{display:flex;flex-direction:column}
 <div class="toast" id="toast"></div>
 
 <script>
-const TOKEN = localStorage.getItem('msm_token') || '';
 let editId = null;
 
-function H() { return {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN}; }
+function H() { return {'Content-Type':'application/json'}; }
 function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function showPage(id, el) {
@@ -204,10 +203,9 @@ function showPage(id, el) {
 }
 
 async function loadAll() {
-  if(!TOKEN){window.location.href='/login.html';return;}
   try {
     const res = await fetch('/api/admin/stats',{headers:H()});
-    if(res.status===401){window.location.href='/login.html';return;}
+    if(res.status===401){window.location.href='/login';return;}
     if(res.status===403){showErr('Admin access required. Only the first registered user has admin access.');return;}
     const d = await res.json();
 
@@ -338,11 +336,11 @@ async function loadToolStats() {
 
 function fmtDate(dt){return dt?new Date(dt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';}
 function showErr(msg){document.querySelector('.admin-main').innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px;gap:16px;text-align:center"><div style="font-size:48px">🔒</div><div style="font-size:18px;font-weight:700;color:var(--navy)">Access Denied</div><div style="font-size:14px;color:var(--mist);max-width:360px;line-height:1.6">${msg}</div><button class="btn btn-primary" onclick="window.location.href='/app.html'">← Back to App</button></div>`;}
-function logout(){localStorage.removeItem('msm_token');window.location.href='/login.html';}
+async function logout(){await fetch('/api/auth/logout',{method:'POST'});window.location.href='/login';}
 let toastT;
 function toast(msg,type){clearTimeout(toastT);const el=document.getElementById('toast');el.textContent=msg;el.className='toast show '+(type||'');toastT=setTimeout(()=>el.classList.remove('show'),3000);}
 
-if(!TOKEN){window.location.href='/login.html';}else{loadAll();}
+loadAll();
 </script>
 </body>
 </html>

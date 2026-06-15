@@ -1512,14 +1512,12 @@ let bulkJobId = null;
 let bulkPollTimer = null;
 
 // ── Auth ─────────────────────────────────────────────────
-function getToken() { return localStorage.getItem('msm_token') || sessionStorage.getItem('msm_token') || ''; }
-function authHeaders() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
+function authHeaders() { return { 'Content-Type': 'application/json' }; }
 
 async function initApp() {
-  if (!getToken()) { window.location.href = '/login.html'; return; }
   try {
-    const res = await fetch('/api/auth/me', { headers: authHeaders() });
-    if (!res.ok) { localStorage.removeItem('msm_token'); sessionStorage.removeItem('msm_token'); window.location.href = '/login.html'; return; }
+    const res = await fetch('/api/auth/me');
+    if (!res.ok) { window.location.href = '/login'; return; }
     currentUser = await res.json();
     applyUser(currentUser);
     loadStats();
@@ -1528,7 +1526,7 @@ async function initApp() {
       const adminBtn = document.getElementById('admin-nav-btn');
       if (adminBtn) adminBtn.style.display = 'flex';
     }
-  } catch { window.location.href = '/login.html'; }
+  } catch { window.location.href = '/login'; }
 }
 
 function applyUser(u) {
@@ -1662,7 +1660,7 @@ function renderRecentDocsTo(panel, docs) {
   }).join('');
 }
 
-function logout() { localStorage.removeItem('msm_token'); sessionStorage.removeItem('msm_token'); document.cookie = 'msm_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict'; window.location.href='/login.html'; }
+async function logout() { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href = '/login'; }
 
 // ── Navigation ───────────────────────────────────────────
 const PAGE_TITLES={dashboard:'Dashboard',tools:'AI Tools',editor:'Content Editor',chat:'AI Chat',documents:'Documents',seo:'SEO Suite',templates:'Templates',bulk:'Bulk Generate',settings:'Settings',billing:'Billing & Plans'};

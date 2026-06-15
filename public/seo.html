@@ -158,7 +158,6 @@ html,body{height:100%;overflow:hidden;background:var(--cream);font-family:'Plus 
 </div>
 <div class="toast" id="toast"></div>
 <script>
-let token=localStorage.getItem('msm_token')||sessionStorage.getItem('msm_token');
 let currentUser=null,currentTool=null,activeTone='Professional',allTools=[];
 const TOOLS=[
   {id:'seo-meta',name:'SEO Meta Tags',desc:'Title tags and meta descriptions for maximum search CTR.',icon:'🔍',bg:'#EFF6FF',color:'#1D4ED8',badge:'SEO'},
@@ -189,8 +188,7 @@ const FORMS={
   ],prompt:d=>`Write a ${d.length} SEO-optimized article targeting: "${d.keyword}"\nSearch intent: ${d.intent}\nTone: ${activeTone}\n\nRequirements:\n- Include keyword in H1, first paragraph, 2-3 H2s\n- Use ## H2 and ### H3 headings\n- Include internal linking placeholders [LINK: topic]\n- Add author expertise signals (statistics, examples)\n- Include a FAQ section at the end (3 questions)\n- End with a strong CTA`},
 };
 async function init(){
-  if(!token){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
-  try{const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}currentUser=(await r.json()).user;document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
+  try{const r=await fetch('/api/auth/me');if(!r.ok){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}currentUser=await r.json();document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
   const th=localStorage.getItem('theme')||'light';document.documentElement.dataset.theme=th;document.getElementById('th-btn').textContent=th==='dark'?'🌙':'☀️';
   allTools=TOOLS;renderTools(TOOLS);
 }
@@ -218,7 +216,7 @@ async function generate(){
   document.getElementById('out-empty').style.display='none';document.getElementById('out-load').style.display='flex';document.getElementById('out-results').innerHTML='';
   const btn=document.getElementById('gen-btn');btn.disabled=true;btn.textContent='Generating…';
   try{
-    const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({prompt,toolId:currentTool.id,toolName:currentTool.form.name,tone:activeTone,variants:varCount})});
+    const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,toolId:currentTool.id,toolName:currentTool.form.name,tone:activeTone,variants:varCount})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'Generation failed');
     document.getElementById('out-load').style.display='none';
     let texts=[];
@@ -231,7 +229,7 @@ async function generate(){
   finally{btn.disabled=false;btn.textContent='🔍 Generate SEO Content';}
 }
 function copyRes(btn,idx){const t=document.getElementById('rb-'+idx)?.textContent||'';navigator.clipboard.writeText(t).then(()=>{btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='📋 Copy',2000)});}
-async function saveRes(idx){const text=document.getElementById('rb-'+idx)?.textContent||'';const title=(currentTool?.form?.name||'SEO')+' — '+new Date().toLocaleDateString('en-GB');try{await fetch('/api/documents',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({title,content:text,tool_id:currentTool?.id,tool_name:currentTool?.form?.name})});toast('Saved ✓','ok');}catch{toast('Save failed','err');}}
+async function saveRes(idx){const text=document.getElementById('rb-'+idx)?.textContent||'';const title=(currentTool?.form?.name||'SEO')+' — '+new Date().toLocaleDateString('en-GB');try{await fetch('/api/documents',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,content:text,tool_id:currentTool?.id,tool_name:currentTool?.form?.name})});toast('Saved ✓','ok');}catch{toast('Save failed','err');}}
 init();
 </script>
 </body>

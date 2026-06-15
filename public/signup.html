@@ -254,16 +254,6 @@ async function handleSignup(e) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Registration failed');
 
-    const remember = document.getElementById('keep-signed-in').checked;
-    if (remember) {
-      localStorage.setItem('msm_token', data.token);
-      localStorage.setItem('msm_user', JSON.stringify(data.user));
-      const exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-      document.cookie = `msm_token=${data.token}; expires=${exp}; path=/; SameSite=Strict`;
-    } else {
-      sessionStorage.setItem('msm_token', data.token);
-      sessionStorage.setItem('msm_user', JSON.stringify(data.user));
-    }
     sucMsg.textContent = `Account created! Welcome to M-EasyTools AI, ${firstName}! Redirecting…`;
     sucMsg.style.display = 'block';
     setTimeout(() => window.location.href = 'app.html', 1400);
@@ -276,8 +266,7 @@ async function handleSignup(e) {
 }
 
 function socialSignup(provider) {
-  const remember = document.getElementById('keep-signed-in').checked;
-  window.location.href = `/api/auth/${provider.toLowerCase()}` + (remember ? '?remember=true' : '');
+  window.location.href = `/api/auth/${provider.toLowerCase()}`;
 }
 </script>
 

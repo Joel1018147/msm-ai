@@ -722,10 +722,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Plus J
 
 <script>
 // ── Auth check ────────────────────────────────────────────
-const TOKEN = localStorage.getItem('msm_token');
-function authH() { 
-  const tok = localStorage.getItem('msm_token');
-  return {'Content-Type':'application/json','Authorization':'Bearer '+tok};
+function authH() {
+  return {'Content-Type':'application/json'};
 }
 
 // ── Helpers ───────────────────────────────────────────────
@@ -1550,7 +1548,7 @@ function copyEnriched() {
 renderHistory();
 
 // Check if logged in
-if(!TOKEN){ document.querySelector('.gao-hero-sub').innerHTML += '<br><strong style="color:var(--orange)">⚠️ Please <a href="login.html" style="color:var(--teal)">sign in</a> to run live GAO analysis.</strong>'; }
+fetch('/api/auth/me').then(r=>{ if(!r.ok) document.querySelector('.gao-hero-sub').innerHTML += '<br><strong style="color:var(--orange)">⚠️ Please <a href="/login" style="color:var(--teal)">sign in</a> to run live GAO analysis.</strong>'; });
 </script>
 
 <!-- ══ GAO i18n ══ -->

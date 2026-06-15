@@ -286,17 +286,6 @@ async function handleLogin(e) {
 
     if (!res.ok) throw new Error(data.error || 'Login failed');
 
-    const remember = document.getElementById('remember-me').checked;
-    if (remember) {
-      localStorage.setItem('msm_token', data.token);
-      localStorage.setItem('msm_user', JSON.stringify(data.user));
-      const exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-      document.cookie = `msm_token=${data.token}; expires=${exp}; path=/; SameSite=Strict`;
-    } else {
-      sessionStorage.setItem('msm_token', data.token);
-      sessionStorage.setItem('msm_user', JSON.stringify(data.user));
-    }
-
     sucMsg.textContent = `Welcome back, ${data.user.name}! Redirecting to dashboard…`;
     sucMsg.style.display = 'block';
     setTimeout(() => window.location.href = getRedirect(), 1200);
@@ -323,9 +312,9 @@ function getRedirect() {
 
 function socialLogin(provider) {
   const redirect = new URLSearchParams(window.location.search).get('redirect') || '';
-  const params = new URLSearchParams({ remember: 'true' });
-  if (redirect) params.set('redirect', redirect);
-  window.location.href = `/api/auth/${provider.toLowerCase()}?${params}`;
+  const params = redirect ? new URLSearchParams({ redirect }) : new URLSearchParams();
+  const qs = params.toString();
+  window.location.href = `/api/auth/${provider.toLowerCase()}${qs ? '?' + qs : ''}`;
 }
 
 // Handle OAuth error redirects back to login page

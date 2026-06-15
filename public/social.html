@@ -177,7 +177,6 @@ html,body{height:100%;overflow:hidden;background:var(--cream);font-family:'Plus 
 
 <div class="toast" id="toast"></div>
 <script>
-let token=localStorage.getItem('msm_token')||sessionStorage.getItem('msm_token');
 let currentUser=null,currentTool=null,activeTone='Professional',allTools=[];
 
 const TOOLS=[
@@ -218,11 +217,10 @@ const FORMS={
 };
 
 async function init(){
-  if(!token){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
   try{
-    const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});
-    if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
-    currentUser=(await r.json()).user;
+    const r=await fetch('/api/auth/me');
+    if(!r.ok){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
+    currentUser=await r.json();
     document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();
     document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];
     document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();
@@ -258,7 +256,7 @@ async function generate(){
   document.getElementById('out-empty').style.display='none';document.getElementById('out-load').style.display='flex';document.getElementById('out-results').innerHTML='';
   const btn=document.getElementById('gen-btn');btn.disabled=true;btn.textContent='Generating…';
   try{
-    const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({prompt,toolId:currentTool.id,toolName:currentTool.form.name,tone:activeTone,variants:varCount})});
+    const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,toolId:currentTool.id,toolName:currentTool.form.name,tone:activeTone,variants:varCount})});
     const data=await r.json();if(!r.ok)throw new Error(data.error||'Generation failed');
     document.getElementById('out-load').style.display='none';
     let texts=[];
@@ -274,7 +272,7 @@ function copyRes(btn,idx){const t=document.getElementById('rb-'+idx)?.textConten
 async function saveRes(idx){
   const text=document.getElementById('rb-'+idx)?.textContent||'';
   const title=(currentTool?.form?.name||'Content')+' — '+new Date().toLocaleDateString('en-GB');
-  try{await fetch('/api/documents',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({title,content:text,tool_id:currentTool?.id,tool_name:currentTool?.form?.name})});toast('Saved to Documents ✓','ok');}
+  try{await fetch('/api/documents',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,content:text,tool_id:currentTool?.id,tool_name:currentTool?.form?.name})});toast('Saved to Documents ✓','ok');}
   catch{toast('Save failed','err');}
 }
 init();

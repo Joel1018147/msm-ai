@@ -2,33 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="0;url=/app">
 <title>Signing in — M-EasyTools AI</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#080810;color:#F0F0FF;display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:15px}
-</style>
 </head>
 <body>
-<script>
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  var token  = params.get('token');
-  var remember = params.get('remember') === 'true';
-  var name   = params.get('name');
-  var redirect = params.get('redirect') || '/app';
-  var safeRedirect = (redirect.startsWith('/') && !redirect.startsWith('//')) ? redirect : '/app';
-
-  if (!token) { window.location.href = '/login.html?error=oauth_failed'; return; }
-
-  // Always persist Google OAuth sessions in localStorage so users stay logged in
-  localStorage.setItem('msm_token', token);
-  if (name) localStorage.setItem('msm_user', JSON.stringify({ name: decodeURIComponent(name) }));
-  var exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-  document.cookie = 'msm_token=' + token + '; expires=' + exp + '; path=/; SameSite=Strict';
-
-  window.location.href = safeRedirect;
-})();
-</script>
+<script>window.location.replace('/app');</script>
 </body>
 </html>

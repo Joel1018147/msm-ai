@@ -169,7 +169,6 @@ html,body{min-height:100%;background:var(--cream);font-family:'Plus Jakarta Sans
 <div class="toast" id="toast"></div>
 
 <script>
-const token=localStorage.getItem('msm_token')||sessionStorage.getItem('msm_token');
 let currentUser=null;
 
 const MODULE_META={
@@ -188,14 +187,13 @@ function toast(msg,type='ok'){const el=document.getElementById('toast');el.textC
 function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);document.getElementById('th-btn').textContent=t==='dark'?'🌙':'☀️';}
 
 async function init(){
-  if(!token){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
   const th=localStorage.getItem('theme')||'light';
   document.documentElement.dataset.theme=th;
   document.getElementById('th-btn').textContent=th==='dark'?'🌙':'☀️';
   try{
-    const r=await fetch('/api/auth/me',{headers:{Authorization:'Bearer '+token}});
-    if(!r.ok){localStorage.removeItem('msm_token');sessionStorage.removeItem('msm_token');window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
-    currentUser=(await r.json()).user;
+    const r=await fetch('/api/auth/me');
+    if(!r.ok){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}
+    currentUser=await r.json();
     document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();
     document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];
     document.getElementById('stat-plan').textContent=currentUser.role.toUpperCase();
@@ -267,7 +265,7 @@ async function toggleModule(moduleId,checkbox){
   try{
     const r=await fetch('/api/seller/modules/'+moduleId,{
       method:'PUT',
-      headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({is_enabled:enabled})
     });
     if(!r.ok){const e=await r.json();throw new Error(e.error||'Update failed');}

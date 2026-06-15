@@ -12,7 +12,10 @@ const express   = require('express');
 const cors      = require('cors');
 const path      = require('path');
 const bcrypt    = require('bcryptjs');
-const jwt       = require('jsonwebtoken');
+const session   = require('express-session');
+const passport  = require('passport');
+const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
+const pgSession = require('connect-pg-simple')(session);
 const rateLimit = require('express-rate-limit');
 const helmet    = require('helmet');
 const crypto    = require('crypto');
@@ -20,12 +23,28 @@ const { Pool }  = require('pg');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET    = process.env.JWT_SECRET || 'measytools-ai-dev-secret';
 const GROQ_KEY      = process.env.GROQ_API_KEY;
 const GOOGLE_ID     = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const APP_URL_RAW   = process.env.APP_URL || `http://localhost:${PORT}`;
 const APP_URL       = APP_URL_RAW.startsWith('http') ? APP_URL_RAW : `https://${APP_URL_RAW}`;
+
+// ── Startup checks ────────────────────────────────────────────────────────────
+if (!process.env.GOOGLE_CLIENT_ID) {
+  console.error('❌  GOOGLE_CLIENT_ID is missing from .env');
+  process.exit(1);
+}
+if (!process.env.GOOGLE_CLIENT_SECRET) {
+  console.error('❌  GOOGLE_CLIENT_SECRET is missing from .env');
+  process.exit(1);
+}
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+  console.error('❌  SESSION_SECRET must be at least 32 characters long.');
+  console.error('    Generate one: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+  process.exit(1);
+}
+
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
 // ════════════════════════════════════════════════════
 //  POSTGRESQL
@@ -171,6 +190,7 @@ async function initDB() {
 initDB().catch(err => console.error('✗ DB init failed:', err.message));
 
 const db = {
+  pool,
   query:  (t, p) => pool.query(t, p),
   getOne: async (t, p) => { const r = await pool.query(t, p); return r.rows[0] || null; },
   getAll: async (t, p) => { const r = await pool.query(t, p); return r.rows; },
@@ -178,8 +198,64 @@ const db = {
 };
 
 // ════════════════════════════════════════════════════
+//  PASSPORT CONFIG
+// ════════════════════════════════════════════════════
+passport.use(new GoogleStrategy({
+  clientID: GOOGLE_ID,
+  clientSecret: GOOGLE_SECRET,
+  callbackURL: APP_URL + '/auth/google/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails[0].value.toLowerCase();
+    let user = await db.getOne('SELECT * FROM users WHERE google_id = $1', [profile.id]);
+    if (!user) {
+      user = await db.getOne('SELECT * FROM users WHERE email = $1', [email]);
+      if (user) {
+        user = await db.getOne('UPDATE users SET google_id=$1,avatar=$2,last_login=CURRENT_TIMESTAMP WHERE id=$3 RETURNING *', [profile.id, profile.photos?.[0]?.value, user.id]);
+      } else {
+        const isFirst = !(await db.getOne('SELECT id FROM users LIMIT 1'));
+        const apiKey = crypto.randomBytes(32).toString('hex');
+        user = await db.getOne(
+          'INSERT INTO users (name,email,google_id,avatar,plan,credits,credits_max,api_key,role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',
+          [profile.displayName, email, profile.id, profile.photos?.[0]?.value, 'free', 2500, 2500, apiKey, isFirst ? 'admin' : 'user']
+        );
+      }
+    } else {
+      user = await db.getOne('UPDATE users SET last_login=CURRENT_TIMESTAMP,avatar=$1 WHERE id=$2 RETURNING *', [profile.photos?.[0]?.value, user.id]);
+    }
+    if (!user.is_active) return done(null, false, { message: 'account_disabled' });
+    done(null, user);
+  } catch (err) { done(err); }
+}));
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await db.getOne('SELECT * FROM users WHERE id = $1 AND is_active = TRUE', [id]);
+    done(null, user || false);
+  } catch (err) { done(err); }
+});
+
+// ════════════════════════════════════════════════════
 //  MIDDLEWARE
 // ════════════════════════════════════════════════════
+app.set('trust proxy', 1);
+
+app.use(session({
+  store: new pgSession({ pool, tableName: 'user_sessions', createTableIfMissing: true }),
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  name: 'msm.sid',
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  },
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
 app.use(express.json({ limit: '10mb' }));
@@ -191,7 +267,6 @@ const apiLimiter  = rateLimit({ windowMs: 60 * 1000, max: 120, message: { error:
 // ════════════════════════════════════════════════════
 //  AUTH HELPERS
 // ════════════════════════════════════════════════════
-function makeToken(userId) { return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' }); }
 function safeUser(u) {
   return {
     id: u.id, name: u.name, email: u.email, plan: u.plan, role: u.role,
@@ -202,16 +277,10 @@ function safeUser(u) {
   };
 }
 
-async function requireAuth(req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith('Bearer ')) return res.status(401).json({ error: 'Please log in' });
-  try {
-    const decoded = jwt.verify(auth.slice(7), JWT_SECRET);
-    const user = await db.getOne('SELECT * FROM users WHERE id = $1 AND is_active = TRUE', [decoded.userId]);
-    if (!user) return res.status(401).json({ error: 'Account not found' });
-    req.user = user;
-    next();
-  } catch { return res.status(401).json({ error: 'Session expired. Please log in again.' }); }
+function requireAuth(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  if (req.accepts('json')) return res.status(401).json({ error: 'Please log in' });
+  res.redirect('/login');
 }
 
 async function requireAdmin(req, res, next) {
@@ -254,7 +323,10 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
       'INSERT INTO users (name, email, password, plan, credits, credits_max, api_key, role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',
       [name.trim(), email.toLowerCase(), hash, plan, credits, credits, apiKey, isFirst ? 'admin' : 'user']
     );
-    res.status(201).json({ token: makeToken(result.id), user: safeUser(result) });
+    req.login(result, err => {
+      if (err) return res.status(500).json({ error: 'Login failed after registration' });
+      res.status(201).json({ user: safeUser(result) });
+    });
   } catch (err) { res.status(500).json({ error: 'Registration failed: ' + err.message }); }
 });
 
@@ -265,56 +337,47 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     const user = await db.getOne('SELECT * FROM users WHERE email = $1 AND is_active = TRUE', [email.toLowerCase()]);
     if (!user || !user.password || !(await bcrypt.compare(password, user.password))) return res.status(401).json({ error: 'Invalid email or password' });
     await db.run('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
-    res.json({ token: makeToken(user.id), user: safeUser(user) });
+    req.login(user, err => {
+      if (err) return res.status(500).json({ error: 'Login failed' });
+      res.json({ user: safeUser(user) });
+    });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/auth/google', (req, res) => {
+app.get('/auth/google', (req, res, next) => {
   if (!GOOGLE_ID) return res.status(500).send('Google OAuth not configured');
   const redirect = req.query.redirect || '';
-  const state = Buffer.from(JSON.stringify({ remember: 'true', redirect })).toString('base64url');
-  const params = new URLSearchParams({ client_id: GOOGLE_ID, redirect_uri: `${APP_URL}/api/auth/google/callback`, response_type: 'code', scope: 'openid email profile', access_type: 'offline', prompt: 'select_account', state });
-  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+  passport.authenticate('google', {
+    scope: ['openid', 'email', 'profile'],
+    accessType: 'offline',
+    prompt: 'select_account',
+    state: redirect ? Buffer.from(redirect).toString('base64url') : undefined
+  })(req, res, next);
 });
 
-app.get('/api/auth/google/callback', async (req, res) => {
-  const { code, error, state } = req.query;
-  if (error || !code) return res.redirect('/login.html?error=google_cancelled');
-  let redirect = '';
-  try { const s = JSON.parse(Buffer.from(state || '', 'base64url').toString()); redirect = s.redirect || ''; } catch {}
-  try {
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ code, client_id: GOOGLE_ID, client_secret: GOOGLE_SECRET, redirect_uri: `${APP_URL}/api/auth/google/callback`, grant_type: 'authorization_code' })
-    });
-    const tokens = await tokenRes.json();
-    if (!tokenRes.ok) throw new Error(tokens.error_description || 'Token exchange failed');
-    const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${tokens.access_token}` } });
-    const gUser = await userRes.json();
-    if (!gUser.email) throw new Error('Could not get email from Google');
-    let user = await db.getOne('SELECT * FROM users WHERE google_id = $1', [gUser.id]);
-    if (!user) {
-      user = await db.getOne('SELECT * FROM users WHERE email = $1', [gUser.email.toLowerCase()]);
-      if (user) {
-        user = await db.getOne('UPDATE users SET google_id=$1,avatar=$2,last_login=CURRENT_TIMESTAMP WHERE id=$3 RETURNING *', [gUser.id, gUser.picture, user.id]);
-      } else {
-        const isFirst = !(await db.getOne('SELECT id FROM users LIMIT 1'));
-        const apiKey = crypto.randomBytes(32).toString('hex');
-        user = await db.getOne(
-          'INSERT INTO users (name,email,google_id,avatar,plan,credits,credits_max,api_key,role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',
-          [gUser.name, gUser.email.toLowerCase(), gUser.id, gUser.picture, 'free', 2500, 2500, apiKey, isFirst ? 'admin' : 'user']
-        );
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login?error=google_cancelled' }),
+  (req, res) => {
+    let redirect = '/app';
+    try {
+      if (req.query.state) {
+        const r = Buffer.from(req.query.state, 'base64url').toString();
+        if (r.startsWith('/') && !r.startsWith('//')) redirect = r;
       }
-    } else {
-      user = await db.getOne('UPDATE users SET last_login=CURRENT_TIMESTAMP,avatar=$1 WHERE id=$2 RETURNING *', [gUser.picture, user.id]);
-    }
-    if (!user.is_active) return res.redirect('/login.html?error=account_disabled');
-    const safeRedir = (redirect.startsWith('/') && !redirect.startsWith('//')) ? redirect : '/app';
-    res.redirect(`/auth-success.html?token=${makeToken(user.id)}&name=${encodeURIComponent(user.name)}&remember=true&redirect=${encodeURIComponent(safeRedir)}`);
-  } catch (err) { res.redirect(`/login.html?error=${encodeURIComponent(err.message)}`); }
-});
+    } catch {}
+    res.redirect(redirect);
+  }
+);
 
 app.get('/api/auth/me', requireAuth, (req, res) => res.json(safeUser(req.user)));
+
+app.post('/api/auth/logout', (req, res) => {
+  req.logout(err => {
+    if (err) return res.status(500).json({ error: 'Logout failed' });
+    req.session.destroy();
+    res.json({ success: true });
+  });
+});
 
 app.put('/api/auth/me', requireAuth, async (req, res) => {
   const { name, brand_name, brand_desc, brand_tone, groq_key } = req.body;
