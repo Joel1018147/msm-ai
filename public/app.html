@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="ms" data-theme="light" data-lang="bm">
+<html lang="ms" data-platform="tools" data-theme="light" data-lang="bm">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M-EasyTools AI — Platform Pemasaran Pintar</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/modus-design-system.css">
 <style>
 /* ═══════════════════════════════════════════════
    M-EasyTools AI — Design System
@@ -79,9 +78,9 @@
   --shadow-lg:0 12px 40px rgba(0,0,0,0.45);
 }
 
-[data-theme="dark"] .sidebar { background:#0A1018; }
-[data-theme="dark"] .sidebar::after { background:linear-gradient(180deg,transparent,rgba(255,255,255,0.04) 30%,rgba(255,255,255,0.04) 70%,transparent); }
-[data-theme="dark"] .topbar { background:#141E2A; border-bottom-color:#243B55; }
+[data-theme="dark"] .app-sidebar { background:#0A1018; }
+[data-theme="dark"] .app-sidebar::after { background:linear-gradient(180deg,transparent,rgba(255,255,255,0.04) 30%,rgba(255,255,255,0.04) 70%,transparent); }
+[data-theme="dark"] .app-topbar { background:#141E2A; border-bottom-color:#243B55; }
 [data-theme="dark"] .main-area { background:#0F1923; }
 [data-theme="dark"] .panel,.dash-grid .card,[data-theme="dark"] .m-card { background:#1C2940; border-color:#243B55; }
 [data-theme="dark"] .form-panel { background:#141E2A; border-right-color:#243B55; }
@@ -160,13 +159,13 @@
   background:rgba(255,255,255,0.06);
   color:rgba(255,255,255,0.6);
   cursor:pointer;font-size:11px;font-weight:700;
-  font-family:'Plus Jakarta Sans',sans-serif;
+  font-family:var(--font);
   transition:all .2s;letter-spacing:.5px;flex-shrink:0;
 }
 .lang-toggle:hover{background:rgba(255,255,255,0.12);color:white;}
 .lang-flag{font-size:14px;}
 html,body{height:100%;overflow:hidden;background:var(--cream)}
-body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;flex-direction:column}
+body{font-family:var(--font);color:var(--navy);display:flex;flex-direction:column}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -176,7 +175,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 
 /* ══ SIDEBAR ══════════════════════════════════ */
 .app-shell{display:flex;flex:1;overflow:hidden}
-.sidebar{
+.app-sidebar{
   width:242px;min-width:242px;
   background:var(--navy);
   height:100vh;
@@ -184,12 +183,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   overflow-y:auto;
   position:relative;
 }
-.sidebar::after{
+.app-sidebar::after{
   content:'';
   position:absolute;top:0;right:0;bottom:0;width:1px;
   background:linear-gradient(180deg,transparent,rgba(255,255,255,0.07) 30%,rgba(255,255,255,0.07) 70%,transparent);
 }
-.sb-logo{
+.sidebar-logo{
   padding:22px 18px 20px;
   display:flex;align-items:center;gap:11px;
   border-bottom:1px solid rgba(255,255,255,0.06);
@@ -198,48 +197,48 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   width:36px;height:36px;border-radius:10px;
   background:linear-gradient(135deg,var(--orange),#C44E1E);
   display:flex;align-items:center;justify-content:center;
-  font-family:'Libre Baskerville',serif;font-weight:700;font-size:17px;
+  font-family:var(--font);font-weight:700;font-size:17px;
   color:white;flex-shrink:0;
   box-shadow:0 4px 12px rgba(232,98,42,0.4);
 }
 .logo-name{
-  font-family:'Libre Baskerville',serif;
+  font-family:var(--font);
   font-size:19px;font-weight:700;color:white;
   letter-spacing:-0.3px;line-height:1.1;
 }
 .logo-name em{font-style:normal;color:var(--orange3)}
 .logo-tag{font-size:9px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.35);text-transform:uppercase}
 
-.sb-section{
+.sidebar-section-label{
   padding:18px 16px 5px;
   font-size:10px;font-weight:700;letter-spacing:1.4px;
   text-transform:uppercase;color:rgba(255,255,255,0.28);
 }
-.sb-item{
+.sidebar-item{
   display:flex;align-items:center;gap:10px;
   padding:9px 14px;margin:1px 8px;
   border-radius:var(--r-sm);
   cursor:pointer;color:rgba(255,255,255,0.5);
   font-size:13px;font-weight:500;
   border:none;background:none;width:calc(100% - 16px);text-align:left;
-  font-family:'Plus Jakarta Sans',sans-serif;
+  font-family:var(--font);
   transition:all .15s;position:relative;
 }
-.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8)}
-.sb-item.active{background:rgba(232,98,42,0.18);color:white}
-.sb-item.active::before{
+.sidebar-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8)}
+.sidebar-item.active{background:rgba(232,98,42,0.18);color:white}
+.sidebar-item.active::before{
   content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
   width:3px;height:18px;background:var(--orange);border-radius:0 2px 2px 0;
 }
-.sb-icon{width:16px;height:16px;flex-shrink:0;opacity:0.7}
-.sb-item.active .sb-icon{opacity:1}
-.sb-badge{
+.sidebar-item-icon{width:16px;height:16px;flex-shrink:0;opacity:0.7}
+.sidebar-item.active .sidebar-item-icon{opacity:1}
+.sidebar-item-badge{
   margin-left:auto;font-size:10px;font-weight:700;
   padding:2px 7px;border-radius:20px;
   background:var(--orange-glow);color:var(--orange3);
   border:1px solid rgba(232,98,42,0.25);
 }
-.sb-bottom{
+.sidebar-footer{
   margin-top:auto;
   padding:14px 10px;
   border-top:1px solid rgba(255,255,255,0.06);
@@ -265,7 +264,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   flex:1;display:flex;flex-direction:column;overflow:hidden;
   background:var(--cream);
 }
-.topbar{
+.app-topbar{
   height:58px;min-height:58px;
   background:var(--white);
   border-bottom:1px solid var(--fog);
@@ -274,7 +273,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   flex-shrink:0;z-index:10;
 }
 .topbar-title{
-  font-family:'Libre Baskerville',serif;
+  font-family:var(--font);
   font-size:19px;font-weight:600;color:var(--navy);flex:1;
   letter-spacing:-0.2px;
 }
@@ -283,7 +282,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   display:inline-flex;align-items:center;gap:7px;
   padding:8px 18px;border-radius:var(--r-sm);
   font-size:13px;font-weight:600;cursor:pointer;border:none;
-  font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;
+  font-family:var(--font);transition:all .18s;
   white-space:nowrap;
 }
 .btn-primary{background:var(--orange);color:white;box-shadow:0 2px 8px rgba(232,98,42,0.3)}
@@ -312,12 +311,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 }
 .dash-banner::after{
   content:'M';position:absolute;right:32px;bottom:-20px;
-  font-family:'Libre Baskerville',serif;font-size:160px;font-weight:700;
+  font-family:var(--font);font-size:160px;font-weight:700;
   color:rgba(255,255,255,0.03);line-height:1;
 }
 .banner-hello{font-size:13px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:.5px;margin-bottom:4px}
 .banner-title{
-  font-family:'Libre Baskerville',serif;
+  font-family:var(--font);
   font-size:26px;font-weight:700;color:white;
   letter-spacing:-.4px;margin-bottom:6px;
 }
@@ -334,7 +333,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 .m-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
 .m-card-label{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mist);margin-bottom:8px}
 .m-card-val{
-  font-family:'Libre Baskerville',serif;
+  font-family:var(--font);
   font-size:30px;font-weight:700;color:var(--navy);margin-bottom:4px;
   letter-spacing:-.5px;line-height:1;
 }
@@ -398,7 +397,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   padding:20px 28px 0;flex-shrink:0;
 }
 .tools-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.page-title{font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+.page-title{font-family:var(--font);font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
 .page-subtitle{font-size:13px;color:var(--mist);margin-top:2px}
 .search-bar{
   position:relative;
@@ -408,7 +407,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   width:100%;padding:9px 14px 9px 38px;
   background:var(--cream);border:1px solid var(--fog);
   border-radius:var(--r-sm);font-size:13px;color:var(--navy);
-  font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:all .15s;
+  font-family:var(--font);outline:none;transition:all .15s;
 }
 .search-bar input:focus{border-color:var(--orange);background:var(--white);box-shadow:0 0 0 3px var(--orange-bg)}
 .search-bar input::placeholder{color:var(--silver)}
@@ -422,7 +421,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   padding:8px 16px;border-radius:var(--r-sm) var(--r-sm) 0 0;
   font-size:12px;font-weight:700;cursor:pointer;
   border:none;background:transparent;color:var(--mist);
-  font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+  font-family:var(--font);transition:all .15s;
   border-bottom:3px solid transparent;white-space:nowrap;
 }
 .cat-pill:hover{color:var(--navy);background:var(--cream)}
@@ -474,7 +473,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   display:flex;align-items:center;gap:5px;
   font-size:12px;color:var(--mist);cursor:pointer;
   border:none;background:none;
-  font-family:'Plus Jakarta Sans',sans-serif;
+  font-family:var(--font);
   padding:5px 8px;border-radius:6px;transition:all .15s;
 }
 .back-btn:hover{background:var(--cream2);color:var(--slate)}
@@ -485,7 +484,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   width:100%;padding:9px 13px;
   background:var(--cream);border:1px solid var(--fog);
   border-radius:var(--r-sm);font-size:13px;color:var(--navy);
-  font-family:'Plus Jakarta Sans',sans-serif;outline:none;
+  font-family:var(--font);outline:none;
   transition:all .15s;
 }
 .f-input:focus,.f-textarea:focus,.f-select:focus{
@@ -498,7 +497,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 .tone-tag{
   padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;
   cursor:pointer;border:1px solid var(--fog);background:var(--cream);
-  color:var(--mist);font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+  color:var(--mist);font-family:var(--font);transition:all .15s;
 }
 .tone-tag:hover{border-color:var(--orange);color:var(--orange)}
 .tone-tag.on{background:var(--orange-bg);border-color:var(--orange);color:var(--orange)}
@@ -517,7 +516,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 .out-tab{
   padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;
   cursor:pointer;border:none;background:none;color:var(--mist);
-  font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+  font-family:var(--font);transition:all .15s;
 }
 .out-tab.active{background:var(--cream2);color:var(--navy)}
 .out-actions-row{display:flex;gap:8px}
@@ -564,7 +563,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 .edit-textarea{
   width:100%;min-height:320px;padding:16px;
   border:none;background:transparent;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;
+  font-family:var(--font);font-size:13.5px;
   color:var(--navy2);line-height:1.78;resize:none;outline:none;
   display:none;
 }
@@ -606,7 +605,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   flex:1;padding:10px 13px;
   background:var(--cream);border:1px solid var(--fog);
   border-radius:var(--r-sm);font-size:13px;
-  color:var(--navy);font-family:'Plus Jakarta Sans',sans-serif;
+  color:var(--navy);font-family:var(--font);
   outline:none;resize:none;min-height:42px;max-height:130px;
   line-height:1.5;transition:all .15s;
 }
@@ -620,7 +619,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 .filter-btn{
   padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;
   cursor:pointer;border:1px solid var(--fog);background:var(--white);
-  color:var(--mist);font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+  color:var(--mist);font-family:var(--font);transition:all .15s;
 }
 .filter-btn:hover{border-color:var(--orange);color:var(--orange)}
 .filter-btn.active{background:var(--orange);color:white;border-color:var(--orange)}
@@ -651,7 +650,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
   content:'';position:absolute;right:-40px;top:-40px;width:220px;height:220px;
   border-radius:50%;background:radial-gradient(circle,rgba(232,98,42,.15),transparent 70%);
 }
-.seo-intro-title{font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:white;margin-bottom:6px;letter-spacing:-.3px}
+.seo-intro-title{font-family:var(--font);font-size:22px;font-weight:700;color:white;margin-bottom:6px;letter-spacing:-.3px}
 .seo-intro-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:500px}
 .seo-tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .seo-tile{
@@ -661,7 +660,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 }
 .seo-tile:hover{box-shadow:var(--shadow);border-top-color:var(--orange);transform:translateY(-2px)}
 .st-icon{font-size:28px;margin-bottom:12px}
-.st-name{font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.st-name{font-family:var(--font);font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
 .st-desc{font-size:12px;color:var(--mist);line-height:1.6}
 .st-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
 .st-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--orange-bg);color:var(--orange)}
@@ -699,7 +698,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 .sn-item:hover{background:var(--cream);color:var(--navy)}
 .sn-item.active{background:var(--orange-bg);color:var(--orange)}
 .settings-content{overflow-y:auto;padding:28px}
-.sc-title{font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--fog);letter-spacing:-.2px}
+.sc-title{font-family:var(--font);font-size:20px;font-weight:700;color:var(--navy);margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--fog);letter-spacing:-.2px}
 .s-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--fog)}
 .s-row:last-of-type{border-bottom:none}
 .s-info .s-lbl{font-size:14px;font-weight:600;color:var(--navy)}
@@ -734,15 +733,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 }
 .current-plan-banner::after{
   content:'PRO';position:absolute;right:24px;top:50%;transform:translateY(-50%);
-  font-family:'Libre Baskerville',serif;font-size:80px;font-weight:700;
+  font-family:var(--font);font-size:80px;font-weight:700;
   color:rgba(255,255,255,0.04);
 }
 .cpb-left .cpb-tag{font-size:11px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:4px}
-.cpb-left .cpb-name{font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:white;letter-spacing:-.3px}
+.cpb-left .cpb-name{font-family:var(--font);font-size:22px;font-weight:700;color:white;letter-spacing:-.3px}
 .cpb-left .cpb-price{font-size:13px;color:rgba(255,255,255,.5);margin-top:3px}
 .cpb-right{text-align:right}
 .cpb-cred-label{font-size:11px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.cpb-cred-val{font-family:'Libre Baskerville',serif;font-size:24px;font-weight:700;color:white}
+.cpb-cred-val{font-family:var(--font);font-size:24px;font-weight:700;color:white}
 .cpb-bar{width:160px;height:5px;background:rgba(255,255,255,.15);border-radius:3px;margin-top:7px;margin-left:auto}
 .cpb-fill{height:100%;background:var(--orange3);border-radius:3px}
 .plan-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -753,10 +752,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 }
 .plan-card.featured{border-color:var(--orange);box-shadow:0 0 0 1px var(--orange),var(--shadow)}
 .plan-card-tag{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--mist);margin-bottom:4px}
-.plan-card-name{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.2px}
+.plan-card-name{font-family:var(--font);font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.2px}
 .plan-price-row{display:flex;align-items:baseline;gap:2px;margin:14px 0}
 .plan-price-curr{font-size:18px;font-weight:700;color:var(--navy)}
-.plan-price-amt{font-family:'Libre Baskerville',serif;font-size:36px;font-weight:700;color:var(--navy);line-height:1}
+.plan-price-amt{font-family:var(--font);font-size:36px;font-weight:700;color:var(--navy);line-height:1}
 .plan-price-period{font-size:13px;color:var(--mist)}
 .plan-features{list-style:none;margin:16px 0}
 .plan-features li{font-size:12px;color:var(--steel);padding:5px 0;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
@@ -795,8 +794,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 <div class="app-shell">
 
 <!-- ════════════════ SIDEBAR ════════════════ -->
-<nav class="sidebar">
-  <div class="sb-logo">
+<nav class="app-sidebar">
+  <div class="sidebar-logo">
     <div class="logo-glyph">M</div>
     <div>
       <div class="logo-name">M-EasyTools <em>AI</em></div>
@@ -804,51 +803,51 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     </div>
   </div>
 
-  <div class="sb-section" data-i18n="nav_main">Main</div>
-  <button class="sb-item active" onclick="goTo('dashboard')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="6" height="6" rx="1.3"/><rect x="10" y="2" width="6" height="6" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
+  <div class="sidebar-section-label" data-i18n="nav_main">Main</div>
+  <button class="sidebar-item active" onclick="goTo('dashboard')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="6" height="6" rx="1.3"/><rect x="10" y="2" width="6" height="6" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
     <span data-i18n="nav_dashboard">Dashboard</span>
   </button>
-  <button class="sb-item" onclick="goTo('tools')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 5a3 3 0 01-4 2.83V16a1.5 1.5 0 01-3 0V7.83A3 3 0 1110 5V12a.5.5 0 001 0V5z"/></svg>
+  <button class="sidebar-item" onclick="goTo('tools')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14.5 5a3 3 0 01-4 2.83V16a1.5 1.5 0 01-3 0V7.83A3 3 0 1110 5V12a.5.5 0 001 0V5z"/></svg>
     <span data-i18n="nav_tools">AI Tools</span>
-    <span class="sb-badge">40+</span>
+    <span class="sidebar-item-badge">40+</span>
   </button>
-  <button class="sb-item" onclick="goTo('chat')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 9c0 3.866-2.686 7-6 7a5.97 5.97 0 01-3-.8L3 16l.8-3A6 6 0 113 9c0-3.314 2.686-6 6-6s6 2.686 6 6z"/></svg>
+  <button class="sidebar-item" onclick="goTo('chat')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 9c0 3.866-2.686 7-6 7a5.97 5.97 0 01-3-.8L3 16l.8-3A6 6 0 113 9c0-3.314 2.686-6 6-6s6 2.686 6 6z"/></svg>
     <span data-i18n="nav_chat">AI Chat</span>
   </button>
 
-  <div class="sb-section" data-i18n="nav_content">Content</div>
-  <button class="sb-item" onclick="goTo('documents')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 2H5a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V7l-4-5z"/><path d="M10 2v5h5"/></svg>
+  <div class="sidebar-section-label" data-i18n="nav_content">Content</div>
+  <button class="sidebar-item" onclick="goTo('documents')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 2H5a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V7l-4-5z"/><path d="M10 2v5h5"/></svg>
     <span data-i18n="nav_documents">Documents</span>
   </button>
-  <button class="sb-item" onclick="goTo('seo')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.5" cy="7.5" r="4.5"/><path d="M13.5 13.5l-2.5-2.5"/></svg>
+  <button class="sidebar-item" onclick="goTo('seo')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.5" cy="7.5" r="4.5"/><path d="M13.5 13.5l-2.5-2.5"/></svg>
     <span data-i18n="nav_seo">SEO Suite</span>
   </button>
-  <button class="sb-item" onclick="window.location.href='gao.html'">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 2L9 6M9 12L9 16M2 9L6 9M12 9L16 9M4.5 4.5L7 7M11 11L13.5 13.5M13.5 4.5L11 7M7 11L4.5 13.5"/></svg>
+  <button class="sidebar-item" onclick="window.location.href='gao.html'">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 2L9 6M9 12L9 16M2 9L6 9M12 9L16 9M4.5 4.5L7 7M11 11L13.5 13.5M13.5 4.5L11 7M7 11L4.5 13.5"/></svg>
     <span data-i18n="nav_gao">GAO Suite</span>
-    <span class="sb-badge" style="background:var(--teal);color:white">NEW</span>
+    <span class="sidebar-item-badge" style="background:var(--teal);color:white">NEW</span>
   </button>
-  <button class="sb-item" onclick="goTo('bulk')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="14" height="3" rx="1"/><rect x="2" y="7.5" width="14" height="3" rx="1"/><rect x="2" y="13" width="14" height="3" rx="1"/></svg>
+  <button class="sidebar-item" onclick="goTo('bulk')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="14" height="3" rx="1"/><rect x="2" y="7.5" width="14" height="3" rx="1"/><rect x="2" y="13" width="14" height="3" rx="1"/></svg>
     <span data-i18n="nav_bulk">Bulk Generate</span>
   </button>
-  <button class="sb-item" onclick="goTo('templates')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="14" height="5" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
+  <button class="sidebar-item" onclick="goTo('templates')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="14" height="5" rx="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.3"/></svg>
     <span data-i18n="nav_templates">Templates</span>
   </button>
 
-  <div class="sb-section" data-i18n="nav_account">Account</div>
-  <button class="sb-item" onclick="goTo('settings')">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="2.5"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42"/></svg>
+  <div class="sidebar-section-label" data-i18n="nav_account">Account</div>
+  <button class="sidebar-item" onclick="goTo('settings')">
+    <svg class="sidebar-item-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="2.5"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42"/></svg>
     <span data-i18n="nav_settings">Settings</span>
   </button>
 
-  <div class="sb-bottom">
+  <div class="sidebar-footer">
     <!-- Profile tile with dropdown -->
     <div style="position:relative">
       <!-- Profile Menu Dropdown -->
@@ -860,26 +859,26 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
         </div>
         <!-- Dark/Light Mode -->
         <div style="padding:6px">
-          <button onclick="toggleTheme();event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
+          <button onclick="toggleTheme();event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
             <span id="pm-theme-icon" style="font-size:16px">🌙</span>
             <span id="pm-theme-label" data-i18n-pm="theme_dark">Mod Gelap</span>
             <span id="pm-theme-status" style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(232,98,42,0.2);color:#FF7A4A">ON</span>
           </button>
           <!-- Language Toggle -->
-          <button onclick="toggleLang();event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
+          <button onclick="toggleLang();event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
             <span id="pm-lang-flag" style="font-size:16px">🇲🇾</span>
             <span id="pm-lang-label">Bahasa Malaysia</span>
             <span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(26,143,122,0.2);color:#2BBFA0" id="pm-lang-badge">BM</span>
           </button>
           <!-- Settings -->
-          <button onclick="goTo('settings');event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
+          <button onclick="goTo('settings');event.stopPropagation();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='none'">
             <span style="font-size:16px">⚙️</span>
             <span data-i18n="nav_settings">Settings</span>
           </button>
         </div>
         <!-- Divider + Logout -->
         <div style="border-top:1px solid rgba(255,255,255,0.08);padding:6px">
-          <button onclick="logout();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,100,100,0.8);font-size:13px;font-weight:500;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(192,57,43,0.1)'" onmouseout="this.style.background='none'">
+          <button onclick="logout();" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border:none;background:none;color:rgba(255,100,100,0.8);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);text-align:left;transition:background .15s;" onmouseover="this.style.background='rgba(192,57,43,0.1)'" onmouseout="this.style.background='none'">
             <span style="font-size:16px">🚪</span>
             <span id="signout-label" data-i18n="signout_label">Log keluar</span>
           </button>
@@ -903,7 +902,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
 <div class="main-area">
 
   <!-- Topbar -->
-  <div class="topbar">
+  <div class="app-topbar">
     <div class="topbar-title" id="topbar-title" data-i18n="nav_dashboard">Dashboard</div>
     <button class="btn btn-outline btn-sm" onclick="goTo('settings')" style="gap:5px">⚙ <span data-i18n="nav_settings">Tetapan</span></button>
     <button class="btn btn-primary btn-sm" onclick="goTo('tools')"><span data-i18n="btn_new_content">＋ Kandungan Baru</span></button>
@@ -1042,14 +1041,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     <div class="chat-shell">
       <div class="chat-header-row">
         <div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">AI Chat</div>
+          <div style="font-family:var(--font);font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">AI Chat</div>
           <div style="font-size:13px;color:var(--mist);margin-top:3px">Your expert marketing AI — always ready to help</div>
         </div>
         <button class="btn btn-outline btn-sm" onclick="clearChat()">🗑 Clear Chat</button>
       </div>
       <div class="chat-window" id="chat-window">
         <div class="msg ai">
-          <div class="m-av" style="font-size:10px;font-weight:800;font-family:'Libre Baskerville',serif">M</div>
+          <div class="m-av" style="font-size:10px;font-weight:800;font-family:var(--font)">M</div>
           <div class="m-bubble">
             Hi there! I'm M-EasyTools AI, your intelligent marketing assistant. I can help you with:<br><br>
             • Writing and editing any marketing content<br>
@@ -1074,7 +1073,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     <div class="docs-shell">
       <div class="docs-toprow">
         <div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Documents</div>
+          <div style="font-family:var(--font);font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Documents</div>
           <div style="font-size:13px;color:var(--mist);margin-top:3px">All your AI-generated content in one place</div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="goTo('tools')">＋ New Document</button>
@@ -1145,7 +1144,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     <div class="tpl-shell">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Custom Templates</div>
+          <div style="font-family:var(--font);font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Custom Templates</div>
           <div style="font-size:13px;color:var(--mist);margin-top:3px">Save your best prompts and reuse them for any client or campaign</div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="toast('Template builder coming in next update!','')">＋ New Template</button>
@@ -1398,7 +1397,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     <div class="page-body">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Bulk Generate</div>
+          <div style="font-family:var(--font);font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.3px">Bulk Generate</div>
           <div style="font-size:13px;color:var(--mist);margin-top:3px">Generate up to 20 pieces of content at once — perfect for product descriptions, social posts, and email sequences</div>
         </div>
       </div>
@@ -1610,7 +1609,7 @@ const PAGE_TITLES={dashboard:'Dashboard',tools:'AI Tools',editor:'Content Editor
 
 function goTo(page) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(el=>{
+  document.querySelectorAll('.sidebar-item').forEach(el=>{
     el.classList.toggle('active',el.getAttribute('onclick')?.includes(`'${page}'`));
   });
   const pg=document.getElementById('page-'+page);
@@ -1863,7 +1862,7 @@ function appendMsg(type,html,raw){
   win.appendChild(el);scrollChat();return el;
 }
 function scrollChat(){const w=document.getElementById('chat-window');w.scrollTop=w.scrollHeight;}
-function clearChat(){chatHistory=[];document.getElementById('chat-window').innerHTML=`<div class="msg ai"><div class="m-av" style="font-size:10px;font-weight:800;font-family:'Libre Baskerville',serif">M</div><div class="m-bubble">${escHtml(t('chat_cleared'))}</div></div>`;}
+function clearChat(){chatHistory=[];document.getElementById('chat-window').innerHTML=`<div class="msg ai"><div class="m-av" style="font-size:10px;font-weight:800;font-family:var(--font)">M</div><div class="m-bubble">${escHtml(t('chat_cleared'))}</div></div>`;}
 
 // ── Documents ────────────────────────────────────────────
 const TYPE_STYLE={'Blog Writer':'background:#EEF2FF;color:#4F46E5','Email Campaign':'background:#ECFDF5;color:#059669','Product Description':'background:#FFF1F2;color:#E11D48','Ad Copy':'background:var(--orange-bg);color:var(--orange)','Social Media Posts':'background:#FEF3C7;color:#B45309','Sales Outreach Email':'background:#F0FDF4;color:#16A34A','SEO Meta Generator':'background:#EFF6FF;color:#2563EB','Keyword Cluster Builder':'background:#FEFCE8;color:#CA8A04','Landing Page Copy':'background:#FFF7ED;color:#EA580C','Content Rewriter':'background:#F5F3FF;color:#7C3AED'};
@@ -2235,13 +2234,13 @@ function toast(msg,type){
 //  DARK MODE
 // ════════════════════════════════════════════════════
 function initTheme() {
-  const saved = localStorage.getItem('msm_theme') || 'light';
+  const saved = localStorage.getItem('modus-theme') || 'light';
   setTheme(saved);
 }
 
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('msm_theme', theme);
+  localStorage.setItem('modus-theme', theme);
 }
 
 function toggleTheme() {

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-platform="tools" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M-EasyTools AI+ · Seller Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/modus-design-system.css">
 <style>
 :root {
   --bg: #F5EDE3;
@@ -22,7 +22,7 @@
   --dim: #C4A882;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
 ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 /* ── Login screen ── */
@@ -42,7 +42,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
   color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
 }
 .login-title {
-  font-family: 'Libre Baskerville', serif; font-size: 32px; font-weight: 700;
+  font-family: var(--font); font-size: 32px; font-weight: 700;
   color: #F5EDE3; margin-bottom: 8px; letter-spacing: -0.5px;
 }
 .login-sub { font-size: 14px; color: rgba(245,237,227,0.55); margin-bottom: 32px; }
@@ -61,7 +61,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 .btn-login {
   width: 100%; background: var(--accent); color: var(--brand);
   border: none; border-radius: 10px; padding: 14px;
-  font-size: 14px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px; font-weight: 700; font-family: var(--font);
   cursor: pointer; transition: background 0.2s, transform 0.1s;
 }
 .btn-login:hover { background: #D4A017; }
@@ -83,9 +83,9 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
   width: 30px; height: 30px;
   background: linear-gradient(135deg, var(--accent), #8B6508);
   border-radius: 8px; display: flex; align-items: center; justify-content: center;
-  font-family: 'Libre Baskerville', serif; font-size: 13px; font-weight: 700; color: var(--brand);
+  font-family: var(--font); font-size: 13px; font-weight: 700; color: var(--brand);
 }
-.brand-name { font-family: 'Libre Baskerville', serif; font-size: 15px; font-weight: 700; color: #F5EDE3; }
+.brand-name { font-family: var(--font); font-size: 15px; font-weight: 700; color: #F5EDE3; }
 .brand-name em { font-style: normal; color: var(--accent); }
 .brand-tag {
   font-family: 'JetBrains Mono', monospace; font-size: 9px;
@@ -98,7 +98,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 .btn-logout {
   background: none; border: 1px solid rgba(245,237,227,0.15); color: rgba(245,237,227,0.55);
   border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer;
-  transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.2s; font-family: var(--font);
 }
 .btn-logout:hover { border-color: rgba(200,60,60,0.5); color: #F87171; }
 
@@ -109,7 +109,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 }
 .tab-btn {
   background: none; border: none; border-bottom: 2px solid transparent;
-  color: rgba(245,237,227,0.45); font-family: 'Plus Jakarta Sans', sans-serif;
+  color: rgba(245,237,227,0.45); font-family: var(--font);
   font-size: 13px; font-weight: 600; padding: 10px 14px; cursor: pointer;
   transition: all 0.2s; margin-bottom: -1px;
 }
@@ -132,12 +132,12 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
   background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0.7;
 }
 .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
-.stat-value { font-family: 'Libre Baskerville', serif; font-size: 26px; font-weight: 700; color: var(--text); }
+.stat-value { font-family: var(--font); font-size: 26px; font-weight: 700; color: var(--text); }
 .stat-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
 
 /* ── Section header ── */
 .section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.section-title { font-family: 'Libre Baskerville', serif; font-size: 17px; font-weight: 700; color: var(--text); }
+.section-title { font-family: var(--font); font-size: 17px; font-weight: 700; color: var(--text); }
 .section-count { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
 
 /* ── Toolbar row ── */
@@ -146,7 +146,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 .search-wrap input {
   width: 100%; background: var(--card); border: 1px solid var(--border);
   border-radius: 10px; padding: 10px 16px 10px 38px;
-  font-size: 13px; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px; color: var(--text); font-family: var(--font);
   outline: none; transition: border-color 0.2s;
 }
 .search-wrap input:focus { border-color: var(--accent); }
@@ -155,7 +155,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 .filter-select {
   background: var(--card); border: 1px solid var(--border); border-radius: 10px;
   padding: 10px 14px; font-size: 13px; color: var(--text);
-  font-family: 'Plus Jakarta Sans', sans-serif; outline: none; cursor: pointer;
+  font-family: var(--font); outline: none; cursor: pointer;
 }
 .filter-select:focus { border-color: var(--accent); }
 
@@ -176,7 +176,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 .btn-edit {
   background: none; border: 1px solid var(--border); border-radius: 7px;
   padding: 4px 10px; font-size: 11px; font-weight: 600;
-  color: var(--muted); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--muted); cursor: pointer; font-family: var(--font);
   transition: all 0.2s;
 }
 .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
@@ -188,7 +188,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 .page-btn {
   background: var(--card); border: 1px solid var(--border); border-radius: 7px;
   padding: 5px 12px; font-size: 12px; font-weight: 600;
-  color: var(--text); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text); cursor: pointer; font-family: var(--font);
   transition: all 0.2s;
 }
 .page-btn:hover { border-color: var(--accent); color: var(--accent); }
@@ -204,7 +204,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
   width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Libre Baskerville', serif; font-size: 13px; font-weight: 700; color: var(--brand);
+  font-family: var(--font); font-size: 13px; font-weight: 700; color: var(--brand);
 }
 .signup-info { flex: 1; }
 .signup-name { font-size: 13px; font-weight: 600; color: var(--text); }
@@ -252,32 +252,32 @@ body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta San
 .modal-bg { position: fixed; inset: 0; background: rgba(61,31,10,0.45); z-index: 200; display: none; align-items: center; justify-content: center; }
 .modal-bg.open { display: flex; }
 .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 420px; max-width: 95vw; box-shadow: 0 12px 40px rgba(61,31,10,0.2); }
-.modal-title { font-family: 'Libre Baskerville', serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+.modal-title { font-family: var(--font); font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
 .form-group { margin-bottom: 16px; }
 .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; display: block; }
 .form-select, .form-input {
   width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
   padding: 9px 12px; font-size: 13px; color: var(--text);
-  font-family: 'Plus Jakarta Sans', sans-serif; outline: none; transition: border-color 0.2s;
+  font-family: var(--font); outline: none; transition: border-color 0.2s;
 }
 .form-select:focus, .form-input:focus { border-color: var(--accent); }
 .modal-actions { display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end; }
 .btn-primary {
   background: var(--accent); color: var(--brand); border: none; border-radius: 8px;
   padding: 9px 20px; font-size: 13px; font-weight: 700;
-  font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background 0.2s;
+  font-family: var(--font); cursor: pointer; transition: background 0.2s;
 }
 .btn-primary:hover { background: #D4A017; }
 .btn-cancel {
   background: none; border: 1px solid var(--border); border-radius: 8px;
   padding: 9px 18px; font-size: 13px; font-weight: 600;
-  color: var(--muted); font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+  color: var(--muted); font-family: var(--font); cursor: pointer; transition: all 0.2s;
 }
 .btn-cancel:hover { border-color: var(--dim); color: var(--text); }
 .btn-danger {
   background: rgba(192,57,43,0.1); color: var(--red); border: 1px solid rgba(192,57,43,0.25);
   border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600;
-  font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+  font-family: var(--font); cursor: pointer; transition: all 0.2s;
 }
 .btn-danger:hover { background: rgba(192,57,43,0.2); }
 
