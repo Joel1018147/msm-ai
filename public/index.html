@@ -492,8 +492,8 @@ footer{
       </div>
     </div>
 
-    <a href="https://m-easytools-ai-production.up.railway.app/login.html" class="btn btn-ghost" data-i18n="nav.signin">Sign In</a>
-    <a href="https://m-easytools-ai-production.up.railway.app/signup.html" class="btn btn-primary" data-i18n="nav.start">Start Free →</a>
+    <a href="/login" class="btn btn-ghost" data-i18n="nav.signin" onclick="goToApp(this,event)">Sign In</a>
+    <a href="/login" class="btn btn-primary" data-i18n="nav.start" onclick="goToApp(this,event)">Start Free →</a>
   </div>
 </nav>
 
@@ -509,7 +509,7 @@ footer{
   <p class="hero-desc" data-i18n="hero.desc">M-EasyTools AI+ brings together Content, Social, Email, Ads, SEO, Commerce, Sales, Productivity and GAO tools — all in one AI-native platform built to grow your business faster.</p>
   <div class="hero-cta">
     <a href="#systems" class="btn btn-primary btn-lg" data-i18n="hero.cta1">Explore Our Systems ↓</a>
-    <a href="https://m-easytools-ai-production.up.railway.app/signup.html" class="btn-outline-lg btn" data-i18n="hero.cta2">Start for Free →</a>
+    <a href="/login" class="btn-outline-lg btn" data-i18n="hero.cta2" onclick="goToApp(this,event)">Start for Free →</a>
   </div>
   <div class="hero-stats" role="list">
     <div class="h-stat" role="listitem">
@@ -789,8 +789,8 @@ footer{
   <h2 class="cta-title" data-i18n-html="cta.title_html">Start generating content<br><span class="cta-accent">in 60 seconds</span></h2>
   <p class="cta-desc" data-i18n="cta.desc">Join hundreds of Malaysian businesses using M-EasyTools AI+ to create better content, faster.</p>
   <div class="cta-btns">
-    <a href="https://m-easytools-ai-production.up.railway.app/signup.html" class="btn btn-primary btn-lg" data-i18n="cta.create">Create Free Account →</a>
-    <a href="https://m-easytools-ai-production.up.railway.app/login.html" class="btn-outline-lg btn" data-i18n="cta.signin">Sign In</a>
+    <a href="/login" class="btn btn-primary btn-lg" data-i18n="cta.create" onclick="goToApp(this,event)">Create Free Account →</a>
+    <a href="/login" class="btn-outline-lg btn" data-i18n="cta.signin" onclick="goToApp(this,event)">Sign In</a>
   </div>
 </section>
 
@@ -798,9 +798,9 @@ footer{
 <footer>
   <div class="footer-copy" data-i18n="footer.copy">© 2025 M-EasyTools AI+ · Powered by Modus AI Associates</div>
   <div class="footer-links">
-    <a href="https://m-easytools-ai-production.up.railway.app/login.html" data-i18n="footer.signin">Sign In</a>
-    <a href="https://m-easytools-ai-production.up.railway.app/signup.html" data-i18n="footer.signup">Sign Up</a>
-    <a href="https://m-easytools-ai-production.up.railway.app/app.html" data-i18n="footer.dashboard">Dashboard</a>
+    <a href="/login" data-i18n="footer.signin" onclick="goToApp(this,event)">Sign In</a>
+    <a href="/login" data-i18n="footer.signup" onclick="goToApp(this,event)">Sign Up</a>
+    <a href="/app" data-i18n="footer.dashboard" onclick="goToApp(this,event)">Dashboard</a>
     <a href="https://m-easytools-ai-production.up.railway.app/privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
     <a href="https://m-easytools-ai-production.up.railway.app/terms.html" data-i18n="footer.terms">Terms of Service</a>
     <a href="mailto:admin@modusaiassociates.com" data-i18n="footer.contact">Contact</a>
@@ -808,7 +808,22 @@ footer{
 </footer>
 
 <script>
-// Handle ?goto= parameter after login
+// Smart auth-check CTA: if already logged in go to /app, otherwise go to /login
+async function goToApp(el, e) {
+  if (e) e.preventDefault();
+  if (el._checking) return;
+  el._checking = true;
+  el.style.opacity = '0.6';
+  el.style.pointerEvents = 'none';
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+    window.location.href = res.ok ? '/app' : '/login';
+  } catch (_) {
+    window.location.href = '/login';
+  }
+}
+
+// Handle sys-card clicks
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.sys-card').forEach(card => {
     card.addEventListener('click', (e) => {
