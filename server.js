@@ -3,7 +3,7 @@
  * ║     M-EasyTools AI — Full Production Server v4.0                   ║
  * ║     PostgreSQL + Groq AI + Google OAuth + Stripe            ║
  * ║     WordPress/Shopify Integration + Developer API           ║
- * ║     Admin Dashboard + Team Workspaces + Analytics          ║
+ * ║     Seller Panel + Team Workspaces + Analytics             ║
  * ╚══════════════════════════════════════════════════════════════╝
  */
 
@@ -250,8 +250,11 @@ function requireAuth(req, res, next) {
   res.redirect('/login');
 }
 
-async function requireAdmin(req, res, next) {
-  if (req.user?.role !== 'admin') return res.status(403).json({ error: 'Admin access required' });
+function requireSeller(req, res, next) {
+  const key = req.query.key || req.headers['x-seller-key'];
+  const SELLER_KEY = process.env.SELLER_KEY;
+  if (!SELLER_KEY) return res.status(500).json({ error: 'SELLER_KEY not configured' });
+  if (key !== SELLER_KEY) return res.status(401).json({ error: 'Unauthorized' });
   next();
 }
 
@@ -707,49 +710,6 @@ app.put('/api/keys', requireAuth, async (req, res) => {
   res.json({ success: true });
 });
 
-// ════════════════════════════════════════════════════
-//  ADMIN DASHBOARD
-// ════════════════════════════════════════════════════
-app.get('/api/admin/stats', requireAuth, requireAdmin, async (req, res) => {
-  const [totalUsers, totalDocs, totalWords, planBreakdown, recentUsers, topTools, dailySignups] = await Promise.all([
-    db.getOne('SELECT COUNT(*) as c FROM users'),
-    db.getOne('SELECT COUNT(*) as c FROM documents'),
-    db.getOne('SELECT COALESCE(SUM(word_count),0) as w FROM documents'),
-    db.getAll('SELECT plan, COUNT(*) as count FROM users GROUP BY plan'),
-    db.getAll('SELECT id, name, email, plan, created_at, last_login FROM users ORDER BY created_at DESC LIMIT 10'),
-    db.getAll('SELECT tool_name, COUNT(*) as uses, COALESCE(SUM(word_count),0) as words FROM documents WHERE tool_name IS NOT NULL GROUP BY tool_name ORDER BY uses DESC LIMIT 10'),
-    db.getAll("SELECT DATE(created_at) as date, COUNT(*) as signups FROM users WHERE created_at>=NOW()-INTERVAL '30 days' GROUP BY DATE(created_at) ORDER BY date")
-  ]);
-  res.json({ totalUsers: parseInt(totalUsers.c), totalDocs: parseInt(totalDocs.c), totalWords: parseInt(totalWords.w), planBreakdown, recentUsers, topTools, dailySignups });
-});
-
-app.get('/api/admin/users', requireAuth, requireAdmin, async (req, res) => {
-  const { page = 1, limit = 20, search } = req.query;
-  const offset = (page - 1) * limit;
-  let query = 'SELECT id,name,email,plan,role,created_at,last_login,is_active FROM users';
-  const params = [];
-  if (search) { query += ' WHERE name ILIKE $1 OR email ILIKE $1'; params.push(`%${search}%`); }
-  query += ` ORDER BY created_at DESC LIMIT $${params.length+1} OFFSET $${params.length+2}`;
-  params.push(limit, offset);
-  const users = await db.getAll(query, params);
-  const total = await db.getOne('SELECT COUNT(*) as c FROM users');
-  res.json({ users, total: parseInt(total.c) });
-});
-
-app.put('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
-  const { plan, is_active, role } = req.body;
-  await db.run(
-    'UPDATE users SET plan=COALESCE($1,plan), is_active=COALESCE($2,is_active), role=COALESCE($3,role) WHERE id=$4',
-    [plan || null, is_active ?? null, role || null, req.params.id]
-  );
-  res.json({ success: true });
-});
-
-app.delete('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
-  if (parseInt(req.params.id) === req.user.id) return res.status(400).json({ error: 'Cannot delete your own account' });
-  await db.run('UPDATE users SET is_active = FALSE WHERE id = $1', [req.params.id]);
-  res.json({ success: true });
-});
 
 // ════════════════════════════════════════════════════
 //  DEVELOPER API DOCS
@@ -789,8 +749,79 @@ app.get('/api/health', async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════
-//  MODULE MANAGEMENT (Seller Panel)
+//  SELLER PANEL
 // ════════════════════════════════════════════════════
+app.get('/api/seller/verify', requireSeller, (req, res) => res.json({ ok: true }));
+
+app.get('/api/seller/stats', requireSeller, async (req, res) => {
+  try {
+    const [totalUsers, activeUsers, totalDocs, modules, recentSignups, topTools] = await Promise.all([
+      db.getOne('SELECT COUNT(*) as c FROM users'),
+      db.getOne('SELECT COUNT(*) as c FROM users WHERE is_active = TRUE'),
+      db.getOne('SELECT COUNT(*) as c FROM documents'),
+      db.getAll('SELECT module_id, name, is_enabled FROM platform_modules ORDER BY sort_order'),
+      db.getAll('SELECT id, name, email, plan, role, created_at, is_active FROM users ORDER BY created_at DESC LIMIT 10'),
+      db.getAll('SELECT tool_name, COUNT(*) as uses FROM documents WHERE tool_name IS NOT NULL GROUP BY tool_name ORDER BY uses DESC LIMIT 5'),
+    ]);
+    res.json({
+      totalUsers: parseInt(totalUsers.c),
+      activeUsers: parseInt(activeUsers.c),
+      totalDocs: parseInt(totalDocs.c),
+      activeModules: modules.filter(m => m.is_enabled).length,
+      totalModules: modules.length,
+      recentSignups,
+      topTools,
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/seller/users', requireSeller, async (req, res) => {
+  try {
+    const { page = 1, limit = 20, search, plan } = req.query;
+    const offset = (page - 1) * limit;
+    const params = [];
+    const where = [];
+    if (search) { params.push(`%${search}%`); where.push(`(name ILIKE $${params.length} OR email ILIKE $${params.length})`); }
+    if (plan) { params.push(plan); where.push(`plan = $${params.length}`); }
+    const whereClause = where.length ? 'WHERE ' + where.join(' AND ') : '';
+    const users = await db.getAll(
+      `SELECT id,name,email,plan,role,created_at,last_login,is_active FROM users ${whereClause} ORDER BY created_at DESC LIMIT $${params.length+1} OFFSET $${params.length+2}`,
+      [...params, limit, offset]
+    );
+    const total = await db.getOne(`SELECT COUNT(*) as c FROM users ${whereClause}`, params);
+    res.json({ users, total: parseInt(total.c) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/seller/users/:id', requireSeller, async (req, res) => {
+  try {
+    const user = await db.getOne('SELECT id,name,email,plan,role,created_at,last_login,is_active FROM users WHERE id=$1', [req.params.id]);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const docs = await db.getOne('SELECT COUNT(*) as c FROM documents WHERE user_id=$1', [req.params.id]);
+    res.json({ ...user, docCount: parseInt(docs.c) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/seller/users/:id', requireSeller, async (req, res) => {
+  try {
+    const { plan, role, is_active } = req.body;
+    await db.run(
+      'UPDATE users SET plan=COALESCE($1,plan), role=COALESCE($2,role), is_active=COALESCE($3,is_active) WHERE id=$4',
+      [plan || null, role || null, is_active ?? null, req.params.id]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/seller/users/:id/toggle-active', requireSeller, async (req, res) => {
+  try {
+    const user = await db.getOne('SELECT is_active FROM users WHERE id=$1', [req.params.id]);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    await db.run('UPDATE users SET is_active=$1 WHERE id=$2', [!user.is_active, req.params.id]);
+    res.json({ success: true, is_active: !user.is_active });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/modules', async (req, res) => {
   try {
     const modules = await db.getAll('SELECT module_id, name, is_enabled, sort_order FROM platform_modules ORDER BY sort_order');
@@ -798,21 +829,29 @@ app.get('/api/modules', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/seller/modules/:moduleId', requireAuth, requireAdmin, async (req, res) => {
+app.put('/api/seller/modules/:moduleId', requireSeller, async (req, res) => {
   try {
     const { moduleId } = req.params;
     const { is_enabled } = req.body;
     const mod = await db.getOne('SELECT id FROM platform_modules WHERE module_id = $1', [moduleId]);
     if (!mod) return res.status(404).json({ error: 'Module not found' });
-    await db.run('UPDATE platform_modules SET is_enabled = $1, updated_at = CURRENT_TIMESTAMP WHERE module_id = $2', [!!is_enabled, moduleId]);
+    await db.run('UPDATE platform_modules SET is_enabled=$1, updated_at=CURRENT_TIMESTAMP WHERE module_id=$2', [!!is_enabled, moduleId]);
     res.json({ success: true, module_id: moduleId, is_enabled: !!is_enabled });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/seller/stats', requireAuth, requireAdmin, async (req, res) => {
+app.get('/api/seller/documents', requireSeller, async (req, res) => {
   try {
-    const modules = await db.getAll('SELECT module_id, name, is_enabled FROM platform_modules ORDER BY sort_order');
-    res.json({ modules });
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (page - 1) * limit;
+    const docs = await db.getAll(
+      `SELECT d.id, d.title, d.tool_name, d.word_count, d.created_at, u.name as user_name, u.email as user_email
+       FROM documents d JOIN users u ON u.id = d.user_id
+       ORDER BY d.created_at DESC LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+    const total = await db.getOne('SELECT COUNT(*) as c FROM documents');
+    res.json({ documents: docs, total: parseInt(total.c) });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -831,7 +870,7 @@ function checkModule(moduleId) {
 
 // Page routes
 app.get('/app',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'app.html')));
-app.get('/admin',    (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/admin',    (req, res) => res.redirect('/seller'));
 app.get('/login',    (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/signup',   (req, res) => res.sendFile(path.join(__dirname, 'public', 'signup.html')));
 app.get('/seller',   (req, res) => res.sendFile(path.join(__dirname, 'public', 'seller.html')));
@@ -857,7 +896,7 @@ app.listen(PORT, () => {
 ║  WordPress API:  ✓ Ready                        ║
 ║  Shopify API:    ✓ Ready                        ║
 ║  Developer API:  ✓ Ready                        ║
-║  Admin Panel:    ✓ Ready (/admin)               ║
+║  Seller Panel:   ✓ Ready (/seller)              ║
 ║  Team Workspaces:✓ Ready                        ║
 ║  Content Scoring:✓ Ready                        ║
 ╚══════════════════════════════════════════════════╝

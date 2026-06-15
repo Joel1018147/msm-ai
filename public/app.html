@@ -847,10 +847,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);display:flex;f
     <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="2.5"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.22 4.22l1.42 1.42M12.36 12.36l1.42 1.42M4.22 13.78l1.42-1.42M12.36 5.64l1.42-1.42"/></svg>
     <span data-i18n="nav_settings">Settings</span>
   </button>
-  <button class="sb-item" id="admin-nav-btn" onclick="window.location.href='/admin.html'" style="display:none">
-    <svg class="sb-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 2l1.5 4h4l-3.5 2.5 1.5 4L9 10 5.5 12.5l1.5-4L3.5 6h4z"/></svg>
-    <span>Admin Panel</span>
-  </button>
 
   <div class="sb-bottom">
     <!-- Profile tile with dropdown -->
@@ -1488,11 +1484,7 @@ async function initApp() {
     currentUser = await res.json();
     applyUser(currentUser);
     loadStats();
-    // Show admin link if admin
-    if (currentUser.role === 'admin') {
-      const adminBtn = document.getElementById('admin-nav-btn');
-      if (adminBtn) adminBtn.style.display = 'flex';
-    }
+
   } catch { window.location.href = '/login'; }
 }
 
