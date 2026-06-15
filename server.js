@@ -67,8 +67,6 @@ async function initDB() {
         avatar        TEXT,
         plan          VARCHAR(50) DEFAULT 'free',
         role          VARCHAR(20) DEFAULT 'user',
-        credits       INTEGER DEFAULT 2500,
-        credits_max   INTEGER DEFAULT 2500,
         groq_key      TEXT,
         wp_url        TEXT,
         wp_username   TEXT,
@@ -118,39 +116,8 @@ async function initDB() {
         updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
-      CREATE TABLE IF NOT EXISTS usage_log (
-        id           SERIAL PRIMARY KEY,
-        user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        action       VARCHAR(100) NOT NULL,
-        credits_used INTEGER DEFAULT 0,
-        tool_id      VARCHAR(100),
-        created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-
-      CREATE TABLE IF NOT EXISTS api_usage (
-        id           SERIAL PRIMARY KEY,
-        user_id      INTEGER REFERENCES users(id),
-        api_key      VARCHAR(64),
-        endpoint     VARCHAR(255),
-        credits_used INTEGER DEFAULT 0,
-        created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-
-      CREATE TABLE IF NOT EXISTS bulk_jobs (
-        id          SERIAL PRIMARY KEY,
-        user_id     INTEGER REFERENCES users(id),
-        tool_id     VARCHAR(100),
-        tool_name   VARCHAR(255),
-        status      VARCHAR(20) DEFAULT 'pending',
-        total       INTEGER DEFAULT 0,
-        completed   INTEGER DEFAULT 0,
-        results     TEXT,
-        created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-
       CREATE INDEX IF NOT EXISTS idx_documents_user ON documents(user_id);
       CREATE INDEX IF NOT EXISTS idx_documents_team ON documents(team_id);
-      CREATE INDEX IF NOT EXISTS idx_usage_user ON usage_log(user_id);
       CREATE INDEX IF NOT EXISTS idx_users_api_key ON users(api_key);
 
       CREATE TABLE IF NOT EXISTS platform_modules (
@@ -216,8 +183,8 @@ passport.use(new GoogleStrategy({
         const isFirst = !(await db.getOne('SELECT id FROM users LIMIT 1'));
         const apiKey = crypto.randomBytes(32).toString('hex');
         user = await db.getOne(
-          'INSERT INTO users (name,email,google_id,avatar,plan,credits,credits_max,api_key,role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *',
-          [profile.displayName, email, profile.id, profile.photos?.[0]?.value, 'free', 2500, 2500, apiKey, isFirst ? 'admin' : 'user']
+          'INSERT INTO users (name,email,google_id,avatar,plan,api_key,role) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
+          [profile.displayName, email, profile.id, profile.photos?.[0]?.value, 'free', apiKey, isFirst ? 'admin' : 'user']
         );
       }
     } else {
@@ -270,7 +237,7 @@ const apiLimiter  = rateLimit({ windowMs: 60 * 1000, max: 120, message: { error:
 function safeUser(u) {
   return {
     id: u.id, name: u.name, email: u.email, plan: u.plan, role: u.role,
-    credits: u.credits, credits_max: u.credits_max, avatar: u.avatar,
+    avatar: u.avatar,
     brand_name: u.brand_name, brand_desc: u.brand_desc, brand_tone: u.brand_tone,
     api_key: u.api_key, team_id: u.team_id,
     has_wp: !!(u.wp_url), has_shopify: !!(u.shopify_store)
@@ -299,11 +266,6 @@ async function requireApiKey(req, res, next) {
   next();
 }
 
-async function spendCredits(userId, amount, toolId = null) {
-  await db.run('UPDATE users SET credits = GREATEST(0, credits - $1) WHERE id = $2', [amount, userId]);
-  await db.run('INSERT INTO usage_log (user_id, action, credits_used, tool_id) VALUES ($1, $2, $3, $4)', [userId, 'generate', amount, toolId]);
-}
-
 // ════════════════════════════════════════════════════
 //  AUTH ROUTES
 // ════════════════════════════════════════════════════
@@ -314,14 +276,12 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Invalid email' });
     if (await db.getOne('SELECT id FROM users WHERE email = $1', [email.toLowerCase()])) return res.status(409).json({ error: 'Email already registered' });
-    const planCredits = { free: 2500, pro: 10000, agency: 999999 };
-    const credits = planCredits[plan] || 2500;
     const hash = await bcrypt.hash(password, 12);
     const apiKey = crypto.randomBytes(32).toString('hex');
     const isFirst = !(await db.getOne('SELECT id FROM users LIMIT 1'));
     const result = await db.getOne(
-      'INSERT INTO users (name, email, password, plan, credits, credits_max, api_key, role) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',
-      [name.trim(), email.toLowerCase(), hash, plan, credits, credits, apiKey, isFirst ? 'admin' : 'user']
+      'INSERT INTO users (name, email, password, plan, api_key, role) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
+      [name.trim(), email.toLowerCase(), hash, plan, apiKey, isFirst ? 'admin' : 'user']
     );
     req.login(result, err => {
       if (err) return res.status(500).json({ error: 'Login failed after registration' });
@@ -414,7 +374,6 @@ app.post('/api/chat', requireApiKey, apiLimiter, async (req, res) => {
     if (!Array.isArray(messages)) return res.status(400).json({ error: 'Messages array required' });
     const groqKey = req.user.groq_key || GROQ_KEY;
     if (!groqKey) return res.status(400).json({ error: 'Groq API key not configured' });
-    if (req.user.credits < 1) return res.status(402).json({ error: 'No credits remaining' });
     const systemPrompt = `You are M-EasyTools AI, an expert marketing strategist and copywriter. Help with content creation, SEO, email marketing, social media, ad campaigns, and brand strategy. Be specific and actionable. User brand: ${req.user.brand_name || 'Not set'}. Tone: ${req.user.brand_tone || 'Professional'}.`;
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST', headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
@@ -422,7 +381,6 @@ app.post('/api/chat', requireApiKey, apiLimiter, async (req, res) => {
     });
     if (!response.ok) { const e = await response.json(); throw new Error(e.error?.message || 'Groq error'); }
     const data = await response.json();
-    await spendCredits(req.user.id, 5, 'chat');
     res.json({ success: true, message: data.choices[0].message.content, model: data.model });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -433,7 +391,6 @@ app.post('/api/chat', requireApiKey, apiLimiter, async (req, res) => {
 async function generateWithGroq(user, prompt, toolId, toolName, tone, variants = 1) {
   const groqKey = user.groq_key || GROQ_KEY;
   if (!groqKey) throw new Error('Groq API key not configured');
-  if (user.credits < 10) throw new Error('Insufficient credits');
 
   const fullPrompt = variants > 1
     ? prompt + `\n\nGenerate ${variants} distinct variants labeled: ═══ VARIANT 1 ═══, ═══ VARIANT 2 ═══, etc.`
@@ -450,13 +407,10 @@ async function generateWithGroq(user, prompt, toolId, toolName, tone, variants =
   const data = await response.json();
   const text = data.choices[0].message.content;
   const wordCount = text.split(/\s+/).filter(Boolean).length;
-  const creditsUsed = Math.max(10, Math.ceil(wordCount / 10));
 
   // Calculate content score
   const seoScore = Math.min(100, Math.floor(wordCount / 10) + Math.floor(Math.random() * 20) + 60);
   const readability = Math.floor(Math.random() * 20) + 70;
-
-  await spendCredits(user.id, creditsUsed, toolId);
 
   // Auto-save document
   const doc = await pool.query(
@@ -464,7 +418,7 @@ async function generateWithGroq(user, prompt, toolId, toolName, tone, variants =
     [user.id, `${toolName || 'Content'} — ${new Date().toLocaleDateString()}`, text, toolId, toolName, wordCount, seoScore, readability]
   );
 
-  return { text, wordCount, creditsUsed, docId: doc.rows[0].id, seoScore, readability };
+  return { text, wordCount, docId: doc.rows[0].id, seoScore, readability };
 }
 
 app.post('/api/generate', requireApiKey, apiLimiter, async (req, res) => {
@@ -472,53 +426,9 @@ app.post('/api/generate', requireApiKey, apiLimiter, async (req, res) => {
     const { prompt, toolId, toolName, tone = 'Professional', variants = 1 } = req.body;
     if (!prompt?.trim()) return res.status(400).json({ error: 'Prompt required' });
 
-    // Log API usage if using API key
-    if (req.isApiKey) {
-      await db.run('INSERT INTO api_usage (user_id, api_key, endpoint, credits_used) VALUES ($1, $2, $3, $4)', [req.user.id, req.user.api_key, '/api/generate', 10]);
-    }
-
     const result = await generateWithGroq(req.user, prompt, toolId, toolName, tone, variants);
     res.json({ success: true, ...result });
   } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// ════════════════════════════════════════════════════
-//  BULK GENERATION
-// ════════════════════════════════════════════════════
-app.post('/api/bulk/generate', requireAuth, async (req, res) => {
-  const { items, toolId, toolName, tone = 'Professional' } = req.body;
-  if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ error: 'Items array required' });
-  if (items.length > 20) return res.status(400).json({ error: 'Maximum 20 items per bulk job' });
-  if (req.user.credits < items.length * 10) return res.status(402).json({ error: 'Insufficient credits for bulk generation' });
-
-  // Create job
-  const job = await db.getOne(
-    'INSERT INTO bulk_jobs (user_id, tool_id, tool_name, status, total) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-    [req.user.id, toolId, toolName, 'processing', items.length]
-  );
-
-  res.json({ success: true, jobId: job.id, message: `Processing ${items.length} items...` });
-
-  // Process in background
-  (async () => {
-    const results = [];
-    for (const item of items) {
-      try {
-        const result = await generateWithGroq(req.user, item.prompt, toolId, toolName, tone, 1);
-        results.push({ input: item.label || item.prompt.substring(0, 50), output: result.text, docId: result.docId });
-        await db.run('UPDATE bulk_jobs SET completed = completed + 1 WHERE id = $1', [job.id]);
-      } catch (e) {
-        results.push({ input: item.label || item.prompt.substring(0, 50), error: e.message });
-      }
-    }
-    await db.run('UPDATE bulk_jobs SET status = $1, results = $2 WHERE id = $3', ['completed', JSON.stringify(results), job.id]);
-  })();
-});
-
-app.get('/api/bulk/status/:jobId', requireAuth, async (req, res) => {
-  const job = await db.getOne('SELECT * FROM bulk_jobs WHERE id = $1 AND user_id = $2', [req.params.jobId, req.user.id]);
-  if (!job) return res.status(404).json({ error: 'Job not found' });
-  res.json({ ...job, results: job.results ? JSON.parse(job.results) : [] });
 });
 
 // ════════════════════════════════════════════════════
@@ -700,7 +610,7 @@ app.post('/api/teams', requireAuth, async (req, res) => {
 app.get('/api/teams/mine', requireAuth, async (req, res) => {
   if (!req.user.team_id) return res.json({ team: null, members: [] });
   const team = await db.getOne('SELECT * FROM teams WHERE id = $1', [req.user.team_id]);
-  const members = await db.getAll('SELECT u.id, u.name, u.email, u.avatar, u.credits, tm.role, tm.joined_at FROM team_members tm JOIN users u ON u.id = tm.user_id WHERE tm.team_id = $1', [req.user.team_id]);
+  const members = await db.getAll('SELECT u.id, u.name, u.email, u.avatar, tm.role, tm.joined_at FROM team_members tm JOIN users u ON u.id = tm.user_id WHERE tm.team_id = $1', [req.user.team_id]);
   res.json({ team, members });
 });
 
@@ -779,8 +689,6 @@ app.get('/api/stats', requireAuth, async (req, res) => {
   ]);
   res.json({
     totalDocuments: parseInt(totalDocs.c), totalWords: parseInt(totalWords.w),
-    creditsUsed: req.user.credits_max - req.user.credits,
-    creditsRemaining: req.user.credits, creditsMax: req.user.credits_max,
     docsThisWeek: parseInt(weekDocs.c), topTool: topTool?.tool_name || 'None yet',
     recentDocuments: recentDocs, dailyUsage
   });
@@ -808,7 +716,7 @@ app.get('/api/admin/stats', requireAuth, requireAdmin, async (req, res) => {
     db.getOne('SELECT COUNT(*) as c FROM documents'),
     db.getOne('SELECT COALESCE(SUM(word_count),0) as w FROM documents'),
     db.getAll('SELECT plan, COUNT(*) as count FROM users GROUP BY plan'),
-    db.getAll('SELECT id, name, email, plan, credits, created_at, last_login FROM users ORDER BY created_at DESC LIMIT 10'),
+    db.getAll('SELECT id, name, email, plan, created_at, last_login FROM users ORDER BY created_at DESC LIMIT 10'),
     db.getAll('SELECT tool_name, COUNT(*) as uses, COALESCE(SUM(word_count),0) as words FROM documents WHERE tool_name IS NOT NULL GROUP BY tool_name ORDER BY uses DESC LIMIT 10'),
     db.getAll("SELECT DATE(created_at) as date, COUNT(*) as signups FROM users WHERE created_at>=NOW()-INTERVAL '30 days' GROUP BY DATE(created_at) ORDER BY date")
   ]);
@@ -818,7 +726,7 @@ app.get('/api/admin/stats', requireAuth, requireAdmin, async (req, res) => {
 app.get('/api/admin/users', requireAuth, requireAdmin, async (req, res) => {
   const { page = 1, limit = 20, search } = req.query;
   const offset = (page - 1) * limit;
-  let query = 'SELECT id,name,email,plan,role,credits,credits_max,created_at,last_login,is_active FROM users';
+  let query = 'SELECT id,name,email,plan,role,created_at,last_login,is_active FROM users';
   const params = [];
   if (search) { query += ' WHERE name ILIKE $1 OR email ILIKE $1'; params.push(`%${search}%`); }
   query += ` ORDER BY created_at DESC LIMIT $${params.length+1} OFFSET $${params.length+2}`;
@@ -829,12 +737,10 @@ app.get('/api/admin/users', requireAuth, requireAdmin, async (req, res) => {
 });
 
 app.put('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
-  const { plan, credits, is_active, role } = req.body;
-  const planCredits = { free: 2500, pro: 10000, agency: 999999 };
-  const newCredits = plan ? (planCredits[plan] ?? null) : (credits ?? null);
+  const { plan, is_active, role } = req.body;
   await db.run(
-    'UPDATE users SET plan=COALESCE($1,plan), credits=COALESCE($2,credits), credits_max=COALESCE($3,credits_max), is_active=COALESCE($4,is_active), role=COALESCE($5,role) WHERE id=$6',
-    [plan || null, newCredits, newCredits, is_active ?? null, role || null, req.params.id]
+    'UPDATE users SET plan=COALESCE($1,plan), is_active=COALESCE($2,is_active), role=COALESCE($3,role) WHERE id=$4',
+    [plan || null, is_active ?? null, role || null, req.params.id]
   );
   res.json({ success: true });
 });
@@ -842,12 +748,6 @@ app.put('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
 app.delete('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
   if (parseInt(req.params.id) === req.user.id) return res.status(400).json({ error: 'Cannot delete your own account' });
   await db.run('UPDATE users SET is_active = FALSE WHERE id = $1', [req.params.id]);
-  res.json({ success: true });
-});
-
-// Reset user credits (monthly reset simulation)
-app.post('/api/admin/users/:id/reset-credits', requireAuth, requireAdmin, async (req, res) => {
-  await db.run('UPDATE users SET credits = credits_max WHERE id = $1', [req.params.id]);
   res.json({ success: true });
 });
 
@@ -870,7 +770,7 @@ app.get('/api/docs', (req, res) => {
     ],
     example: {
       request: `fetch('${APP_URL}/api/generate', { method: 'POST', headers: { 'X-API-Key': 'your_key', 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: 'Write a blog post about AI marketing', toolId: 'blog-writer', tone: 'Professional' }) })`,
-      response: { success: true, text: 'Generated content...', wordCount: 850, creditsUsed: 85 }
+      response: { success: true, text: 'Generated content...', wordCount: 850 }
     }
   });
 });
@@ -912,12 +812,7 @@ app.put('/api/seller/modules/:moduleId', requireAuth, requireAdmin, async (req, 
 app.get('/api/seller/stats', requireAuth, requireAdmin, async (req, res) => {
   try {
     const modules = await db.getAll('SELECT module_id, name, is_enabled FROM platform_modules ORDER BY sort_order');
-    const toolUsage = await db.getAll(`
-      SELECT tool_id, COUNT(*) as uses, SUM(credits_used) as credits
-      FROM usage_log WHERE created_at > NOW() - INTERVAL '30 days'
-      GROUP BY tool_id ORDER BY uses DESC LIMIT 30
-    `);
-    res.json({ modules, toolUsage });
+    res.json({ modules });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -964,7 +859,6 @@ app.listen(PORT, () => {
 ║  Developer API:  ✓ Ready                        ║
 ║  Admin Panel:    ✓ Ready (/admin)               ║
 ║  Team Workspaces:✓ Ready                        ║
-║  Bulk Generation:✓ Ready                        ║
 ║  Content Scoring:✓ Ready                        ║
 ╚══════════════════════════════════════════════════╝
 `);

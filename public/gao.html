@@ -842,7 +842,7 @@ Format with clear headers and be specific to ${brand} in the ${industry || 'give
     toast('✓ GAO Analysis complete!','success');
     saveGAOAfterAnalysis();
   } catch(e){
-    bodyDiv.textContent = 'Error: '+e.message+'\n\nPlease make sure you are logged in and have credits remaining.';
+    bodyDiv.textContent = 'Error: '+e.message+'\n\nPlease make sure you are logged in.';
     toast('Analysis failed: '+e.message,'error');
   }
 }

@@ -121,7 +121,7 @@ body{display:flex;flex-direction:column}
     </div>
     <div class="table-card">
       <div class="table-head"><div class="table-title">Recent Signups</div></div>
-      <table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Credits</th><th>Joined</th></tr></thead><tbody id="recent-users-tbody"></tbody></table>
+      <table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Joined</th></tr></thead><tbody id="recent-users-tbody"></tbody></table>
     </div>
   </div>
 
@@ -134,7 +134,7 @@ body{display:flex;flex-direction:column}
       <div id="users-total" style="font-size:13px;color:var(--mist)"></div>
     </div>
     <div class="table-card">
-      <table class="data-table"><thead><tr><th>User</th><th>Plan</th><th>Credits</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead><tbody id="users-tbody"></tbody></table>
+      <table class="data-table"><thead><tr><th>User</th><th>Plan</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead><tbody id="users-tbody"></tbody></table>
       <div class="pagination" id="users-pagination"></div>
     </div>
   </div>
@@ -167,7 +167,7 @@ body{display:flex;flex-direction:column}
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title" id="modal-user-name">Edit User</div>
     <div class="form-group"><label class="form-label">Plan</label>
-      <select class="form-select" id="modal-plan"><option value="free">Free (2,500 credits)</option><option value="pro">Pro (10,000 credits)</option><option value="agency">Agency (Unlimited)</option></select>
+      <select class="form-select" id="modal-plan"><option value="free">Free</option><option value="pro">Pro</option><option value="agency">Agency</option></select>
     </div>
     <div class="form-group"><label class="form-label">Role</label>
       <select class="form-select" id="modal-role"><option value="user">User</option><option value="admin">Admin</option></select>
@@ -177,7 +177,6 @@ body{display:flex;flex-direction:column}
     </div>
     <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
-      <button class="btn btn-outline" onclick="resetCreds()">🔄 Reset Credits</button>
       <button class="btn btn-red" onclick="deleteUser()">Suspend User</button>
     </div>
     <div id="modal-err" style="color:var(--red);font-size:13px;margin-top:10px;display:none"></div>
@@ -230,7 +229,6 @@ async function loadAll() {
         <td style="font-weight:600">${esc(u.name)}</td>
         <td style="color:var(--mist);font-size:12px">${esc(u.email)}</td>
         <td><span class="badge badge-${esc(u.plan)}">${esc(u.plan)}</span></td>
-        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${(u.credits||0).toLocaleString()}</td>
         <td style="font-size:12px;color:var(--mist)">${fmtDate(u.created_at)}</td>
       </tr>`).join('');
   } catch(e){showErr(e.message);}
@@ -258,7 +256,6 @@ async function loadUsers(page=1,search='') {
       <tr>
         <td><div style="font-weight:600">${esc(u.name)}</div><div style="font-size:11px;color:var(--mist)">${esc(u.email)}</div></td>
         <td><span class="badge badge-${esc(u.plan)}">${esc(u.plan)}</span></td>
-        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${(u.credits||0).toLocaleString()}</td>
         <td><span class="badge badge-${u.role==='admin'?'admin':'free'}">${esc(u.role)}</span></td>
         <td><span class="badge badge-${u.is_active?'active':'inactive'}">${u.is_active?'Active':'Suspended'}</span></td>
         <td style="font-size:12px;color:var(--mist)">${u.last_login?fmtDate(u.last_login):'Never'}</td>
@@ -290,12 +287,6 @@ async function saveEdit() {
     if(!res.ok)throw new Error('Update failed');
     toast('User updated ✓','success');closeModal();loadUsers();
   } catch(e){document.getElementById('modal-err').textContent=e.message;document.getElementById('modal-err').style.display='block';}
-}
-
-async function resetCreds() {
-  if(!confirm('Reset credits to plan maximum?'))return;
-  await fetch(`/api/admin/users/${editId}/reset-credits`,{method:'POST',headers:H()});
-  toast('Credits reset ✓','success');closeModal();loadUsers();
 }
 
 async function deleteUser() {

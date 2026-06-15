@@ -27,8 +27,6 @@ html,body{height:100%;overflow:hidden;background:var(--cream);font-family:'Plus 
 .nav-title em{font-style:normal;color:var(--mod3)}
 .nav-sub{font-size:9px;color:rgba(255,255,255,0.32);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:1px}
 .nav-r{display:flex;align-items:center;gap:8px}
-.cred-chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.65);font-family:'JetBrains Mono',monospace}
-.cred-dot{width:6px;height:6px;background:var(--mod3);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;text-decoration:none;white-space:nowrap}
 .btn-out{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.12)}
@@ -128,7 +126,6 @@ html,body{height:100%;overflow:hidden;background:var(--cream);font-family:'Plus 
   </div>
   <div class="nav-r">
     <button class="th-btn" id="th-btn" onclick="toggleTheme()">☀️</button>
-    <div class="cred-chip"><div class="cred-dot"></div><span id="cred-count">—</span> credits</div>
     <a href="/app" class="btn btn-out">← Dashboard</a>
     <div class="u-chip"><div class="u-av" id="u-av">?</div><span class="u-nm" id="u-nm">…</span></div>
   </div>
@@ -188,7 +185,7 @@ const FORMS={
   ],prompt:d=>`Write a ${d.length} SEO-optimized article targeting: "${d.keyword}"\nSearch intent: ${d.intent}\nTone: ${activeTone}\n\nRequirements:\n- Include keyword in H1, first paragraph, 2-3 H2s\n- Use ## H2 and ### H3 headings\n- Include internal linking placeholders [LINK: topic]\n- Add author expertise signals (statistics, examples)\n- Include a FAQ section at the end (3 questions)\n- End with a strong CTA`},
 };
 async function init(){
-  try{const r=await fetch('/api/auth/me');if(!r.ok){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}currentUser=await r.json();document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
+  try{const r=await fetch('/api/auth/me');if(!r.ok){window.location='/login?redirect='+encodeURIComponent(window.location.pathname);return}currentUser=await r.json();document.getElementById('u-av').textContent=currentUser.name[0].toUpperCase();document.getElementById('u-nm').textContent=currentUser.name.split(' ')[0];}catch{window.location='/login?redirect='+encodeURIComponent(window.location.pathname)}
   const th=localStorage.getItem('theme')||'light';document.documentElement.dataset.theme=th;document.getElementById('th-btn').textContent=th==='dark'?'🌙':'☀️';
   allTools=TOOLS;renderTools(TOOLS);
 }
@@ -223,7 +220,6 @@ async function generate(){
     if(varCount>1&&data.text?.includes('═══ VARIANT'))texts=data.text.split(/═══\s*VARIANT \d+\s*═══/i).filter(v=>v.trim());
     else texts=[data.text||''];
     document.getElementById('out-results').innerHTML=texts.map((txt,i)=>`<div class="res-block"><div class="rb-head"><span class="rb-lbl">Result ${i+1}</span><div class="rb-acts"><button class="rb-btn" onclick="copyRes(this,${i})">📋 Copy</button><button class="rb-btn" onclick="saveRes(${i})">💾 Save</button></div></div><div class="rb-body" id="rb-${i}">${escHtml(txt.trim())}</div></div>`).join('');
-    if(currentUser){currentUser.credits=Math.max(0,currentUser.credits-(data.creditsUsed||0));document.getElementById('cred-count').textContent=currentUser.credits.toLocaleString();}
     toast('SEO content generated! ✓','ok');
   }catch(err){toast(err.message||'Generation failed','err');document.getElementById('out-load').style.display='none';document.getElementById('out-empty').style.display='flex';}
   finally{btn.disabled=false;btn.textContent='🔍 Generate SEO Content';}
