@@ -314,7 +314,7 @@ function socialLogin(provider) {
   const redirect = new URLSearchParams(window.location.search).get('redirect') || '';
   const params = redirect ? new URLSearchParams({ redirect }) : new URLSearchParams();
   const qs = params.toString();
-  window.location.href = `/api/auth/${provider.toLowerCase()}${qs ? '?' + qs : ''}`;
+  window.location.href = `/auth/${provider.toLowerCase()}${qs ? '?' + qs : ''}`;
 }
 
 // Handle OAuth error redirects back to login page
