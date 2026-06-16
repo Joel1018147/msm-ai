@@ -411,9 +411,20 @@ async function generateWithGroq(user, prompt, toolId, toolName, tone, variants =
   const text = data.choices[0].message.content;
   const wordCount = text.split(/\s+/).filter(Boolean).length;
 
-  // Calculate content score
-  const seoScore = Math.min(100, Math.floor(wordCount / 10) + Math.floor(Math.random() * 20) + 60);
-  const readability = Math.floor(Math.random() * 20) + 70;
+  // Deterministic content score based on measurable signals
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim()).length || 1;
+  const avgWordsPerSentence = wordCount / sentences;
+  const hasStructure = /#{1,3}\s|^[*-]\s/m.test(text);
+  const seoScore = Math.min(100, Math.max(40,
+    (wordCount >= 300 ? 25 : Math.floor(wordCount / 12)) +
+    (wordCount >= 800 ? 15 : 0) +
+    (hasStructure ? 15 : 5) +
+    (avgWordsPerSentence < 20 ? 15 : avgWordsPerSentence < 30 ? 10 : 5) + 20
+  ));
+  const syllables = text.split(/\s+/).reduce((acc, w) => acc + Math.max(1, w.replace(/[^aeiouy]/gi, '').length), 0);
+  const readability = Math.min(100, Math.max(30, Math.round(
+    206.835 - 1.015 * avgWordsPerSentence - 84.6 * (syllables / (wordCount || 1))
+  )));
 
   // Auto-save document
   const doc = await pool.query(
@@ -858,11 +869,21 @@ app.get('/api/seller/documents', requireSeller, async (req, res) => {
 // ════════════════════════════════════════════════════
 //  MODULE PAGE ROUTES
 // ════════════════════════════════════════════════════
+const moduleCache = new Map();
+const MODULE_CACHE_TTL = 60_000;
+
 function checkModule(moduleId) {
   return async (req, res, next) => {
     try {
+      const cached = moduleCache.get(moduleId);
+      if (cached && Date.now() - cached.at < MODULE_CACHE_TTL) {
+        if (!cached.enabled) return res.sendFile(path.join(__dirname, 'public', 'module-unavailable.html'));
+        return next();
+      }
       const mod = await db.getOne('SELECT is_enabled FROM platform_modules WHERE module_id = $1', [moduleId]);
-      if (mod && !mod.is_enabled) return res.sendFile(path.join(__dirname, 'public', 'module-unavailable.html'));
+      const enabled = !mod || mod.is_enabled;
+      moduleCache.set(moduleId, { enabled, at: Date.now() });
+      if (!enabled) return res.sendFile(path.join(__dirname, 'public', 'module-unavailable.html'));
       next();
     } catch { next(); }
   };
