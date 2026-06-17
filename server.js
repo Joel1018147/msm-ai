@@ -19,7 +19,10 @@ const pgSession = require('connect-pg-simple')(session);
 const rateLimit = require('express-rate-limit');
 const helmet    = require('helmet');
 const crypto    = require('crypto');
-const { Pool }  = require('pg');
+const fs        = require('fs');
+const { pool }  = require('./db');
+const { checkSub, updateExpiredSubscriptions, sendTrialReminders } = require('./middleware/checkSub');
+const subscriptionRoutes = require('./routes/subscription');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -49,11 +52,6 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 // ════════════════════════════════════════════════════
 //  POSTGRESQL
 // ════════════════════════════════════════════════════
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
-
 async function initDB() {
   const client = await pool.connect();
   try {
@@ -258,6 +256,14 @@ function requireSeller(req, res, next) {
   next();
 }
 
+// ── Subscription expiry scheduler ────────────────────────────────────────────
+async function runScheduledTasks() {
+  await updateExpiredSubscriptions(pool).catch(console.error);
+  await sendTrialReminders(pool).catch(console.error);
+}
+runScheduledTasks();
+setInterval(runScheduledTasks, 60 * 60 * 1000);
+
 // Developer API Key auth
 async function requireApiKey(req, res, next) {
   const key = req.headers['x-api-key'];
@@ -448,7 +454,7 @@ app.post('/api/generate', requireApiKey, apiLimiter, async (req, res) => {
 // ════════════════════════════════════════════════════
 //  CONTENT SCORING
 // ════════════════════════════════════════════════════
-app.post('/api/score', requireAuth, async (req, res) => {
+app.post('/api/score', requireAuth, checkSub, async (req, res) => {
   const { content, keyword, targetLength } = req.body;
   if (!content) return res.status(400).json({ error: 'Content required' });
 
@@ -500,7 +506,7 @@ app.post('/api/score', requireAuth, async (req, res) => {
 // ════════════════════════════════════════════════════
 //  WORDPRESS INTEGRATION
 // ════════════════════════════════════════════════════
-app.post('/api/integrations/wordpress/connect', requireAuth, async (req, res) => {
+app.post('/api/integrations/wordpress/connect', requireAuth, checkSub, async (req, res) => {
   const { url, username, password } = req.body;
   if (!url || !username || !password) return res.status(400).json({ error: 'URL, username and app password required' });
 
@@ -517,7 +523,7 @@ app.post('/api/integrations/wordpress/connect', requireAuth, async (req, res) =>
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-app.post('/api/integrations/wordpress/publish', requireAuth, async (req, res) => {
+app.post('/api/integrations/wordpress/publish', requireAuth, checkSub, async (req, res) => {
   const { docId, title, status = 'draft', categories = [], tags = [] } = req.body;
   if (!req.user.wp_url) return res.status(400).json({ error: 'WordPress not connected. Go to Settings → Integrations.' });
 
@@ -540,7 +546,7 @@ app.post('/api/integrations/wordpress/publish', requireAuth, async (req, res) =>
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/integrations/wordpress/disconnect', requireAuth, async (req, res) => {
+app.delete('/api/integrations/wordpress/disconnect', requireAuth, checkSub, async (req, res) => {
   await db.run('UPDATE users SET wp_url=NULL, wp_username=NULL, wp_password=NULL WHERE id=$1', [req.user.id]);
   res.json({ success: true });
 });
@@ -548,7 +554,7 @@ app.delete('/api/integrations/wordpress/disconnect', requireAuth, async (req, re
 // ════════════════════════════════════════════════════
 //  SHOPIFY INTEGRATION
 // ════════════════════════════════════════════════════
-app.post('/api/integrations/shopify/connect', requireAuth, async (req, res) => {
+app.post('/api/integrations/shopify/connect', requireAuth, checkSub, async (req, res) => {
   const { store, token } = req.body;
   if (!store || !token) return res.status(400).json({ error: 'Store domain and access token required' });
 
@@ -564,7 +570,7 @@ app.post('/api/integrations/shopify/connect', requireAuth, async (req, res) => {
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-app.post('/api/integrations/shopify/publish', requireAuth, async (req, res) => {
+app.post('/api/integrations/shopify/publish', requireAuth, checkSub, async (req, res) => {
   const { docId, productId, field = 'body_html' } = req.body;
   if (!req.user.shopify_store) return res.status(400).json({ error: 'Shopify not connected. Go to Settings → Integrations.' });
 
@@ -593,7 +599,7 @@ app.post('/api/integrations/shopify/publish', requireAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/integrations/shopify/products', requireAuth, async (req, res) => {
+app.get('/api/integrations/shopify/products', requireAuth, checkSub, async (req, res) => {
   if (!req.user.shopify_store) return res.status(400).json({ error: 'Shopify not connected' });
   try {
     const response = await fetch(`https://${req.user.shopify_store}/admin/api/2024-01/products.json?limit=20&fields=id,title,status`, {
@@ -604,7 +610,7 @@ app.get('/api/integrations/shopify/products', requireAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/integrations/shopify/disconnect', requireAuth, async (req, res) => {
+app.delete('/api/integrations/shopify/disconnect', requireAuth, checkSub, async (req, res) => {
   await db.run('UPDATE users SET shopify_store=NULL, shopify_token=NULL WHERE id=$1', [req.user.id]);
   res.json({ success: true });
 });
@@ -612,7 +618,7 @@ app.delete('/api/integrations/shopify/disconnect', requireAuth, async (req, res)
 // ════════════════════════════════════════════════════
 //  TEAM WORKSPACES
 // ════════════════════════════════════════════════════
-app.post('/api/teams', requireAuth, async (req, res) => {
+app.post('/api/teams', requireAuth, checkSub, async (req, res) => {
   const { name } = req.body;
   if (!name?.trim()) return res.status(400).json({ error: 'Team name required' });
   const team = await db.getOne('INSERT INTO teams (name, owner_id) VALUES ($1, $2) RETURNING *', [name.trim(), req.user.id]);
@@ -621,14 +627,14 @@ app.post('/api/teams', requireAuth, async (req, res) => {
   res.status(201).json({ team });
 });
 
-app.get('/api/teams/mine', requireAuth, async (req, res) => {
+app.get('/api/teams/mine', requireAuth, checkSub, async (req, res) => {
   if (!req.user.team_id) return res.json({ team: null, members: [] });
   const team = await db.getOne('SELECT * FROM teams WHERE id = $1', [req.user.team_id]);
   const members = await db.getAll('SELECT u.id, u.name, u.email, u.avatar, tm.role, tm.joined_at FROM team_members tm JOIN users u ON u.id = tm.user_id WHERE tm.team_id = $1', [req.user.team_id]);
   res.json({ team, members });
 });
 
-app.post('/api/teams/invite', requireAuth, async (req, res) => {
+app.post('/api/teams/invite', requireAuth, checkSub, async (req, res) => {
   const { email, role = 'member' } = req.body;
   if (!req.user.team_id) return res.status(400).json({ error: 'You are not in a team' });
   const invitee = await db.getOne('SELECT * FROM users WHERE email = $1', [email.toLowerCase()]);
@@ -639,7 +645,7 @@ app.post('/api/teams/invite', requireAuth, async (req, res) => {
   res.json({ success: true, message: `${invitee.name} added to your team` });
 });
 
-app.delete('/api/teams/members/:userId', requireAuth, async (req, res) => {
+app.delete('/api/teams/members/:userId', requireAuth, checkSub, async (req, res) => {
   if (!req.user.team_id) return res.status(400).json({ error: 'Not in a team' });
   await db.run('UPDATE users SET team_id = NULL WHERE id = $1 AND team_id = $2', [req.params.userId, req.user.team_id]);
   await db.run('DELETE FROM team_members WHERE user_id = $1 AND team_id = $2', [req.params.userId, req.user.team_id]);
@@ -662,13 +668,13 @@ app.get('/api/documents', requireApiKey, async (req, res) => {
   res.json({ documents: docs, total: parseInt(total.c) });
 });
 
-app.get('/api/documents/:id', requireAuth, async (req, res) => {
+app.get('/api/documents/:id', requireAuth, checkSub, async (req, res) => {
   const doc = await db.getOne('SELECT * FROM documents WHERE id=$1 AND user_id=$2', [req.params.id, req.user.id]);
   if (!doc) return res.status(404).json({ error: 'Not found' });
   res.json(doc);
 });
 
-app.post('/api/documents', requireAuth, async (req, res) => {
+app.post('/api/documents', requireAuth, checkSub, async (req, res) => {
   const { title, content, tool_id, tool_name } = req.body;
   if (!title) return res.status(400).json({ error: 'Title required' });
   const wc = (content || '').split(/\s+/).filter(Boolean).length;
@@ -676,14 +682,14 @@ app.post('/api/documents', requireAuth, async (req, res) => {
   res.status(201).json({ id: doc.id, success: true });
 });
 
-app.put('/api/documents/:id', requireAuth, async (req, res) => {
+app.put('/api/documents/:id', requireAuth, checkSub, async (req, res) => {
   const { title, content } = req.body;
   const wc = (content || '').split(/\s+/).filter(Boolean).length;
   await db.run('UPDATE documents SET title=COALESCE($1,title),content=COALESCE($2,content),word_count=$3,updated_at=CURRENT_TIMESTAMP WHERE id=$4 AND user_id=$5', [title, content, wc, req.params.id, req.user.id]);
   res.json({ success: true });
 });
 
-app.delete('/api/documents/:id', requireAuth, async (req, res) => {
+app.delete('/api/documents/:id', requireAuth, checkSub, async (req, res) => {
   await db.run('DELETE FROM documents WHERE id=$1 AND user_id=$2', [req.params.id, req.user.id]);
   res.json({ success: true });
 });
@@ -691,7 +697,7 @@ app.delete('/api/documents/:id', requireAuth, async (req, res) => {
 // ════════════════════════════════════════════════════
 //  STATS & ANALYTICS
 // ════════════════════════════════════════════════════
-app.get('/api/stats', requireAuth, async (req, res) => {
+app.get('/api/stats', requireAuth, checkSub, async (req, res) => {
   const uid = req.user.id;
   const [totalDocs, totalWords, weekDocs, topTool, recentDocs, dailyUsage] = await Promise.all([
     db.getOne('SELECT COUNT(*) as c FROM documents WHERE user_id=$1', [uid]),
@@ -711,11 +717,11 @@ app.get('/api/stats', requireAuth, async (req, res) => {
 // ════════════════════════════════════════════════════
 //  API KEYS MANAGEMENT
 // ════════════════════════════════════════════════════
-app.get('/api/keys', requireAuth, (req, res) => {
+app.get('/api/keys', requireAuth, checkSub, (req, res) => {
   res.json({ has_groq: !!(req.user.groq_key || GROQ_KEY), api_key: req.user.api_key, groq_preview: req.user.groq_key ? req.user.groq_key.slice(0,12)+'…' : (GROQ_KEY ? '✓ Server key active' : null) });
 });
 
-app.put('/api/keys', requireAuth, async (req, res) => {
+app.put('/api/keys', requireAuth, checkSub, async (req, res) => {
   const { groq_key } = req.body;
   await db.run('UPDATE users SET groq_key=COALESCE($1,groq_key) WHERE id=$2', [groq_key || null, req.user.id]);
   res.json({ success: true });
@@ -889,6 +895,116 @@ function checkModule(moduleId) {
   };
 }
 
+// ── Subscription router (payment callbacks — no auth required) ────────────────
+app.use('/', subscriptionRoutes);
+
+// ── Billing & subscription routes ─────────────────────────────────────────────
+app.get('/billing', requireAuth, checkSub, (req, res) => res.sendFile(path.join(__dirname, 'public', 'billing.html')));
+app.post('/billing/checkout', requireAuth, checkSub, subscriptionRoutes.checkoutHandler);
+app.get('/api/subscription/status', requireAuth, checkSub, subscriptionRoutes.statusHandler);
+app.get('/api/subscription/invoices', requireAuth, checkSub, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM invoices WHERE user_id = $1 ORDER BY created_at DESC', [req.user.id]);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: 'Could not fetch invoices.' }); }
+});
+
+// ── Seller subscription routes ────────────────────────────────────────────────
+app.get('/api/seller/subscription/stats', requireSeller, async (req, res) => {
+  try {
+    const [total, active, trial, grace, expired] = await Promise.all([
+      pool.query("SELECT COUNT(*) FROM subscriptions"),
+      pool.query("SELECT COUNT(*) FROM subscriptions WHERE status='active'"),
+      pool.query("SELECT COUNT(*) FROM subscriptions WHERE status='trial'"),
+      pool.query("SELECT COUNT(*) FROM subscriptions WHERE status='grace'"),
+      pool.query("SELECT COUNT(*) FROM subscriptions WHERE status='expired'"),
+    ]);
+    const revenue = await pool.query("SELECT COALESCE(SUM(amount),0) AS total FROM payments WHERE status='success'");
+    res.json({
+      total:   parseInt(total.rows[0].count),
+      active:  parseInt(active.rows[0].count),
+      trial:   parseInt(trial.rows[0].count),
+      grace:   parseInt(grace.rows[0].count),
+      expired: parseInt(expired.rows[0].count),
+      revenue: parseFloat(revenue.rows[0].total).toFixed(2),
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/seller/subscription/users', requireSeller, async (req, res) => {
+  try {
+    const { search } = req.query;
+    let q = `SELECT u.id, u.name, u.email, s.status, s.plan, s.billing_cycle,
+                    s.trial_ends_at, s.paid_until, s.grace_until, s.created_at
+             FROM subscriptions s JOIN users u ON u.id = s.user_id`;
+    const params = [];
+    if (search) { params.push(`%${search}%`); q += ` WHERE u.name ILIKE $1 OR u.email ILIKE $1`; }
+    q += ' ORDER BY s.created_at DESC LIMIT 100';
+    const { rows } = await pool.query(q, params);
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/seller/subscription/extend-trial', requireSeller, async (req, res) => {
+  try {
+    const { user_id, days = 7 } = req.body;
+    if (!user_id) return res.status(400).json({ error: 'user_id required' });
+    await pool.query(
+      `UPDATE subscriptions SET trial_ends_at = GREATEST(trial_ends_at, NOW()) + make_interval(days => $1), updated_at = NOW() WHERE user_id = $2`,
+      [days, user_id]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/seller/subscription/activate', requireSeller, async (req, res) => {
+  try {
+    const { user_id, days = 365, billing_cycle = 'yearly' } = req.body;
+    if (!user_id) return res.status(400).json({ error: 'user_id required' });
+    await pool.query(
+      `INSERT INTO subscriptions (user_id, plan, billing_cycle, status, trial_starts_at, trial_ends_at, paid_until)
+       VALUES ($1, $2, $2, 'active', NOW(), NOW(), NOW() + make_interval(days => $3))
+       ON CONFLICT (user_id) DO UPDATE
+         SET status = 'active', billing_cycle = $2, plan = $2,
+             paid_until = NOW() + make_interval(days => $3), updated_at = NOW()`,
+      [user_id, billing_cycle, days]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/seller/subscription/reset', requireSeller, async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    if (!user_id) return res.status(400).json({ error: 'user_id required' });
+    await pool.query(
+      `UPDATE subscriptions SET status='trial', trial_starts_at=NOW(), trial_ends_at=NOW()+INTERVAL '30 days', paid_until=NULL, grace_until=NULL, updated_at=NOW() WHERE user_id=$1`,
+      [user_id]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── Run migrations on startup ──────────────────────────────────────────────────
+(async () => {
+  const migrationFiles = ['migrations/003_subscriptions.sql'];
+  for (const file of migrationFiles) {
+    try {
+      const sql = fs.readFileSync(path.join(__dirname, file), 'utf8');
+      await pool.query(sql);
+      console.log(`✅ Migration applied: ${file}`);
+    } catch (err) {
+      console.error(`❌ Migration failed (${file}):`, err.message);
+    }
+  }
+  // Ensure reminder_sent column exists on already-migrated deployments
+  try {
+    await pool.query(`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS reminder_sent JSONB DEFAULT '{}'`);
+  } catch (err) {
+    console.error('reminder_sent column migration failed:', err.message);
+  }
+})();
+
 // Page routes
 app.get('/app',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'app.html')));
 app.get('/admin',    (req, res) => res.redirect('/seller'));
@@ -920,6 +1036,7 @@ app.listen(PORT, () => {
 ║  Seller Panel:   ✓ Ready (/seller)              ║
 ║  Team Workspaces:✓ Ready                        ║
 ║  Content Scoring:✓ Ready                        ║
+║  Billing System: ✓ Ready (/billing)             ║
 ╚══════════════════════════════════════════════════╝
 `);
 });

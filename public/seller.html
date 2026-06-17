@@ -374,6 +374,34 @@
       </div>
     </div>
 
+    <!-- Subscriptions section (collapsible) -->
+    <div class="section-block">
+      <div class="section-hd clickable" onclick="toggleSection('subscriptions')">
+        <div class="section-title">Subscriptions</div>
+        <div class="section-right">
+          <span class="section-count" id="sub-count"></span>
+          <span class="section-chevron" id="chevron-subscriptions">▼</span>
+        </div>
+      </div>
+      <div class="section-body" id="section-subscriptions">
+        <div id="sub-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+          <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" id="sub-stat-active">—</div></div>
+          <div class="stat-card"><div class="stat-label">Trial</div><div class="stat-value" id="sub-stat-trial">—</div></div>
+          <div class="stat-card"><div class="stat-label">Revenue</div><div class="stat-value" id="sub-stat-revenue">—</div></div>
+        </div>
+        <div class="search-wrap">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <input type="text" id="sub-search" placeholder="Search by name or email…" oninput="loadSubUsers(this.value)">
+        </div>
+        <div id="sub-table">
+          <div class="loading-bar"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -441,7 +469,7 @@ function doLogout() {
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 async function loadAll() {
-  await Promise.all([loadStats(), loadUsers(1), loadModules(), loadDocuments(1)]);
+  await Promise.all([loadStats(), loadUsers(1), loadModules(), loadDocuments(1), loadSubStats(), loadSubUsers()]);
 }
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
@@ -685,6 +713,96 @@ function showToast(msg) {
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Subscription management ───────────────────────────────────────────────────
+async function loadSubStats() {
+  try {
+    const s = await apiFetch('/api/seller/subscription/stats');
+    document.getElementById('sub-stat-active').textContent  = s.active  ?? '—';
+    document.getElementById('sub-stat-trial').textContent   = s.trial   ?? '—';
+    document.getElementById('sub-stat-revenue').textContent = 'RM' + (s.revenue ?? '0.00');
+    document.getElementById('sub-count').textContent        = `${s.total ?? 0} total`;
+  } catch(e) {}
+}
+
+async function loadSubUsers(search = '') {
+  const el = document.getElementById('sub-table');
+  el.innerHTML = '<div class="loading-bar"><div class="spinner"></div></div>';
+  try {
+    const url  = '/api/seller/subscription/users' + (search ? `?search=${encodeURIComponent(search)}` : '');
+    const rows = await apiFetch(url);
+    renderSubTable(rows);
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Failed to load subscriptions.</p></div>';
+  }
+}
+
+function renderSubTable(rows) {
+  const el = document.getElementById('sub-table');
+  if (!rows || !rows.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">💳</div><p>No subscriptions yet.</p></div>';
+    return;
+  }
+  const statusColor = { active: 'var(--green)', trial: '#3b82f6', grace: 'var(--amber)', expired: 'var(--red)' };
+  el.innerHTML = `
+    <table class="docs-table">
+      <thead><tr>
+        <th>User</th><th>Status</th><th>Plan</th><th>Expires</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${rows.map(r => `
+        <tr>
+          <td>
+            <div style="font-weight:600;font-size:13px">${esc(r.name)}</div>
+            <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">${esc(r.email)}</div>
+          </td>
+          <td><span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:${statusColor[r.status]||'var(--muted)'}">${esc(r.status)}</span></td>
+          <td><span class="meta-pill">${esc(r.billing_cycle || 'trial')}</span></td>
+          <td style="font-size:11px;color:var(--muted)">${fmtDate(r.paid_until || r.trial_ends_at)}</td>
+          <td style="display:flex;gap:6px;flex-wrap:wrap">
+            <button onclick="extendTrial(${r.id})"  style="font-size:10px;padding:4px 8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);color:#3b82f6;border-radius:6px;cursor:pointer">+7d Trial</button>
+            <button onclick="activateSub(${r.id})"  style="font-size:10px;padding:4px 8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:var(--green);border-radius:6px;cursor:pointer">Activate</button>
+            <button onclick="resetSub(${r.id})"     style="font-size:10px;padding:4px 8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--red);border-radius:6px;cursor:pointer">Reset</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function extendTrial(userId) {
+  try {
+    await apiFetch('/api/seller/subscription/extend-trial', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, days: 7 }),
+    });
+    showToast('✅ Trial extended by 7 days');
+    loadSubUsers(document.getElementById('sub-search').value);
+  } catch(e) { showToast('❌ Failed to extend trial'); }
+}
+
+async function activateSub(userId) {
+  try {
+    await apiFetch('/api/seller/subscription/activate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, days: 365, billing_cycle: 'yearly' }),
+    });
+    showToast('✅ Subscription activated for 365 days');
+    loadSubStats();
+    loadSubUsers(document.getElementById('sub-search').value);
+  } catch(e) { showToast('❌ Failed to activate subscription'); }
+}
+
+async function resetSub(userId) {
+  if (!confirm('Reset this user back to a fresh 30-day trial?')) return;
+  try {
+    await apiFetch('/api/seller/subscription/reset', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    });
+    showToast('✅ Subscription reset to trial');
+    loadSubStats();
+    loadSubUsers(document.getElementById('sub-search').value);
+  } catch(e) { showToast('❌ Failed to reset subscription'); }
 }
 
 document.getElementById('seller-key-input').focus();

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-platform="tools" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Billing — M-EasyTools AI+</title>
+<link rel="stylesheet" href="/modus-design-system.css">
+
+<!-- Dark mode init — runs before first paint to avoid flash -->
+<script>
+(function(){
+  var t = localStorage.getItem('modus-theme');
+  if (t === 'dark') document.documentElement.setAttribute('data-theme','dark');
+})();
+</script>
+
+<style>
+/* ── Page-level overrides ─────────────────────────────────────── */
+.app-main { padding: 28px 32px 60px; }
+
+/* Status card */
+#status-card { max-width: 620px; }
+#status-card .card { padding: 28px; }
+
+/* Trial progress */
+.trial-progress { margin: 14px 0 6px; }
+
+/* Pricing card */
+#pricing { margin-top: 40px; }
+.pricing-wrap { max-width: 460px; margin: 0 auto; }
+.pricing-card { padding: 32px; }
+.price-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.price-period {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 4px;
+}
+.feature-list { list-style: none; padding: 0; margin: 0; }
+.feature-list li {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.8;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.feature-list li::before {
+  content: '✓';
+  color: var(--green);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.cycle-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+/* Invoice table */
+#invoices { margin-top: 40px; }
+
+/* Skeleton widths */
+.sk-w-60 { width: 60%; }
+.sk-w-40 { width: 40%; }
+.sk-h-8  { height: 8px; }
+.sk-h-36 { height: 36px; }
+
+/* Alert dismiss */
+.alert-dismissable { position: relative; padding-right: 40px; }
+.alert-dismissable .alert-close { position: absolute; top: 12px; right: 14px; }
+
+/* Section heading */
+.billing-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  margin-bottom: 16px;
+}
+
+/* Already subscribed box */
+.subscribed-box {
+  text-align: center;
+  padding: 14px;
+  border-radius: var(--r);
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(22,163,74,0.2);
+}
+
+/* Responsive: hide sidebar on mobile */
+@media (max-width: 768px) {
+  .app-main { padding: 16px 16px 60px; }
+  #status-card { max-width: 100%; }
+}
+</style>
+</head>
+
+<body>
+<div class="app-layout">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────────────────── -->
+  <aside class="app-sidebar">
+    <a class="sidebar-logo" href="/app">
+      <div class="sidebar-brand-dot">🛠️</div>
+      <div class="sidebar-brand">M-EasyTools AI+<em>Marketing Suite</em></div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-item" href="/app">
+        <span class="sidebar-item-icon">←</span>
+        Back to App
+      </a>
+      <a class="sidebar-item active" href="/billing">
+        <span class="sidebar-item-icon">💳</span>
+        Billing
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ── TOPBAR ──────────────────────────────────────────────────────── -->
+  <header class="app-topbar">
+    <div class="topbar-brand">
+      <div class="topbar-brand-dot">🛠️</div>
+      M-EasyTools AI+
+    </div>
+    <div class="topbar-right">
+      <span id="topbar-email" class="text-muted text-sm" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <button class="theme-toggle" id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">☀️</button>
+    </div>
+  </header>
+
+  <!-- ── MAIN ────────────────────────────────────────────────────────── -->
+  <main class="app-main" id="main-content">
+
+    <!-- URL-param banners injected here by JS -->
+    <div id="param-banners"></div>
+
+    <!-- ── SECTION 1: STATUS CARD ─────────────────────────────────── -->
+    <section id="status-card">
+      <h2 class="billing-section-title">Subscription Status</h2>
+
+      <!-- Warning banner for trial ending soon — injected by JS -->
+      <div id="trial-warning"></div>
+
+      <!-- Grace / expired error banner — injected by JS -->
+      <div id="status-error-banner"></div>
+
+      <!-- Skeleton (shown while loading) -->
+      <div id="status-skeleton" class="card" style="padding:28px">
+        <div class="skeleton skeleton-title sk-w-40" style="margin-bottom:16px"></div>
+        <div class="skeleton skeleton-text" style="margin-bottom:8px"></div>
+        <div class="skeleton skeleton-text sk-w-60" style="margin-bottom:16px"></div>
+        <div class="skeleton sk-h-8 rounded-full" style="width:100%;margin-bottom:16px"></div>
+        <div class="skeleton skeleton-btn" style="width:160px;height:36px"></div>
+      </div>
+
+      <!-- Actual status card — hidden until data loads -->
+      <div id="status-content" class="card" style="display:none">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+          <div>
+            <div id="status-header" class="page-title" style="margin-bottom:4px"></div>
+            <div id="status-body" class="text-secondary text-sm" style="margin-top:6px"></div>
+          </div>
+          <span id="status-badge" class="badge"></span>
+        </div>
+        <!-- Trial progress bar — shown only for trial state -->
+        <div id="trial-progress-wrap" class="trial-progress" style="display:none">
+          <div class="progress progress-lg">
+            <div class="progress-bar" id="trial-progress-bar" style="width:0%"></div>
+          </div>
+          <div class="text-muted text-xs" id="trial-progress-label" style="margin-top:6px"></div>
+        </div>
+        <div id="status-cta" style="margin-top:16px"></div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: PRICING ──────────────────────────────────────── -->
+    <section id="pricing">
+      <h2 class="billing-section-title">Choose Your Plan</h2>
+
+      <div class="pricing-wrap">
+        <!-- Cycle toggle -->
+        <div class="cycle-toggle">
+          <div class="tabs-pill" role="tablist">
+            <button class="tab" id="tab-monthly" role="tab" aria-selected="false" onclick="setCycle('monthly')">Monthly</button>
+            <button class="tab active" id="tab-yearly" role="tab" aria-selected="true" onclick="setCycle('yearly')">
+              Yearly <span class="badge badge-green" style="margin-left:6px">Save 20%</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Plan card -->
+        <div class="card pricing-card">
+          <div style="margin-bottom:4px">
+            <h3 class="page-title" style="margin-bottom:2px">M-EasyTools AI+</h3>
+          </div>
+
+          <!-- Price display -->
+          <div id="price-display" style="margin:20px 0">
+            <div>
+              <span class="price-value" id="price-amount">RM365</span>
+              <span class="price-period" id="price-period">/year</span>
+            </div>
+            <p class="text-muted text-sm" id="price-sub" style="margin-top:5px">= RM1 per day · billed annually</p>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Features -->
+          <ul class="feature-list" style="margin:16px 0">
+            <li>96 AI marketing tools (Content, SEO, Social, Ads, Email)</li>
+            <li>SEO &amp; GAO optimization (Search + Generative AI)</li>
+            <li>Social media content generation (Instagram, Facebook, TikTok)</li>
+            <li>Ads &amp; email copywriting with conversion focus</li>
+            <li>WordPress &amp; Shopify one-click publish</li>
+            <li>Bulk content generation</li>
+            <li>Developer API access with your own API key</li>
+            <li>Unlimited document storage</li>
+            <li>Priority support</li>
+          </ul>
+
+          <div class="divider"></div>
+
+          <!-- CTA -->
+          <div id="pricing-cta" style="margin-top:20px">
+            <button id="subscribe-btn" class="btn btn-primary btn-lg" style="width:100%" onclick="submitCheckout()">
+              Subscribe — RM365/year
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 3: INVOICE HISTORY ─────────────────────────────── -->
+    <section id="invoices" style="margin-bottom:40px">
+      <h2 class="billing-section-title">Invoice History</h2>
+
+      <div class="table-wrap" id="invoice-table-wrap">
+        <!-- Skeleton rows -->
+        <div id="invoice-skeleton">
+          <div class="table-header">
+            <h3>Invoices</h3>
+          </div>
+          <div style="padding:20px">
+            <div class="skeleton skeleton-text" style="margin-bottom:10px"></div>
+            <div class="skeleton skeleton-text sk-w-60" style="margin-bottom:10px"></div>
+            <div class="skeleton skeleton-text sk-w-40"></div>
+          </div>
+        </div>
+        <!-- Actual table — hidden until data loads -->
+        <div id="invoice-content" style="display:none">
+          <div class="table-header">
+            <h3>Invoices</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Invoice No</th>
+                <th>Date</th>
+                <th>Plan</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="invoice-tbody"></tbody>
+          </table>
+          <!-- Empty state — shown when no invoices -->
+          <div class="empty-state" id="invoice-empty" style="display:none">
+            <span class="empty-state-icon">🧾</span>
+            <h3>No invoices yet</h3>
+            <p>Your invoices will appear here after your first payment.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /.app-main -->
+</div><!-- /.app-layout -->
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   BILLING PAGE — M-EasyTools AI+
+════════════════════════════════════════════════════════════════════ */
+
+// ── Theme toggle ───────────────────────────────────────────────────
+(function() {
+  var html = document.documentElement;
+  var btn  = document.getElementById('theme-btn');
+
+  function syncIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '🌙' : '☀️';
+  }
+  syncIcon();
+
+  btn.addEventListener('click', function() {
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('modus-theme', next);
+    syncIcon();
+  });
+})();
+
+// ── Billing cycle state ───────────────────────────────────────────
+var selectedCycle = 'yearly';
+var subStatus = null;
+
+function setCycle(cycle) {
+  selectedCycle = cycle;
+
+  // Toggle pill tabs
+  document.getElementById('tab-monthly').classList.toggle('active', cycle === 'monthly');
+  document.getElementById('tab-yearly').classList.toggle('active', cycle === 'yearly');
+
+  // Update price display
+  var amountEl  = document.getElementById('price-amount');
+  var periodEl  = document.getElementById('price-period');
+  var subEl     = document.getElementById('price-sub');
+  var btnEl     = document.getElementById('subscribe-btn');
+
+  if (cycle === 'yearly') {
+    amountEl.textContent = 'RM365';
+    periodEl.textContent = '/year';
+    subEl.textContent    = '= RM1 per day · billed annually';
+    if (btnEl) btnEl.textContent = 'Subscribe — RM365/year';
+  } else {
+    amountEl.textContent = 'RM38';
+    periodEl.textContent = '/month';
+    subEl.textContent    = 'RM456/year · billed monthly';
+    if (btnEl) btnEl.textContent = 'Subscribe — RM38/month';
+  }
+}
+
+// ── Checkout form submit ──────────────────────────────────────────
+function submitCheckout() {
+  var form   = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/billing/checkout';
+  var input  = document.createElement('input');
+  input.type  = 'hidden';
+  input.name  = 'billing_cycle';
+  input.value = selectedCycle;
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function fmtDate(iso) {
+  if (!iso) return '—';
+  var d = new Date(iso);
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function scrollToPricing() {
+  document.getElementById('pricing').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function dismissAlert(el) {
+  el.remove();
+}
+
+// ── URL param banners ─────────────────────────────────────────────
+function renderParamBanners() {
+  var params  = new URLSearchParams(window.location.search);
+  var wrap    = document.getElementById('param-banners');
+
+  if (params.get('success') === 'true') {
+    var el = document.createElement('div');
+    el.className = 'alert alert-success alert-dismissable animate-fade-down';
+    el.innerHTML = '<span class="alert-icon">🎉</span>'
+      + '<div class="alert-body">Payment successful! Your subscription is now active.</div>'
+      + '<button class="alert-close" onclick="dismissAlert(this.parentElement)" aria-label="Dismiss">&times;</button>';
+    wrap.appendChild(el);
+  }
+
+  if (params.get('failed') === 'true') {
+    var el2 = document.createElement('div');
+    el2.className = 'alert alert-error alert-dismissable animate-fade-down';
+    el2.innerHTML = '<span class="alert-icon">❌</span>'
+      + '<div class="alert-body">Payment was not completed. Please try again or contact support.</div>'
+      + '<button class="alert-close" onclick="dismissAlert(this.parentElement)" aria-label="Dismiss">&times;</button>';
+    wrap.appendChild(el2);
+  }
+
+  if (params.get('expired') === 'true') {
+    var el3 = document.createElement('div');
+    el3.className = 'alert alert-error animate-fade-down';
+    el3.innerHTML = '<span class="alert-icon">🔒</span>'
+      + '<div class="alert-body">Your account has been locked due to an expired subscription. Please renew below.</div>';
+    wrap.appendChild(el3);
+  }
+}
+
+// ── Render subscription status card ──────────────────────────────
+function renderStatusCard(data) {
+  var skeleton = document.getElementById('status-skeleton');
+  var content  = document.getElementById('status-content');
+  var header   = document.getElementById('status-header');
+  var body     = document.getElementById('status-body');
+  var badge    = document.getElementById('status-badge');
+  var cta      = document.getElementById('status-cta');
+  var trialWrap = document.getElementById('trial-progress-wrap');
+  var trialBar  = document.getElementById('trial-progress-bar');
+  var trialLbl  = document.getElementById('trial-progress-label');
+  var warnWrap  = document.getElementById('trial-warning');
+  var errWrap   = document.getElementById('status-error-banner');
+
+  subStatus = data.status;
+
+  skeleton.style.display = 'none';
+  content.style.display  = 'block';
+
+  if (data.status === 'trial') {
+    var dl   = data.daysLeft != null ? data.daysLeft : 30;
+    var pct  = Math.min(100, Math.round(((30 - dl) / 30) * 100));
+
+    header.textContent = '🎁 Free Trial Active';
+    body.textContent   = dl + ' days remaining out of 30';
+    badge.className    = 'badge badge-blue';
+    badge.textContent  = 'Trial';
+
+    trialWrap.style.display = 'block';
+    trialBar.style.width    = pct + '%';
+    trialLbl.textContent    = pct + '% of trial consumed';
+
+    if (dl <= 7) {
+      var w = document.createElement('div');
+      w.className = 'alert alert-warning animate-fade-down';
+      w.style.marginBottom = '12px';
+      w.innerHTML = '<span class="alert-icon">⚠️</span>'
+        + '<div class="alert-body">Your trial ends in ' + dl + ' day' + (dl === 1 ? '' : 's')
+        + '. Subscribe to keep access.</div>';
+      warnWrap.innerHTML = '';
+      warnWrap.appendChild(w);
+    }
+
+    cta.innerHTML = '<button class="btn btn-primary" onclick="scrollToPricing()">Choose a Plan</button>';
+
+  } else if (data.status === 'active') {
+    var planLabel = data.billing_cycle === 'yearly' ? 'Annual' : 'Monthly';
+    var renewDate = fmtDate(data.paid_until);
+
+    header.textContent = '✅ Subscription Active';
+    body.textContent   = planLabel + ' Plan · Renews ' + renewDate;
+    badge.className    = 'badge badge-green';
+    badge.textContent  = 'Active';
+    cta.innerHTML      = '';
+
+  } else if (data.status === 'grace') {
+    header.textContent = '⚠️ Subscription Expired';
+    body.textContent   = 'Renew now to avoid losing access';
+    badge.className    = 'badge badge-red';
+    badge.textContent  = 'Grace Period';
+
+    var msg = (data.bannerMessage) || 'Your subscription has expired. Please renew.';
+    var e = document.createElement('div');
+    e.className = 'alert alert-error animate-fade-down';
+    e.style.marginBottom = '12px';
+    e.innerHTML = '<span class="alert-icon">❌</span><div class="alert-body">' + escHtml(msg) + '</div>';
+    errWrap.innerHTML = '';
+    errWrap.appendChild(e);
+
+    cta.innerHTML = '<button class="btn btn-danger" onclick="scrollToPricing()">Renew Now</button>';
+
+  } else {
+    // expired / locked
+    header.textContent = '🔒 Account Locked';
+    body.textContent   = 'Your account is locked. Renew your subscription to restore full access.';
+    badge.className    = 'badge badge-red';
+    badge.textContent  = 'Locked';
+
+    var e2 = document.createElement('div');
+    e2.className = 'alert alert-error animate-fade-down';
+    e2.style.marginBottom = '12px';
+    e2.innerHTML = '<span class="alert-icon">🔒</span><div class="alert-body">Your account is locked. Renew your subscription to restore full access.</div>';
+    errWrap.innerHTML = '';
+    errWrap.appendChild(e2);
+
+    cta.innerHTML = '<button class="btn btn-danger" onclick="scrollToPricing()">Unlock Account</button>';
+  }
+
+  // Update pricing CTA if already subscribed
+  if (data.status === 'active') {
+    var ctaDiv = document.getElementById('pricing-cta');
+    ctaDiv.innerHTML = '<div class="subscribed-box">✓ You\'re already subscribed</div>';
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Load user email ───────────────────────────────────────────────
+async function loadUser() {
+  try {
+    var res  = await fetch('/api/auth/me');
+    if (!res.ok) return;
+    var data = await res.json();
+    var el   = document.getElementById('topbar-email');
+    if (el && data.email) el.textContent = data.email;
+  } catch (e) { /* silent */ }
+}
+
+// ── Fetch helpers ─────────────────────────────────────────────────
+async function fetchStatus() {
+  try {
+    var res = await fetch('/api/subscription/status');
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+async function fetchInvoices() {
+  try {
+    var res = await fetch('/api/subscription/invoices');
+    if (!res.ok) return [];
+    return await res.json();
+  } catch(e) { return []; }
+}
+
+function renderInvoices(invoices) {
+  var skeleton = document.getElementById('invoice-skeleton');
+  var content  = document.getElementById('invoice-content');
+  var tbody    = document.getElementById('invoice-tbody');
+  var empty    = document.getElementById('invoice-empty');
+  if (skeleton) skeleton.style.display = 'none';
+  if (content)  content.style.display  = 'block';
+  if (!tbody) return;
+  if (!invoices || invoices.length === 0) {
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  tbody.innerHTML = invoices.map(function(inv) {
+    var plan = inv.billing_cycle === 'yearly' ? 'Annual Plan' : 'Monthly Plan';
+    var amt  = 'RM' + parseFloat(inv.total_amount || 0).toFixed(2);
+    return '<tr>'
+      + '<td>' + escHtml(inv.invoice_number || '—') + '</td>'
+      + '<td>' + fmtDate(inv.created_at) + '</td>'
+      + '<td>' + escHtml(plan) + '</td>'
+      + '<td>' + escHtml(amt) + '</td>'
+      + '<td><span class="badge badge-green">Issued</span></td>'
+      + '</tr>';
+  }).join('');
+}
+
+// ── Load subscription status ──────────────────────────────────────
+async function loadStatus() {
+  try {
+    var res  = await fetch('/api/subscription/status');
+    if (!res.ok) throw new Error('Status ' + res.status);
+    var data = await res.json();
+    renderStatusCard(data);
+  } catch (e) {
+    document.getElementById('status-skeleton').style.display = 'none';
+    var content = document.getElementById('status-content');
+    content.style.display = 'block';
+    document.getElementById('status-header').textContent = '⚠️ Could not load status';
+    document.getElementById('status-body').textContent   = 'Please refresh the page.';
+    document.getElementById('status-badge').className    = 'badge badge-gray';
+    document.getElementById('status-badge').textContent  = 'Unknown';
+  }
+}
+
+// ── Load invoices ─────────────────────────────────────────────────
+async function loadInvoices() {
+  var skeleton = document.getElementById('invoice-skeleton');
+  var content  = document.getElementById('invoice-content');
+  var tbody    = document.getElementById('invoice-tbody');
+  var empty    = document.getElementById('invoice-empty');
+
+  try {
+    var res  = await fetch('/api/subscription/invoices');
+
+    if (!res.ok) {
+      skeleton.style.display = 'none';
+      content.style.display  = 'block';
+      empty.style.display    = 'block';
+      return;
+    }
+
+    var invoices = await res.json();
+    skeleton.style.display = 'none';
+    content.style.display  = 'block';
+
+    if (!Array.isArray(invoices) || invoices.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+
+    invoices.forEach(function(inv) {
+      var tr  = document.createElement('tr');
+      var plan = inv.billing_cycle === 'yearly' ? 'Annual Plan' : 'Monthly Plan';
+      var amt  = 'RM' + parseFloat(inv.total_amount || 0).toFixed(2);
+      tr.innerHTML = '<td>' + escHtml(inv.invoice_number || '—') + '</td>'
+        + '<td>' + fmtDate(inv.created_at) + '</td>'
+        + '<td>' + escHtml(plan) + '</td>'
+        + '<td>' + escHtml(amt) + '</td>'
+        + '<td><span class="badge badge-green">Issued</span></td>';
+      tbody.appendChild(tr);
+    });
+
+  } catch (e) {
+    skeleton.style.display = 'none';
+    content.style.display  = 'block';
+    empty.style.display    = 'block';
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  renderParamBanners();
+  loadUser();
+  loadStatus();
+  loadInvoices();
+  setCycle('yearly'); // ensure default state is correct
+});
+</script>
+</body>
+</html>

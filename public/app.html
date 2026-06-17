@@ -787,10 +787,12 @@ body{font-family:var(--font);color:var(--navy);display:flex;flex-direction:colum
   .dash-grid{grid-template-columns:1fr}
   .editor-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
 }
+#sub-banner { grid-column: 2; }
+.alert { position: sticky; top: 0; z-index: 30; border-radius: 0; }
 </style>
 </head>
 <body>
-
+<div id="sub-banner" style="grid-column:2;"></div>
 <div class="app-shell">
 
 <!-- ════════════════ SIDEBAR ════════════════ -->
@@ -3542,6 +3544,25 @@ initApp();
     if(el) el.remove();
   }
 })();
+
+function loadSubBanner() {
+  fetch('/api/subscription/status')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.showBanner) return;
+      var el = document.getElementById('sub-banner');
+      if (!el) return;
+      var isError = data.bannerType === 'error';
+      var msg = String(data.bannerMessage || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      el.innerHTML = '<div class="alert ' + (isError ? 'alert-error' : 'alert-warning') + '" style="display:flex;align-items:center;gap:10px">'
+        + '<span>' + (isError ? '⚠️' : '💡') + '</span>'
+        + '<div style="flex:1">' + msg + '</div>'
+        + '<a href="/billing" style="white-space:nowrap;font-size:12px;font-weight:700;text-decoration:none;color:inherit">Manage →</a>'
+        + '</div>';
+    })
+    .catch(function() {});
+}
+loadSubBanner();
 </script>
 </body>
 </html>
